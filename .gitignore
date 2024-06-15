@@ -1,0 +1,206 @@
+# Java specific
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.ipr
+*.iws
+
+# Logs
+*.log
+logs/
+*.log.*
+log/
+log/*
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+gen/
+*.ipr
+
+# maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+# Gradle
+.gradle
+build/
+!gradle-wrapper.jar
+.gradle/
+build/
+
+# Eclipse
+.project
+.classpath
+.settings/
+bin/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+# Node.js
+node_modules/
+dist/
+npm-debug.log*
+yarn-error.log*
+
+# Package files
+*.war
+*.jar
+
+# Spring Boot
+/*.springBeans
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# User-specific files
+.idea/
+*.iml
+*.iws
+*.swp
+*~
+
+# Generated files
+out/
+target/
+
+# Specific to your IDE (IntelliJ IDEA)
+.idea/
+*.iml
+*.iws
+
+# Gradle specific
+.gradle/
+build/
+
+# Generated files
+generated/
+
+# Dependency directory
+node_modules/
+bower_components/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Vue.js specific
+dist/
+*.local
+
+# Testing
+/coverage
+/lcov-report
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+
+# MacOS specific
+.DS_Store
+
+# Optional REACT Native Packager files
+/packager-info.json
+/npm-debug.*
+/yarn-debug.log*
+/yarn-error.log*
+
+# Specific to Eclipse
+*.pydevproject
+.project
+.metadata
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# Specific to CodeKit
+*.codekit3
+
+# Hugo static site
+public/
+
+# Temporary files created by IDEs
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist/
+build/
+*.manifest
+*.spec
+
+# Jekyll site
+_site/
+
+# .idea/misc.xml can contain sensitive data, so ignore it if present.
+.idea/misc.xml
+
+# Snyk
+.snyk
+
+# JetBrains Rider
+.idea/
+*.sln
+*.user
+*.suo
+*.pdb
+*.ipch
+*.opensdf
+*.sdf
+*.v12.suo
+*.VC.db
+*.VC.VC.opendb
+*.cache
+*.ilk
+*.idb
+*.tlog
+*.obj
+*.log
+*.vspscc
+*.vssscc
+*.tmp
+*.userprefs
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/cspell.json
+.vscode/cspell-ext.json
+.vscode/typings/
+
+# MacOS
+*.DS_Store
