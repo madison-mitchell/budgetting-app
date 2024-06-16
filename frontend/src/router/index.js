@@ -1,8 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/HomeView.vue';
-import Login from '../components/Login.vue';
-import BankAccounts from '../components/BankAccounts.vue';
 import authService from '../services/authService';
+import Login from '../components/Login.vue';
+import BankAccountsView from '../views/BankAccountsView.vue';
+import TransactionsView from '../views/TransactionsView.vue';
+import ExpensesView from '../views/ExpensesView.vue';
 
 const routes = [
     {
@@ -16,8 +18,19 @@ const routes = [
     },
     {
         path: '/bank-accounts',
-        component: BankAccounts,
+        name: 'bank-accounts',
+        component: BankAccountsView,
         meta: { requiresAuth: true },
+    },
+    {
+        path: '/transactions',
+        name: 'Transactions',
+        component: TransactionsView,
+    },
+    {
+        path: '/expenses',
+        name: 'Expenses',
+        component: ExpensesView,
     },
 ];
 

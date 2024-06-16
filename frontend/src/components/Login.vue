@@ -7,7 +7,7 @@
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
             <form class="space-y-6" action="#" method="POST" @submit.prevent="handleLogin">
                 <div>
-                    <label for="username" class="block text-sm font-medium leading-6 text-gray-900">username</label>
+                    <label for="username" class="flex text-sm font-medium leading-6 text-gray-900">Username</label>
                     <div class="mt-2">
                         <input
                             id="username"
@@ -21,7 +21,7 @@
 
                 <div>
                     <div class="flex items-center justify-between">
-                        <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
+                        <label for="password" class="flex text-sm font-medium leading-6 text-gray-900">Password</label>
                         <div class="text-sm">
                             <a href="#" class="font-semibold text-sky-600 hover:text-sky-500">Forgot password?</a>
                         </div>

@@ -2,9 +2,11 @@ package com.mmg.app.controller;
 
 import com.mmg.app.model.Transactions;
 import com.mmg.app.service.TransactionsService;
+import com.mmg.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -36,8 +38,15 @@ public class TransactionsController {
         return transactionsService.getTransactionById(id);
     }
 
+//    @GetMapping
+//    public List<Transactions> getAllTransactions() {
+//        return transactionsService.getAllTransactions();
+//    }
+
     @GetMapping
-    public List<Transactions> getAllTransactions() {
-        return transactionsService.getAllTransactions();
+    public List<Transactions> getTransactionsForCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        return transactionsService.findByUsername(currentUsername);
     }
 }

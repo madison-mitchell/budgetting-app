@@ -3,6 +3,8 @@ package com.mmg.app.controller;
 import com.mmg.app.model.Expenses;
 import com.mmg.app.service.ExpensesService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,8 +38,15 @@ public class ExpensesController {
         return expensesService.getExpenseById(id);
     }
 
+//    @GetMapping
+//    public List<Expenses> getAllExpenses() {
+//        return expensesService.getAllExpenses();
+//    }
+
     @GetMapping
-    public List<Expenses> getAllExpenses() {
-        return expensesService.getAllExpenses();
+    public List<Expenses> getUserExpensesForCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        return expensesService.findByUsername(currentUsername);
     }
 }

@@ -1,9 +1,17 @@
 <template>
-    <nav>
-        <router-link to="/">HOME</router-link>
-    </nav>
-    <router-view />
+    <div id="app">
+        <navigation />
+        <router-view />
+    </div>
 </template>
+
+<script>
+import Navigation from './components/Navigation.vue';
+export default {
+    components: { Navigation },
+    name: 'App',
+};
+</script>
 
 <style>
 #app {
