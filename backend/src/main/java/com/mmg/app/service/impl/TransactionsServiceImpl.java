@@ -1,11 +1,13 @@
 package com.mmg.app.service.impl;
 
+import com.mmg.app.dto.CategoryTotalDto;
 import com.mmg.app.model.Transactions;
 import com.mmg.app.model.User;
 import com.mmg.app.repository.TransactionsRepository;
 import com.mmg.app.repository.UserRepository;
 import com.mmg.app.service.TransactionsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,5 +50,16 @@ public class TransactionsServiceImpl implements TransactionsService {
     public List<Transactions> findByUsername(String username) {
         User user = userRepository.findByUsername(username);
         return transactionsRepository.findByUserId(user.getId());
+    }
+
+    @Override
+    public List<CategoryTotalDto> calculateCategoryTotalsByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+        Long userId = user.getId();
+        // Your logic to calculate category totals by user ID
+        return transactionsRepository.findCategoryTotalsByUserId(userId);
     }
 }

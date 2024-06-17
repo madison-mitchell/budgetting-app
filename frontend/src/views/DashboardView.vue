@@ -11,11 +11,19 @@
                 </ul>
             </div>
             <!-- Transaction Categories Overview -->
-            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800">Transaction Categories</h3>
-                <ul>
-                    <li v-for="transaction in transactions" :key="transaction.id">{{ transaction.category.parentCategory.name }}</li>
-                </ul>
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg py-6 px-10">
+                <h3 class="text-lg font-semibold text-gray-800">Categories</h3>
+                <div v-for="(parentCategory, index) in categories" :key="index">
+                    <h4 class="text-md text-left font-semibold text-gray-700">{{ parentCategory.name }}</h4>
+                    <table class="table-auto w-full ml-4">
+                        <tbody>
+                            <tr v-for="childCategory in parentCategory.children" :key="childCategory.id">
+                                <td class="text-left px-4 w-40">{{ childCategory.name }}</td>
+                                <td class="text-right tracking-wide px-4">{{ formatBalance(childCategory.totalAmount) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <!-- Expenses Overview -->
             <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
@@ -36,7 +44,7 @@ export default {
     data() {
         return {
             totalBalance: 0,
-            transactions: [],
+            categories: [],
             expenses: [],
             accounts: [],
         };
@@ -67,13 +75,15 @@ export default {
         },
         fetchTransactionCategories() {
             axios
-                .get('http://localhost:8080/api/transactions/categories', {
+                .get(`http://localhost:8080/api/transactions/category-totals`, {
                     headers: {
                         Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
                     },
                 })
                 .then((response) => {
-                    this.transactions = response.data;
+                    console.log('Fetched category data:', response.data);
+                    this.categories = this.organizeCategories(response.data);
+                    console.log('Organized categories:', this.categories);
                 })
                 .catch((error) => {
                     console.error('Failed to fetch transaction categories:', error);
@@ -94,8 +104,24 @@ export default {
                 });
         },
         formatBalance(balance) {
+            if (balance === null || balance === undefined) {
+                return '$0.00';
+            }
             const formattedBalance = balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
             return balance < 0 ? `-$${formattedBalance.slice(1)}` : `$${formattedBalance}`;
+        },
+        organizeCategories(categoryData) {
+            const categories = {};
+            categoryData.forEach((item) => {
+                const parent = { id: item.parentId, name: item.parentName };
+                const child = { id: item.childId, name: item.childName, totalAmount: item.totalAmount };
+
+                if (!categories[parent.id]) {
+                    categories[parent.id] = { name: parent.name, children: [] };
+                }
+                categories[parent.id].children.push(child);
+            });
+            return Object.values(categories);
         },
     },
 };

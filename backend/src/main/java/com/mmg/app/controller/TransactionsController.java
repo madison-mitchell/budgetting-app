@@ -1,9 +1,12 @@
 package com.mmg.app.controller;
 
+import com.mmg.app.dto.CategoryTotalDto;
 import com.mmg.app.model.Transactions;
 import com.mmg.app.service.TransactionsService;
 import com.mmg.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -56,4 +59,13 @@ public class TransactionsController {
         String currentUsername = authentication.getName();
         return transactionsService.findByUsername(currentUsername);
     }
+
+    @GetMapping("/category-totals")
+    public ResponseEntity<List<CategoryTotalDto>> getCategoryTotalsByUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        List<CategoryTotalDto> categoryTotals = transactionsService.calculateCategoryTotalsByUsername(currentUsername);
+        return new ResponseEntity<>(categoryTotals, HttpStatus.OK);
+    }
+
 }

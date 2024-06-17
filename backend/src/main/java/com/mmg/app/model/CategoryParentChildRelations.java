@@ -1,6 +1,5 @@
 package com.mmg.app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -10,18 +9,16 @@ public class CategoryParentChildRelations {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fullname")
-    private String fullName;
-
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "parentcategoryid")
-    private CategoryParent parentCategoryId;
+    private CategoryParent parent;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "childcategoryid")
-    private CategoryChild childCategoryId;
+    private CategoryChild child;
+
+    @Column(name = "fullname")
+    private String fullName;
 
     public Long getId() {
         return id;
@@ -31,27 +28,27 @@ public class CategoryParentChildRelations {
         this.id = id;
     }
 
+    public CategoryParent getParent() {
+        return parent;
+    }
+
+    public void setParent(CategoryParent parent) {
+        this.parent = parent;
+    }
+
+    public CategoryChild getChild() {
+        return child;
+    }
+
+    public void setChild(CategoryChild child) {
+        this.child = child;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public CategoryParent getParentCategory() {
-        return parentCategoryId;
-    }
-
-    public void setParentCategory(CategoryParent parentCategoryId) {
-        this.parentCategoryId = parentCategoryId;
-    }
-
-    public CategoryChild getChildCategory() {
-        return childCategoryId;
-    }
-
-    public void setChildCategory(CategoryChild childCategoryId) {
-        this.childCategoryId = childCategoryId;
     }
 }

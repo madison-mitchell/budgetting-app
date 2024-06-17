@@ -12,12 +12,11 @@ public class CategoryChild {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
     private String name;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "childCategoryId")
-    @Column(name = "parentcategories")
-    private List<CategoryParentChildRelations> parentCategories;
+    @ManyToMany(mappedBy = "childCategories")
+    private List<CategoryParent> parentCategories;
 
     public Long getId() {
         return id;
@@ -35,13 +34,11 @@ public class CategoryChild {
         this.name = name;
     }
 
-    public List<CategoryParentChildRelations> getParentCategories() {
+    public List<CategoryParent> getParentCategories() {
         return parentCategories;
     }
 
-    public void setParentCategories(List<CategoryParentChildRelations> parentCategories) {
+    public void setParentCategories(List<CategoryParent> parentCategories) {
         this.parentCategories = parentCategories;
     }
-
-    // Getters and Setters
 }

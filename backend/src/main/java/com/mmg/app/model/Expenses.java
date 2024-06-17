@@ -1,5 +1,6 @@
 package com.mmg.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Date;
 
@@ -16,6 +17,7 @@ public class Expenses {
 
     private double amount;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "categoryid")
     private CategoryParentChildRelations category;

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
-
 @Entity
 @Table(name = "categoryparent")
 public class CategoryParent {
@@ -12,12 +11,16 @@ public class CategoryParent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name")
     private String name;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "parentCategoryId")
-    @Column(name = "childcategories")
-    private List<CategoryParentChildRelations> childCategories;
+    @ManyToMany
+    @JoinTable(
+            name = "categoryparentchildrelations",
+            joinColumns = @JoinColumn(name = "parentcategoryid"),
+            inverseJoinColumns = @JoinColumn(name = "childcategoryid")
+    )
+    private List<CategoryChild> childCategories;
 
     public Long getId() {
         return id;
@@ -35,13 +38,11 @@ public class CategoryParent {
         this.name = name;
     }
 
-    public List<CategoryParentChildRelations> getChildCategories() {
+    public List<CategoryChild> getChildCategories() {
         return childCategories;
     }
 
-    public void setChildCategories(List<CategoryParentChildRelations> childCategories) {
+    public void setChildCategories(List<CategoryChild> childCategories) {
         this.childCategories = childCategories;
     }
-
-    // Getters and Setters
 }
