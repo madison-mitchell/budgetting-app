@@ -3,30 +3,45 @@
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Bank Accounts Overview -->
-            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg py-6 flex flex-col flex-grow-0">
                 <h3 class="text-lg font-semibold text-gray-800">Bank Accounts</h3>
-                <p class="text-lg font-semibold mt-4">Total Balance: {{ formatBalance(totalBalance) }}</p>
-                <ul>
-                    <li v-for="account in accounts" :key="account.id">{{ account.bankName }} : {{ formatBalance(account.balance) }}</li>
-                </ul>
+
+                <table class="table-auto w-full">
+                    <tbody>
+                        <tr v-for="account in accounts" :key="account.id">
+                            <td class="text-left px-4 w-full">{{ account.bankName }}</td>
+                            <td :class="{ 'text-red-600': account.totalAmount < 0, 'text-right tracking-wide px-4': true }" class="text-right w-40">
+                                {{ formatBalance(account.balance) }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 class="text-lg font-semibold mt-4">Total Balance: {{ formatBalance(totalBalance) }}</h3>
             </div>
-            <!-- Transaction Categories Overview -->
-            <div class="bg-white shadow-md border border-grey-50 rounded-lg py-6 px-10">
+            <!-- Top Categories Overview -->
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg py-6 px-10 flex flex-col flex-grow-0">
                 <h3 class="text-lg font-semibold text-gray-800">Categories</h3>
-                <div v-for="(parentCategory, index) in categories" :key="index">
-                    <h4 class="text-md text-left font-semibold text-gray-700">{{ parentCategory.name }}</h4>
-                    <table class="table-auto w-full ml-4">
-                        <tbody>
-                            <tr v-for="childCategory in parentCategory.children" :key="childCategory.id">
-                                <td class="text-left px-4 w-40">{{ childCategory.name }}</td>
-                                <td class="text-right tracking-wide px-4">{{ formatBalance(childCategory.totalAmount) }}</td>
+                <table class="table-auto w-full">
+                    <tbody>
+                        <div v-for="(parentCategory, index) in topCategories" :key="index">
+                            <tr class="font-semibold">
+                                <td class="text-left w-full">{{ parentCategory.name }}</td>
+                                <td :class="{ 'text-red-600': parentCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }" class="w-full text-right">
+                                    {{ formatBalance(parentCategory.totalAmount) }}
+                                </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            <tr v-for="childCategory in parentCategory.children" :key="childCategory.id">
+                                <td class="text-left pl-4 w-full">{{ childCategory.name }}</td>
+                                <td :class="{ 'text-red-600': childCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }">
+                                    {{ formatBalance(childCategory.totalAmount) }}
+                                </td>
+                            </tr>
+                        </div>
+                    </tbody>
+                </table>
             </div>
             <!-- Expenses Overview -->
-            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6 flex flex-col flex-grow-0">
                 <h3 class="text-lg font-semibold text-gray-800">Expenses</h3>
                 <ul>
                     <li v-for="expense in expenses" :key="expense.id">{{ expense.description }}: {{ formatBalance(expense.amount) }}</li>
@@ -45,6 +60,7 @@ export default {
         return {
             totalBalance: 0,
             categories: [],
+            topCategories: [],
             expenses: [],
             accounts: [],
         };
@@ -75,7 +91,7 @@ export default {
         },
         fetchTransactionCategories() {
             axios
-                .get(`http://localhost:8080/api/transactions/category-totals`, {
+                .get('http://localhost:8080/api/transactions/category-totals', {
                     headers: {
                         Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
                     },
@@ -84,6 +100,8 @@ export default {
                     console.log('Fetched category data:', response.data);
                     this.categories = this.organizeCategories(response.data);
                     console.log('Organized categories:', this.categories);
+                    this.topCategories = this.getTopAndBottomCategories(this.categories);
+                    console.log('Top and bottom categories:', this.topCategories);
                 })
                 .catch((error) => {
                     console.error('Failed to fetch transaction categories:', error);
@@ -113,20 +131,29 @@ export default {
         organizeCategories(categoryData) {
             const categories = {};
             categoryData.forEach((item) => {
-                const parent = { id: item.parentId, name: item.parentName };
+                const parent = { id: item.parentId, name: item.parentName, totalAmount: 0 };
                 const child = { id: item.childId, name: item.childName, totalAmount: item.totalAmount };
 
                 if (!categories[parent.id]) {
-                    categories[parent.id] = { name: parent.name, children: [] };
+                    categories[parent.id] = { name: parent.name, totalAmount: 0, children: [] };
                 }
                 categories[parent.id].children.push(child);
+                categories[parent.id].totalAmount += child.totalAmount;
             });
             return Object.values(categories);
+        },
+        getTopAndBottomCategories(categories) {
+            // Sort categories by totalAmount
+            categories.sort((a, b) => b.totalAmount - a.totalAmount);
+
+            // Get top 3 and bottom 3 categories
+            const top3 = categories.slice(0, 3);
+            const bottom3 = categories.slice(-3);
+
+            return [...top3, ...bottom3];
         },
     },
 };
 </script>
 
-<style scoped>
-/* Add any scoped styles here if needed */
-</style>
+<style scoped></style>

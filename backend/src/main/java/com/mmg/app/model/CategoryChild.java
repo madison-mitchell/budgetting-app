@@ -15,8 +15,8 @@ public class CategoryChild {
     @Column(name = "name")
     private String name;
 
-    @ManyToMany(mappedBy = "childCategories")
-    private List<CategoryParent> parentCategories;
+//    @ManyToMany(mappedBy = "childCategories")
+//    private List<CategoryParent> parentCategories;
 
     public Long getId() {
         return id;
@@ -34,11 +34,11 @@ public class CategoryChild {
         this.name = name;
     }
 
-    public List<CategoryParent> getParentCategories() {
-        return parentCategories;
-    }
-
-    public void setParentCategories(List<CategoryParent> parentCategories) {
-        this.parentCategories = parentCategories;
-    }
+//    public List<CategoryParent> getParentCategories() {
+//        return parentCategories;
+//    }
+//
+//    public void setParentCategories(List<CategoryParent> parentCategories) {
+//        this.parentCategories = parentCategories;
+//    }
 }
