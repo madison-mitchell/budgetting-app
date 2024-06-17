@@ -10,4 +10,6 @@ public interface BankAccountService {
     void deleteBankAccount(Long id);
     BankAccount getBankAccountById(Long id);
     List<BankAccount> getAllBankAccounts();
+
+    List<BankAccount> findByUsername(String currentUsername);
 }

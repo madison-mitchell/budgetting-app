@@ -5,6 +5,7 @@ import Login from '../components/Login.vue';
 import BankAccountsView from '../views/BankAccountsView.vue';
 import TransactionsView from '../views/TransactionsView.vue';
 import ExpensesView from '../views/ExpensesView.vue';
+import DashboardView from '../views/DashboardView.vue';
 
 const routes = [
     {
@@ -31,6 +32,11 @@ const routes = [
         path: '/expenses',
         name: 'Expenses',
         component: ExpensesView,
+    },
+    {
+        path: '/dashboard',
+        name: 'Dashboard',
+        component: DashboardView,
     },
 ];
 

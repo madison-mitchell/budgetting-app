@@ -1,5 +1,6 @@
 package com.mmg.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -13,7 +14,8 @@ public class CategoryChild {
 
     private String name;
 
-    @OneToMany(mappedBy = "childCategory")
+    @JsonIgnore
+    @OneToMany(mappedBy = "childCategoryId")
     @Column(name = "parentcategories")
     private List<CategoryParentChildRelations> parentCategories;
 

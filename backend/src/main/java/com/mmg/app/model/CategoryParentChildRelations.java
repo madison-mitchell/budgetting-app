@@ -16,12 +16,12 @@ public class CategoryParentChildRelations {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "parentcategoryid")
-    private CategoryParent parentCategory;
+    private CategoryParent parentCategoryId;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "childcategoryid")
-    private CategoryChild childCategory;
+    private CategoryChild childCategoryId;
 
     public Long getId() {
         return id;
@@ -40,18 +40,18 @@ public class CategoryParentChildRelations {
     }
 
     public CategoryParent getParentCategory() {
-        return parentCategory;
+        return parentCategoryId;
     }
 
-    public void setParentCategory(CategoryParent parentCategory) {
-        this.parentCategory = parentCategory;
+    public void setParentCategory(CategoryParent parentCategoryId) {
+        this.parentCategoryId = parentCategoryId;
     }
 
     public CategoryChild getChildCategory() {
-        return childCategory;
+        return childCategoryId;
     }
 
-    public void setChildCategory(CategoryChild childCategory) {
-        this.childCategory = childCategory;
+    public void setChildCategory(CategoryChild childCategoryId) {
+        this.childCategoryId = childCategoryId;
     }
 }

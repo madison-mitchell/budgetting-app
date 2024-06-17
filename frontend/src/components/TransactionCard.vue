@@ -12,6 +12,7 @@
 
         <div>
             <h3 class="text-lg font-semibold text-gray-800">{{ transaction.description }}</h3>
+            <h2 class="text-md font-semibold text-gray-500">{{ transaction.user.username }}</h2>
             <p
                 class="text-lg font-semibold mt-4"
                 :class="{

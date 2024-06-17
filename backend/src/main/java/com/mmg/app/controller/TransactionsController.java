@@ -49,4 +49,11 @@ public class TransactionsController {
         String currentUsername = authentication.getName();
         return transactionsService.findByUsername(currentUsername);
     }
+
+    @GetMapping("/categories")
+    public List<Transactions> getTransactionsCategoriesForCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        return transactionsService.findByUsername(currentUsername);
+    }
 }

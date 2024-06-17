@@ -21,6 +21,7 @@
 
         <div>
             <h3 class="text-lg font-semibold text-gray-800">{{ expense.description }}</h3>
+            <h2 class="text-md font-semibold text-gray-500">{{ expense.user.username }}</h2>
             <p
                 class="text-lg font-semibold mt-4"
                 :class="{
