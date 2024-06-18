@@ -5,7 +5,7 @@
         </div>
 
         <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-            <form class="space-y-6" action="#" method="POST" @submit.prevent="handleLogin">
+            <form class="space-y-6" @submit.prevent="handleLogin">
                 <div>
                     <label for="username" class="flex text-sm font-medium leading-6 text-gray-900">Username</label>
                     <div class="mt-2">
@@ -68,7 +68,7 @@ export default {
             authService
                 .login({ username: this.username, password: this.password })
                 .then(() => {
-                    this.$router.push('/bank-accounts'); // Redirect to BankAccounts view
+                    this.$router.push('/dashboard'); // Redirect to Dashboard view
                 })
                 .catch(() => {
                     this.message = 'Failed to login. Please check your credentials.';
