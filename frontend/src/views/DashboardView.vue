@@ -1,16 +1,16 @@
 <template>
     <div class="max-w-7xl mx-auto p-12">
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid gap-6 auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             <!-- Bank Accounts Overview -->
-            <div class="bg-white shadow-md border border-grey-50 rounded-lg py-6 flex flex-col flex-grow-0">
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
                 <h3 class="text-lg font-semibold text-gray-800">Bank Accounts</h3>
 
                 <table class="table-auto w-full">
                     <tbody>
                         <tr v-for="account in accounts" :key="account.id">
                             <td class="text-left px-4 w-full">{{ account.bankName }}</td>
-                            <td :class="{ 'text-red-600': account.totalAmount < 0, 'text-right tracking-wide px-4': true }" class="text-right w-40">
+                            <td :class="{ 'text-red-600': account.balance < 0, 'text-right tracking-wide px-4': true }" class="text-right w-40">
                                 {{ formatBalance(account.balance) }}
                             </td>
                         </tr>
@@ -18,8 +18,15 @@
                 </table>
                 <h3 class="text-lg font-semibold mt-4">Total Balance: {{ formatBalance(totalBalance) }}</h3>
             </div>
+            <!-- Expenses Overview -->
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-800">Expenses</h3>
+                <ul>
+                    <li v-for="expense in expenses" :key="expense.id">{{ expense.description }}: {{ formatBalance(expense.amount) }}</li>
+                </ul>
+            </div>
             <!-- Top Categories Overview -->
-            <div class="bg-white shadow-md border border-grey-50 rounded-lg py-6 px-10 flex flex-col flex-grow-0">
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg py-6 px-10 md:col-span-2 lg:col-span-1 lg:row-span-2">
                 <h3 class="text-lg font-semibold text-gray-800">Categories</h3>
                 <table class="table-auto w-full">
                     <tbody>
@@ -30,7 +37,7 @@
                                     {{ formatBalance(parentCategory.totalAmount) }}
                                 </td>
                             </tr>
-                            <tr v-for="childCategory in parentCategory.children" :key="childCategory.id">
+                            <tr v-for="childCategory in parentCategory.children || []" :key="childCategory.id">
                                 <td class="text-left pl-4 w-full">{{ childCategory.name }}</td>
                                 <td :class="{ 'text-red-600': childCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }">
                                     {{ formatBalance(childCategory.totalAmount) }}
@@ -39,13 +46,6 @@
                         </div>
                     </tbody>
                 </table>
-            </div>
-            <!-- Expenses Overview -->
-            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6 flex flex-col flex-grow-0">
-                <h3 class="text-lg font-semibold text-gray-800">Expenses</h3>
-                <ul>
-                    <li v-for="expense in expenses" :key="expense.id">{{ expense.description }}: {{ formatBalance(expense.amount) }}</li>
-                </ul>
             </div>
         </div>
     </div>
@@ -131,11 +131,11 @@ export default {
         organizeCategories(categoryData) {
             const categories = {};
             categoryData.forEach((item) => {
-                const parent = { id: item.parentId, name: item.parentName, totalAmount: 0 };
+                const parent = { id: item.parentId, name: item.parentName, totalAmount: 0, children: [] };
                 const child = { id: item.childId, name: item.childName, totalAmount: item.totalAmount };
 
                 if (!categories[parent.id]) {
-                    categories[parent.id] = { name: parent.name, totalAmount: 0, children: [] };
+                    categories[parent.id] = parent;
                 }
                 categories[parent.id].children.push(child);
                 categories[parent.id].totalAmount += child.totalAmount;

@@ -9,7 +9,7 @@
             <p><strong>Email:</strong> {{ user.email }}</p>
             <p><strong>Phone:</strong> {{ user.phoneNumber }}</p>
             <p><strong>Address:</strong> {{ user.address }}</p>
-            <p><strong>Birthdate:</strong> {{ user.dateOfBirth }}</p>
+            <p><strong>Birthdate:</strong> {{ formatDate(user.dateOfBirth) }}</p>
             <p><strong>Last Login:</strong> {{ user.lastLogin }}</p>
             <p><strong>Role:</strong> {{ user.role }}</p>
             <!-- Add more fields as necessary -->
@@ -55,6 +55,10 @@ export default {
                     console.error('Failed to fetch user profile:', error);
                     this.errorMessage = 'Failed to fetch user profile';
                 });
+        },
+        formatDate(datetime) {
+            const date = new Date(datetime);
+            return date.toLocaleDateString();
         },
     },
 };

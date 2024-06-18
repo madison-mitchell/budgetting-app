@@ -10,6 +10,7 @@
             <router-link to="/dashboard" class="mr-4">DASHBOARD</router-link>
             <router-link to="/bank-accounts" class="mr-4">BANK ACCOUNTS</router-link><router-link to="/transactions" class="mr-4">TRANSACTIONS</router-link>
             <router-link to="/expenses" class="mr-4">EXPENSES</router-link>
+            <router-link to="/categories" class="mr-4">CATEGORIES</router-link>
         </div>
     </nav>
 </template>

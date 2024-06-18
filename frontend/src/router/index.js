@@ -5,8 +5,9 @@ import BankAccountsView from '../views/BankAccountsView.vue';
 import TransactionsView from '../views/TransactionsView.vue';
 import ExpensesView from '../views/ExpensesView.vue';
 import DashboardView from '../views/DashboardView.vue';
-import ProfileView from '../views/ProfileView.vue'; // Ensure ProfileView is imported
+import ProfileView from '../views/ProfileView.vue';
 import authService from '../services/authService';
+import CategoriesView from '../views/CategoriesView.vue';
 
 const routes = [
     { path: '/', name: 'Home', component: HomeView, meta: { requiresAuth: true } },
@@ -16,6 +17,7 @@ const routes = [
     { path: '/transactions', name: 'Transactions', component: TransactionsView, meta: { requiresAuth: true } },
     { path: '/expenses', name: 'Expenses', component: ExpensesView, meta: { requiresAuth: true } },
     { path: '/profile', name: 'Profile', component: ProfileView, meta: { requiresAuth: true } },
+    { path: '/categories', name: 'Categories', component: CategoriesView },
 ];
 
 const router = createRouter({
