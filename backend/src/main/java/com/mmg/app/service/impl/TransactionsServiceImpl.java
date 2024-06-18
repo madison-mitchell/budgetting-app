@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TransactionsServiceImpl implements TransactionsService {
@@ -59,7 +61,19 @@ public class TransactionsServiceImpl implements TransactionsService {
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
         Long userId = user.getId();
-        // Your logic to calculate category totals by user ID
-        return transactionsRepository.findCategoryTotalsByUserId(userId);
+        List<CategoryTotalDto> categoryTotals = transactionsRepository.findCategoryTotalsByUserId(userId);
+
+        // Calculate parent category totals based on child categories
+        Map<Long, Double> parentCategoryBudgets = new HashMap<>();
+        for (CategoryTotalDto dto : categoryTotals) {
+            parentCategoryBudgets.put(dto.getParentId(), parentCategoryBudgets.getOrDefault(dto.getParentId(), 0.0) + dto.getBudget());
+        }
+
+        // Update parent category budgets in the DTOs
+        for (CategoryTotalDto dto : categoryTotals) {
+            dto.setBudget(parentCategoryBudgets.get(dto.getParentId()));
+        }
+
+        return categoryTotals;
     }
 }

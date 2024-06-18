@@ -6,15 +6,15 @@
                 <div class="flex justify-between items-center">
                     <h3 class="text-lg font-semibold text-gray-800">{{ parentCategory.name }}</h3>
                     <h3 class="text-lg font-semibold" :class="{ 'text-red-600': parentCategory.totalAmount < 0 }">
-                        {{ formatBalance(parentCategory.totalAmount) }}
+                        {{ formatBalance(parentCategory.totalAmount) }} / {{ formatBalance(parentCategory.budget) }}
                     </h3>
                 </div>
                 <table class="table-auto w-full mt-4">
                     <tbody>
                         <tr v-for="childCategory in parentCategory.children" :key="childCategory.id">
-                            <td class="text-left px-4 w-full">{{ childCategory.name }}</td>
-                            <td :class="{ 'text-red-600': childCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }" class="text-right w-40">
-                                {{ formatBalance(childCategory.totalAmount) }}
+                            <td class="text-left px-4">{{ childCategory.name }}</td>
+                            <td :class="{ 'text-red-600': childCategory.totalAmount < 0, 'text-gray-500': true }" class="text-right tracking-wide">
+                                {{ formatBalance(childCategory.totalAmount) }} / {{ formatBalance(childCategory.budget) }}
                             </td>
                         </tr>
                     </tbody>
@@ -62,14 +62,15 @@ export default {
         organizeCategories(categoryData) {
             const categories = {};
             categoryData.forEach((item) => {
-                const parent = { id: item.parentId, name: item.parentName, totalAmount: 0, children: [] };
-                const child = { id: item.childId, name: item.childName, totalAmount: item.totalAmount };
+                const parent = { id: item.parentId, name: item.parentName, totalAmount: 0, budget: 0, children: [] };
+                const child = { id: item.childId, name: item.childName, totalAmount: item.totalAmount, budget: item.budget };
 
                 if (!categories[parent.id]) {
                     categories[parent.id] = parent;
                 }
                 categories[parent.id].children.push(child);
                 categories[parent.id].totalAmount += child.totalAmount;
+                categories[parent.id].budget += child.budget;
             });
             return Object.values(categories);
         },

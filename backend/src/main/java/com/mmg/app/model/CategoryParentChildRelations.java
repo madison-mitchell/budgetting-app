@@ -17,8 +17,7 @@ public class CategoryParentChildRelations {
     @JoinColumn(name = "childcategoryid")
     private CategoryChild child;
 
-    @Column(name = "fullname")
-    private String fullName;
+    private Double budget;
 
     public Long getId() {
         return id;
@@ -44,11 +43,11 @@ public class CategoryParentChildRelations {
         this.child = child;
     }
 
-    public String getFullName() {
-        return fullName;
+    public Double getBudget() {
+        return budget;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setBudget(Double budget) {
+        this.budget = budget;
     }
 }
