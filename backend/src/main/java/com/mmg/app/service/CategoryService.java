@@ -16,4 +16,6 @@ public interface CategoryService {
     CategoryParent getCategoryParentById(Long id);
     CategoryChild getCategoryChildById(Long id);
     CategoryParentChildRelations getCategoryParentChildRelationsById(Long id);
+
+    boolean setBudget(Long relationId, Double newBudget);
 }

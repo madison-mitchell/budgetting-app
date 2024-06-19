@@ -1,6 +1,7 @@
 package com.mmg.app.dto;
 
 public class CategoryTotalDto {
+    private Long relationId;
     private Long parentId;
     private String parentName;
     private Long childId;
@@ -8,13 +9,22 @@ public class CategoryTotalDto {
     private double totalAmount;
     private double budget;
 
-    public CategoryTotalDto(Long parentId, String parentName, Long childId, String childName, double totalAmount, double budget) {
+    public CategoryTotalDto(Long relationId, Long parentId, String parentName, Long childId, String childName, double totalAmount, double budget) {
+        this.relationId = relationId;
         this.parentId = parentId;
         this.parentName = parentName;
         this.childId = childId;
         this.childName = childName;
         this.totalAmount = totalAmount;
         this.budget = budget;
+    }
+    
+    public Long getRelationId() {
+        return relationId;
+    }
+
+    public void setRelationId(Long relationId) {
+        this.relationId = relationId;
     }
 
     public Long getParentId() {

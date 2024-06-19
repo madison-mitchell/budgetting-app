@@ -9,6 +9,7 @@ import com.mmg.app.repository.CategoryParentChildRelationsRepository;
 import com.mmg.app.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -67,5 +68,18 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryParentChildRelations getCategoryParentChildRelationsById(Long id) {
         return categoryParentChildRelationsRepository.findById(id).orElse(null);
+    }
+
+    public boolean setBudget(Long relationId, Double newBudget) {
+        Optional<CategoryParentChildRelations> optionalRelation = categoryParentChildRelationsRepository.findById(relationId);
+
+        if (optionalRelation.isPresent()) {
+            CategoryParentChildRelations relation = optionalRelation.get();
+            relation.setBudget(newBudget);
+            categoryParentChildRelationsRepository.save(relation);
+            return true;
+        }
+
+        return false;
     }
 }
