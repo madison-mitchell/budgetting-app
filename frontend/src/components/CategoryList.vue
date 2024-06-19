@@ -1,6 +1,6 @@
 <template>
     <div class="space-y-2 shadow-md border border-grey-50 rounded-lg p-6 bg-white">
-        <div v-for="(parentCategory, index) in sortedCategories" :key="parentCategory.id" class="mt-0 mb-0 p-0">
+        <div v-for="parentCategory in sortedCategories" :key="parentCategory.id" class="mt-0 mb-0 p-0">
             <div class="flex justify-between items-center">
                 <h3 class="text-md font-semibold text-gray-800">{{ parentCategory.name }}</h3>
                 <h3 class="text-md font-semibold" :class="{ 'text-red-600': parentCategory.totalAmount < 0 }">
@@ -19,7 +19,7 @@
                             {{ formatBalance(childCategory.totalAmount) }} /
                             <span @click="editBudget(childCategory)" class="cursor-pointer">
                                 <span v-if="!childCategory.editing">{{ formatBalance(childCategory.budget) }}</span>
-                                <input v-else v-model="childCategory.budgetFormatted" @blur="saveBudget(childCategory, 'child')" class="w-20 text-right" />
+                                <input v-else v-model="childCategory.budgetFormatted" @blur="saveBudget(childCategory, 'child', parentCategory)" class="w-20 text-right" />
                             </span>
                         </td>
                     </tr>
@@ -65,7 +65,7 @@ export default {
             category.editing = true;
             category.budgetFormatted = this.formatInputBalance(category.budget);
         },
-        saveBudget(category) {
+        saveBudget(category, type, parentCategory = null) {
             category.editing = false;
             category.budget = parseFloat(category.budgetFormatted);
             const relationId = category.relationId;
@@ -85,10 +85,16 @@ export default {
                 )
                 .then((response) => {
                     console.log('Budget updated successfully for relationId:', relationId);
+                    if (type === 'child' && parentCategory) {
+                        this.updateParentCategoryBudget(parentCategory); // Update the parent category budget
+                    }
                 })
                 .catch((error) => {
                     console.error('Failed to update budget:', error);
                 });
+        },
+        updateParentCategoryBudget(parentCategory) {
+            parentCategory.budget = parentCategory.children.reduce((acc, child) => acc + child.budget, 0);
         },
         resetEditing() {
             this.categories.forEach((parentCategory) => {
