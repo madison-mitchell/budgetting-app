@@ -11,11 +11,11 @@ public class CategoryParentChildRelations {
 
     @ManyToOne
     @JoinColumn(name = "parentcategoryid")
-    private CategoryParent parent;
+    private CategoryParent parentCategory;
 
     @ManyToOne
     @JoinColumn(name = "childcategoryid")
-    private CategoryChild child;
+    private CategoryChild childCategory;
 
     private Double budget;
 
@@ -27,20 +27,20 @@ public class CategoryParentChildRelations {
         this.id = id;
     }
 
-    public CategoryParent getParent() {
-        return parent;
+    public CategoryParent getParentCategory() {
+        return parentCategory;
     }
 
-    public void setParent(CategoryParent parent) {
-        this.parent = parent;
+    public void setParentCategory(CategoryParent parentCategory) {
+        this.parentCategory = parentCategory;
     }
 
-    public CategoryChild getChild() {
-        return child;
+    public CategoryChild getChildCategory() {
+        return childCategory;
     }
 
-    public void setChild(CategoryChild child) {
-        this.child = child;
+    public void setChildCategory(CategoryChild childCategory) {
+        this.childCategory = childCategory;
     }
 
     public Double getBudget() {

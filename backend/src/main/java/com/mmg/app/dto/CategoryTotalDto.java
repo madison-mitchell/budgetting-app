@@ -2,23 +2,25 @@ package com.mmg.app.dto;
 
 public class CategoryTotalDto {
     private Long relationId;
-    private Long parentId;
+    private Long parentCategoryId;
     private String parentName;
-    private Long childId;
+    private Long childCategoryId;
     private String childName;
     private double totalAmount;
     private double budget;
 
-    public CategoryTotalDto(Long relationId, Long parentId, String parentName, Long childId, String childName, double totalAmount, double budget) {
+    // Constructor
+    public CategoryTotalDto(Long relationId, Long parentCategoryId, String parentName, Long childCategoryId, String childName, double totalAmount, double budget) {
         this.relationId = relationId;
-        this.parentId = parentId;
+        this.parentCategoryId = parentCategoryId;
         this.parentName = parentName;
-        this.childId = childId;
+        this.childCategoryId = childCategoryId;
         this.childName = childName;
         this.totalAmount = totalAmount;
         this.budget = budget;
     }
-    
+
+    // Getters and Setters
     public Long getRelationId() {
         return relationId;
     }
@@ -27,12 +29,12 @@ public class CategoryTotalDto {
         this.relationId = relationId;
     }
 
-    public Long getParentId() {
-        return parentId;
+    public Long getParentCategoryId() {
+        return parentCategoryId;
     }
 
-    public void setParentId(Long parentId) {
-        this.parentId = parentId;
+    public void setParentCategoryId(Long parentCategoryId) {
+        this.parentCategoryId = parentCategoryId;
     }
 
     public String getParentName() {
@@ -43,12 +45,12 @@ public class CategoryTotalDto {
         this.parentName = parentName;
     }
 
-    public Long getChildId() {
-        return childId;
+    public Long getChildCategoryId() {
+        return childCategoryId;
     }
 
-    public void setChildId(Long childId) {
-        this.childId = childId;
+    public void setChildCategoryId(Long childCategoryId) {
+        this.childCategoryId = childCategoryId;
     }
 
     public String getChildName() {

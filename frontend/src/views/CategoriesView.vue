@@ -32,6 +32,7 @@ export default {
                 })
                 .then((response) => {
                     this.categories = this.organizeCategories(response.data);
+                    console.log('this.categories: ', this.categories);
                 })
                 .catch((error) => {
                     console.error('Failed to fetch categories:', error);
@@ -39,19 +40,20 @@ export default {
         },
         organizeCategories(categoryData) {
             const categories = {};
+
             categoryData.forEach((item) => {
-                if (!categories[item.parentId]) {
-                    categories[item.parentId] = {
-                        id: item.parentId,
+                if (!categories[item.parentCategoryId]) {
+                    categories[item.parentCategoryId] = {
+                        id: item.parentCategoryId,
                         name: item.parentName,
                         totalAmount: 0,
                         budget: 0,
                         children: [],
                     };
                 }
-                const parent = categories[item.parentId];
+                const parent = categories[item.parentCategoryId];
                 const child = {
-                    id: item.childId,
+                    id: item.childCategoryId,
                     name: item.childName,
                     totalAmount: item.totalAmount,
                     budget: item.budget,
@@ -61,6 +63,7 @@ export default {
                 parent.totalAmount += child.totalAmount;
                 parent.budget += child.budget;
             });
+
             return Object.values(categories);
         },
     },

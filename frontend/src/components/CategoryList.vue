@@ -1,6 +1,6 @@
 <template>
     <div class="space-y-2 shadow-md border border-grey-50 rounded-lg p-6 bg-white">
-        <div v-for="(parentCategory, index) in sortedCategories" :key="index" class="mt-0 mb-0 p-0">
+        <div v-for="(parentCategory, index) in sortedCategories" :key="parentCategory.id" class="mt-0 mb-0 p-0">
             <div class="flex justify-between items-center">
                 <h3 class="text-md font-semibold text-gray-800">{{ parentCategory.name }}</h3>
                 <h3 class="text-md font-semibold" :class="{ 'text-red-600': parentCategory.totalAmount < 0 }">
@@ -13,11 +13,11 @@
             </div>
             <table class="table-auto w-full text-sm">
                 <tbody>
-                    <tr v-for="childCategory in parentCategory.children" :key="childCategory.id">
+                    <tr v-for="childCategory in parentCategory.children" :key="childCategory.relationId">
                         <td class="text-left pl-6">{{ childCategory.name }}</td>
                         <td :class="{ 'text-red-600': childCategory.totalAmount < 0, 'text-gray-500': true }" class="text-right tracking-wide">
                             {{ formatBalance(childCategory.totalAmount) }} /
-                            <span @click="editBudget(childCategory, 'child')" class="cursor-pointer">
+                            <span @click="editBudget(childCategory)" class="cursor-pointer">
                                 <span v-if="!childCategory.editing">{{ formatBalance(childCategory.budget) }}</span>
                                 <input v-else v-model="childCategory.budgetFormatted" @blur="saveBudget(childCategory, 'child')" class="w-20 text-right" />
                             </span>
@@ -59,12 +59,13 @@ export default {
             const numBalance = Number(balance);
             return isNaN(numBalance) ? '0.00' : numBalance.toFixed(2);
         },
-        editBudget(category, type) {
+        editBudget(category) {
             this.resetEditing();
+            console.log('EDITING Category.RelationId: ' + category.relationId);
             category.editing = true;
             category.budgetFormatted = this.formatInputBalance(category.budget);
         },
-        saveBudget(category, type) {
+        saveBudget(category) {
             category.editing = false;
             category.budget = parseFloat(category.budgetFormatted);
             const relationId = category.relationId;

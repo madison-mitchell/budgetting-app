@@ -12,10 +12,13 @@ import java.util.List;
 @Repository
 public interface TransactionsRepository extends JpaRepository<Transactions, Long> {
     @Query("SELECT new com.mmg.app.dto.CategoryTotalDto(" +
-            "c.id, c.parent.id, c.parent.name, c.child.id, c.child.name, SUM(t.amount), c.budget) " +
-            "FROM Transactions t JOIN t.category c " +
+            "c.id, p.id, p.name, ch.id, ch.name, SUM(t.amount), c.budget) " +
+            "FROM Transactions t " +
+            "JOIN t.category c " +
+            "JOIN c.parentCategory p " +
+            "JOIN c.childCategory ch " +
             "WHERE t.user.id = :userId " +
-            "GROUP BY c.id, c.parent.id, c.parent.name, c.child.id, c.child.name, c.budget")
+            "GROUP BY c.id, p.id, p.name, ch.id, ch.name, c.budget")
     List<CategoryTotalDto> findCategoryTotalsByUserId(@Param("userId") Long userId);
 
     List<Transactions> findByUserId(Long id);
