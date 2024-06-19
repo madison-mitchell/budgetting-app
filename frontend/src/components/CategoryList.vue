@@ -86,7 +86,8 @@ export default {
                 .then((response) => {
                     console.log('Budget updated successfully for relationId:', relationId);
                     if (type === 'child' && parentCategory) {
-                        this.updateParentCategoryBudget(parentCategory); // Update the parent category budget
+                        this.updateParentCategoryBudget(parentCategory);
+                        console.log('response: ' + response);
                     }
                 })
                 .catch((error) => {
