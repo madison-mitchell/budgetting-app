@@ -3,7 +3,13 @@
         <div v-for="parentCategory in sortedCategories" :key="parentCategory.id" class="mt-0 mb-0 p-0">
             <div class="flex justify-between items-center">
                 <h3 class="text-md font-semibold text-gray-800">{{ parentCategory.name }}</h3>
-                <h3 class="text-md font-semibold" :class="{ 'text-red-600': parentCategory.totalAmount < 0 }">
+                <h3
+                    class="text-md font-semibold"
+                    :class="{
+                        'text-red-600': parentCategory.name !== 'Income' && parentCategory.totalAmount < parentCategory.budget,
+                        'text-green-600': parentCategory.name === 'Income' && parentCategory.totalAmount >= parentCategory.budget,
+                        'text-amber-600': parentCategory.name !== 'Income' && parentCategory.totalAmount == parentCategory.budget,
+                    }">
                     {{ formatBalance(parentCategory.totalAmount) }} /
                     <span @click="editBudget(parentCategory, 'parent')" class="cursor-pointer">
                         <span v-if="!parentCategory.editing">{{ formatBalance(parentCategory.budget) }}</span>
@@ -15,7 +21,18 @@
                 <tbody>
                     <tr v-for="childCategory in parentCategory.children" :key="childCategory.relationId">
                         <td class="text-left pl-6">{{ childCategory.name }}</td>
-                        <td :class="{ 'text-red-600': childCategory.totalAmount < 0, 'text-gray-500': true }" class="text-right tracking-wide">
+                        <td
+                            :class="{
+                                // 'text-red-600': childCategory.name !== 'Income' && childCategory.totalAmount < childCategory.budget,
+                                // 'text-gray-500': true,
+
+                                'text-green-600': childCategory.name === 'Salary' && childCategory.totalAmount >= childCategory.budget,
+                                'text-red-600': childCategory.name !== 'Salary' && childCategory.totalAmount < childCategory.budget,
+                                'text-green-600': childCategory.name !== 'Salary' && childCategory.totalAmount >= childCategory.budget * 0.9,
+                                'text-yellow-500': childCategory.name !== 'Salary' && childCategory.totalAmount > childCategory.budget,
+                                'text-amber-600': childCategory.name !== 'Salary' && childCategory.totalAmount == childCategory.budget,
+                            }"
+                            class="text-right tracking-wide">
                             {{ formatBalance(childCategory.totalAmount) }} /
                             <span @click="editBudget(childCategory)" class="cursor-pointer">
                                 <span v-if="!childCategory.editing">{{ formatBalance(childCategory.budget) }}</span>
@@ -87,7 +104,6 @@ export default {
                     console.log('Budget updated successfully for relationId:', relationId);
                     if (type === 'child' && parentCategory) {
                         this.updateParentCategoryBudget(parentCategory);
-                        console.log('response: ' + response);
                     }
                 })
                 .catch((error) => {
