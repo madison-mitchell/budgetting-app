@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-7xl mx-auto p-12">
+    <div class="max-w-7xl mx-auto p-12 text-gray-600">
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h2>
         <div class="grid gap-6 auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             <!-- Bank Accounts Overview -->
@@ -31,15 +31,29 @@
                 <table class="table-auto w-full">
                     <tbody>
                         <div v-for="parentCategory in topCategories" :key="parentCategory.id">
-                            <tr class="font-semibold flex justify-between">
+                            <tr class="font-semibold flex justify-between text-md">
                                 <td class="text-left">{{ parentCategory.name }}</td>
-                                <td :class="{ 'text-red-600': parentCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }" class="text-right">
+                                <td
+                                    :class="{
+                                        'text-red-600': parentCategory.totalAmount < parentCategory.budget,
+                                        'text-amber-600': parentCategory.name !== 'Income' && parentCategory.totalAmount === parentCategory.budget,
+                                        'text-green-600': parentCategory.name === 'Income' && parentCategory.totalAmount === parentCategory.budget,
+                                        'text-yellow-500': parentCategory.totalAmount <= parentCategory.budget * 0.85 && parentCategory.totalAmount > parentCategory.budget,
+                                    }"
+                                    class="text-right tracking-wide px-4">
                                     {{ formatBalance(parentCategory.totalAmount) }} / {{ formatBalance(parentCategory.budget) }}
                                 </td>
                             </tr>
-                            <tr v-for="childCategory in parentCategory.children || []" :key="childCategory.id" class="flex justify-between">
+                            <tr v-for="childCategory in parentCategory.children || []" :key="childCategory.id" class="flex justify-between text-sm">
                                 <td class="text-left pl-4">{{ childCategory.name }}</td>
-                                <td :class="{ 'text-red-600': childCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }">
+                                <td
+                                    :class="{
+                                        'text-red-600': childCategory.totalAmount < childCategory.budget,
+                                        'text-amber-600': childCategory.name !== 'Salary' && childCategory.totalAmount === childCategory.budget,
+                                        'text-green-600': childCategory.name === 'Salary' && childCategory.totalAmount === childCategory.budget,
+                                        'text-yellow-500': childCategory.totalAmount <= childCategory.budget * 0.85 && childCategory.totalAmount > childCategory.budget,
+                                    }"
+                                    class="text-right tracking-wide px-4">
                                     {{ formatBalance(childCategory.totalAmount) }} / {{ formatBalance(childCategory.budget) }}
                                 </td>
                             </tr>
