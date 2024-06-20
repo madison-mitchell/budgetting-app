@@ -11,10 +11,10 @@
         </div>
 
         <div>
-            <h3 class="text-lg font-semibold text-gray-800">{{ transaction.category.parent.name }}</h3>
-            <h3 class="text-lg font-semibold text-gray-800">{{ transaction.category.child.name }}</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ transaction.category.parentCategory.name }}</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ transaction.category.childCategory.name }}</h3>
             <h2 class="text-md font-semibold text-gray-500">{{ formatDate(transaction.timeOfTransaction) }}</h2>
-            <!-- <h2 class="text-md font-semibold text-gray-500">{{ transaction.user.username }}</h2> -->
+            <h2 class="text-md font-semibold text-gray-500">{{ transaction.user.username }}</h2>
             <p
                 class="text-lg font-semibold mt-4"
                 :class="{
