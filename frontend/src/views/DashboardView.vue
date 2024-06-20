@@ -30,17 +30,17 @@
                 <h3 class="text-lg font-semibold text-gray-800">Categories</h3>
                 <table class="table-auto w-full">
                     <tbody>
-                        <div v-for="(parentCategory, index) in topCategories" :key="index">
-                            <tr class="font-semibold">
-                                <td class="text-left w-full">{{ parentCategory.name }}</td>
-                                <td :class="{ 'text-red-600': parentCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }" class="w-full text-right">
-                                    {{ formatBalance(parentCategory.totalAmount) }}
+                        <div v-for="parentCategory in topCategories" :key="parentCategory.id">
+                            <tr class="font-semibold flex justify-between">
+                                <td class="text-left">{{ parentCategory.name }}</td>
+                                <td :class="{ 'text-red-600': parentCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }" class="text-right">
+                                    {{ formatBalance(parentCategory.totalAmount) }} / {{ formatBalance(parentCategory.budget) }}
                                 </td>
                             </tr>
-                            <tr v-for="childCategory in parentCategory.children || []" :key="childCategory.id">
-                                <td class="text-left pl-4 w-full">{{ childCategory.name }}</td>
+                            <tr v-for="childCategory in parentCategory.children || []" :key="childCategory.id" class="flex justify-between">
+                                <td class="text-left pl-4">{{ childCategory.name }}</td>
                                 <td :class="{ 'text-red-600': childCategory.totalAmount < 0, 'text-right tracking-wide px-4': true }">
-                                    {{ formatBalance(childCategory.totalAmount) }}
+                                    {{ formatBalance(childCategory.totalAmount) }} / {{ formatBalance(childCategory.budget) }}
                                 </td>
                             </tr>
                         </div>
@@ -130,16 +130,31 @@ export default {
         },
         organizeCategories(categoryData) {
             const categories = {};
-            categoryData.forEach((item) => {
-                const parent = { id: item.parentId, name: item.parentName, totalAmount: 0, children: [] };
-                const child = { id: item.childId, name: item.childName, totalAmount: item.totalAmount };
 
-                if (!categories[parent.id]) {
-                    categories[parent.id] = parent;
+            categoryData.forEach((item) => {
+                if (!categories[item.parentCategoryId]) {
+                    categories[item.parentCategoryId] = {
+                        id: item.parentCategoryId,
+                        name: item.parentName,
+                        totalAmount: 0,
+                        budget: 0,
+                        children: [],
+                    };
                 }
-                categories[parent.id].children.push(child);
-                categories[parent.id].totalAmount += child.totalAmount;
+                const parent = categories[item.parentCategoryId];
+                const child = {
+                    relationId: item.relationId,
+                    id: item.childId,
+                    name: item.childName,
+                    totalAmount: item.totalAmount,
+                    budget: item.budget,
+                };
+
+                parent.children.push(child);
+                parent.totalAmount += child.totalAmount;
+                parent.budget += child.budget;
             });
+
             return Object.values(categories);
         },
         getTopAndBottomCategories(categories) {
