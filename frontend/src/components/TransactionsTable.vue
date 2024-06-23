@@ -1,16 +1,17 @@
 <template>
     <!-- <div class="overflow-x-auto"> -->
     <div>
-        <div class="mb-4">
-            <label for="month-selector" class="block text-sm font-medium text-gray-700">Select Month</label>
+        <div class="mb-4 flex items-center">
+            <label for="month-selector" class="text-sm font-medium text-gray-700 w-40">Time Period</label>
             <select
                 id="month-selector"
                 v-model="selectedMonth"
                 @change="filterTransactionsByMonth"
-                class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                class="flex-grow border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
                 <option v-for="month in availableMonths" :key="month.value" :value="month.value">{{ month.text }}</option>
             </select>
         </div>
+
         <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
             <thead>
                 <tr class="w-full bg-gray-100 border-b">

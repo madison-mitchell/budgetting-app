@@ -27,8 +27,8 @@
                 <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.childCategory.name }}</option>
             </select>
         </td>
-        <td class="px-6 py-4">
-            <button @click="addTransaction" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add</button>
+        <td class="pr-3">
+            <button @click="addTransaction" class="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-full">+</button>
         </td>
     </tr>
 </template>
