@@ -7,7 +7,7 @@
         <td class="px-6 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.balance < 0 }">{{ formatBalance(transaction.balance) }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ transaction.type }}</td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
-            <input type="checkbox" v-model="transaction.isPlanned" @change="updateTransaction" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
+            <input type="checkbox" v-model="transaction.planned" @change="updateTransaction" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
         </td>
         <td class="px-6 py-4 whitespace-nowrap">{{ formatBalance(transaction.plannedAmount) }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ transaction.categoryId.childCategory.name }}</td>

@@ -1,5 +1,4 @@
 <template>
-    <!-- <div class="overflow-x-auto"> -->
     <div>
         <div class="mb-4 flex items-center">
             <label for="month-selector" class="text-sm font-medium text-gray-700 w-40">Time Period</label>
@@ -27,7 +26,7 @@
                 </tr>
             </thead>
             <tbody>
-                <TransactionRow v-for="transaction in sortedTransactions" :key="transaction.id" :transaction="transaction" @update-transaction="updateTransaction" />
+                <TransactionRow v-for="transaction in filteredTransactions" :key="transaction.id" :transaction="transaction" @update-transaction="updateTransaction" />
                 <NewTransactionForm :categories="categories" @add-transaction="addTransaction" />
             </tbody>
         </table>
@@ -38,8 +37,6 @@
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 import TransactionRow from './TransactionRow.vue';
 import NewTransactionForm from './NewTransactionForm.vue';
-import axios from 'axios';
-import authService from '../services/authService';
 
 export default {
     components: {
@@ -60,7 +57,6 @@ export default {
         return {
             selectedMonth: '',
             availableMonths: [],
-            sortedTransactions: [],
         };
     },
     watch: {
@@ -68,7 +64,6 @@ export default {
             handler(newTransactions) {
                 this.setupAvailableMonths();
                 this.filterTransactionsByMonth();
-                this.sortTransactions();
             },
             deep: true,
         },
@@ -76,7 +71,33 @@ export default {
     mounted() {
         this.setupAvailableMonths();
         this.filterTransactionsByMonth();
-        this.sortTransactions();
+    },
+    computed: {
+        filteredTransactions() {
+            const selectedMonth = this.selectedMonth;
+            let filteredTransactions = this.transactions;
+
+            if (selectedMonth) {
+                const start = startOfMonth(parseISO(`${selectedMonth}-01`));
+                const end = endOfMonth(parseISO(`${selectedMonth}-01`));
+                filteredTransactions = this.transactions.filter((transaction) => {
+                    const transactionDate = parseISO(transaction.timeOfTransaction);
+                    return transactionDate >= start && transactionDate <= end;
+                });
+            }
+
+            // Sort transactions by date in chronological order
+            filteredTransactions.sort((a, b) => new Date(a.timeOfTransaction) - new Date(b.timeOfTransaction));
+
+            // Calculate balances
+            let balance = 0;
+            filteredTransactions = filteredTransactions.map((transaction) => {
+                balance += transaction.amount;
+                return { ...transaction, balance };
+            });
+
+            return filteredTransactions;
+        },
     },
     methods: {
         setupAvailableMonths() {
@@ -113,24 +134,28 @@ export default {
                 this.sortedTransactions = this.transactions;
             }
         },
-        sortTransactions() {
-            this.sortedTransactions.sort((a, b) => new Date(a.timeOfTransaction) - new Date(b.timeOfTransaction));
-        },
         sortBy(field) {
-            this.sortField = field;
-            this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
-            this.sortedTransactions.sort((a, b) => {
+            if (this.sortField === field) {
+                this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                this.sortField = field;
+                this.sortOrder = 'asc';
+            }
+
+            // Re-sort transactions by the selected field
+            this.filteredTransactions.sort((a, b) => {
                 let modifier = this.sortOrder === 'asc' ? 1 : -1;
-                if (a[this.sortField] < b[this.sortField]) return -1 * modifier;
-                if (a[this.sortField] > b[this.sortField]) return 1 * modifier;
+                if (a[field] < b[field]) return -1 * modifier;
+                if (a[field] > b[field]) return 1 * modifier;
                 return 0;
             });
-        },
-        updateTransaction(transaction) {
-            this.$emit('update-transaction', transaction);
-        },
-        addTransaction(newTransaction) {
-            this.$emit('add-transaction', newTransaction);
+
+            // Re-calculate balances after sorting
+            let balance = 0;
+            this.filteredTransactions = this.filteredTransactions.map((transaction) => {
+                balance += transaction.amount;
+                return { ...transaction, balance };
+            });
         },
     },
 };
