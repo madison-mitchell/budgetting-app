@@ -68,4 +68,12 @@ public class TransactionsController {
         return new ResponseEntity<>(categoryTotals, HttpStatus.OK);
     }
 
+    @GetMapping("/account/{accountId}")
+    public ResponseEntity<List<Transactions>> getTransactionsByAccountId(@PathVariable Long accountId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        List<Transactions> transactions = transactionsService.findTransactionsByAccountIdAndUsername(accountId, currentUsername);
+        return new ResponseEntity<>(transactions, HttpStatus.OK);
+    }
+
 }

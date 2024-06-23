@@ -9,21 +9,13 @@ public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "userid")
+    @ManyToOne @JoinColumn(name = "userid")
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "bankaccountid")
+    @ManyToOne @JoinColumn(name = "bankaccountid")
     private BankAccount bankAccount;
-
     private double amount;
-
-    @ManyToOne
-    @JoinColumn(name = "categoryid")
+    @ManyToOne @JoinColumn(name = "categoryid")
     private CategoryParentChildRelations category;
-
     private String description;
     @Column(name = "timeoftransaction")
     private Date timeOfTransaction;
@@ -33,7 +25,11 @@ public class Transactions {
     private String frequency;
     private boolean included;
     private String reviewed;
-    private String type; // Credit or Debit
+    private String type; // Cr
+    @Column(name = "isplanned")// edit or Debit
+    private boolean isPlanned;
+    @Column(name = "plannedamount")
+    private double plannedAmount;
 
     public Long getId() {
         return id;
@@ -145,5 +141,21 @@ public class Transactions {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public boolean isPlanned() {
+        return isPlanned;
+    }
+
+    public void setPlanned(boolean planned) {
+        isPlanned = planned;
+    }
+
+    public double getPlannedAmount() {
+        return plannedAmount;
+    }
+
+    public void setPlannedAmount(double plannedAmount) {
+        this.plannedAmount = plannedAmount;
     }
 }

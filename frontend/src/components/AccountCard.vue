@@ -1,5 +1,7 @@
 <template>
-    <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6 flex flex-col justify-between">
+    <div
+        @click="$router.push({ name: 'BankAccountDetail', params: { accountId: account.id } })"
+        class="cursor-pointer bg-white shadow-md border border-grey-50 rounded-lg p-6 flex flex-col justify-between">
         <div>
             <h3 class="text-lg font-semibold text-gray-800">{{ account.name }}</h3>
             <h2 class="text-md font-semibold text-gray-500">{{ account.user.username }}</h2>

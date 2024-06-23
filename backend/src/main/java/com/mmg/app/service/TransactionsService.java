@@ -12,4 +12,5 @@ public interface TransactionsService {
     List<Transactions> getAllTransactions();
     List<Transactions> findByUsername(String currentUsername);
     List<CategoryTotalDto> calculateCategoryTotalsByUsername(String username);
+    List<Transactions> findTransactionsByAccountIdAndUsername(Long accountId, String username);
 }

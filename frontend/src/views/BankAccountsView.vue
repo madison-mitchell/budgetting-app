@@ -1,9 +1,12 @@
+<!-- src/views/BankAccountView.vue -->
 <template>
     <div class="max-w-7xl mx-auto p-12">
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Bank Accounts</h2>
         <div v-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AccountCard v-for="account in bankAccounts" :key="account.id" :account="account" />
+            <AccountCard v-for="account in bankAccounts" :key="account.id" :account="account">
+                <router-link :to="{ name: 'BankAccountDetail', params: { accountId: account.id } }" class="text-blue-500 hover:underline"> View Details </router-link>
+            </AccountCard>
             <!-- Add New Account Card -->
             <AddButton @click="showModal = true" />
         </div>

@@ -22,4 +22,7 @@ public interface TransactionsRepository extends JpaRepository<Transactions, Long
     List<CategoryTotalDto> findCategoryTotalsByUserId(@Param("userId") Long userId);
 
     List<Transactions> findByUserId(Long id);
+
+    @Query("SELECT t FROM Transactions t WHERE t.bankAccount.id = :accountId AND t.user.id = :userId")
+    List<Transactions> findTransactionsByAccountIdAndUserId(@Param("accountId") Long accountId, @Param("userId") Long userId);
 }

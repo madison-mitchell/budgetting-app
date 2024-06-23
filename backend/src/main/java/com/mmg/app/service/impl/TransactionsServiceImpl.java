@@ -68,12 +68,15 @@ public class TransactionsServiceImpl implements TransactionsService {
         for (CategoryTotalDto dto : categoryTotals) {
             parentCategoryBudgets.put(dto.getParentCategoryId(), parentCategoryBudgets.getOrDefault(dto.getParentCategoryId(), 0.0) + dto.getBudget());
         }
-
-        // Update parent category budgets in the DTOs
-//        for (CategoryTotalDto dto : categoryTotals) {
-//            dto.setBudget(parentCategoryBudgets.get(dto.getParentCategoryId()));
-//        }
-
         return categoryTotals;
+    }
+
+    @Override
+    public List<Transactions> findTransactionsByAccountIdAndUsername(Long accountId, String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
+        return transactionsRepository.findTransactionsByAccountIdAndUserId(accountId, user.getId());
     }
 }
