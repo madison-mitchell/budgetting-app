@@ -1,5 +1,6 @@
 <template>
-    <div class="overflow-x-auto">
+    <!-- <div class="overflow-x-auto"> -->
+    <div>
         <div class="mb-4">
             <label for="month-selector" class="block text-sm font-medium text-gray-700">Select Month</label>
             <select
@@ -25,28 +26,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="transaction in filteredTransactions" :key="transaction.id" class="border-b hover:bg-gray-50 text-left text-sm">
-                    <td class="px-6 py-4 whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ transaction.merchant }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ transaction.description }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap" :class="{ 'text-green-600': transaction.amount > 0 }">{{ formatBalance(transaction.amount) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.balance < 0 }">{{ formatBalance(transaction.balance) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ transaction.type }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-center">
-                        <input
-                            type="checkbox"
-                            v-model="transaction.planned"
-                            @change="updateTransaction(transaction)"
-                            class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ formatBalance(transaction.plannedAmount) }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ transaction.categoryId.childCategory.name }}</td>
-                </tr>
-                <tr>
-                    <td colspan="9">
-                        <new-transaction-form :categories="categories" @add-transaction="addTransaction" />
-                    </td>
-                </tr>
+                <TransactionRow v-for="transaction in sortedTransactions" :key="transaction.id" :transaction="transaction" @update-transaction="updateTransaction" />
+                <NewTransactionForm :categories="categories" @add-transaction="addTransaction" />
             </tbody>
         </table>
     </div>
@@ -54,10 +35,14 @@
 
 <script>
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
+import TransactionRow from './TransactionRow.vue';
 import NewTransactionForm from './NewTransactionForm.vue';
+import axios from 'axios';
+import authService from '../services/authService';
 
 export default {
     components: {
+        TransactionRow,
         NewTransactionForm,
     },
     props: {
@@ -74,7 +59,7 @@ export default {
         return {
             selectedMonth: '',
             availableMonths: [],
-            filteredTransactions: [],
+            sortedTransactions: [],
         };
     },
     watch: {
@@ -82,6 +67,7 @@ export default {
             handler(newTransactions) {
                 this.setupAvailableMonths();
                 this.filterTransactionsByMonth();
+                this.sortTransactions();
             },
             deep: true,
         },
@@ -89,6 +75,7 @@ export default {
     mounted() {
         this.setupAvailableMonths();
         this.filterTransactionsByMonth();
+        this.sortTransactions();
     },
     methods: {
         setupAvailableMonths() {
@@ -117,38 +104,25 @@ export default {
             if (selectedMonth) {
                 const start = startOfMonth(parseISO(`${selectedMonth}-01`));
                 const end = endOfMonth(parseISO(`${selectedMonth}-01`));
-                this.filteredTransactions = this.transactions.filter((transaction) => {
+                this.sortedTransactions = this.transactions.filter((transaction) => {
                     const transactionDate = parseISO(transaction.timeOfTransaction);
                     return transactionDate >= start && transactionDate <= end;
                 });
             } else {
-                this.filteredTransactions = this.transactions;
+                this.sortedTransactions = this.transactions;
             }
-
-            // Sort the filtered transactions in chronological order
-            this.filteredTransactions.sort((a, b) => new Date(a.timeOfTransaction) - new Date(b.timeOfTransaction));
-
-            // Calculate the balance
-            this.calculateBalances();
-
-            console.log('filteredTransactions: ', this.filteredTransactions);
         },
-        formatDate(date) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(date).toLocaleDateString(undefined, options);
+        sortTransactions() {
+            this.sortedTransactions.sort((a, b) => new Date(a.timeOfTransaction) - new Date(b.timeOfTransaction));
         },
-        formatBalance(balance) {
-            if (balance === null || balance === undefined) {
-                return '$0.00';
-            }
-            const formattedBalance = balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-            return balance < 0 ? `-$${formattedBalance.slice(1)}` : `$${formattedBalance}`;
-        },
-        calculateBalances() {
-            let balance = 0;
-            this.filteredTransactions = this.filteredTransactions.map((transaction) => {
-                balance += transaction.amount;
-                return { ...transaction, balance };
+        sortBy(field) {
+            this.sortField = field;
+            this.sortOrder = this.sortOrder === 'asc' ? 'desc' : 'asc';
+            this.sortedTransactions.sort((a, b) => {
+                let modifier = this.sortOrder === 'asc' ? 1 : -1;
+                if (a[this.sortField] < b[this.sortField]) return -1 * modifier;
+                if (a[this.sortField] > b[this.sortField]) return 1 * modifier;
+                return 0;
             });
         },
         updateTransaction(transaction) {

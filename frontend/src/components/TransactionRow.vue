@@ -7,7 +7,7 @@
         <td class="px-6 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.balance < 0 }">{{ formatBalance(transaction.balance) }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ transaction.type }}</td>
         <td class="px-6 py-4 whitespace-nowrap text-center">
-            <input type="checkbox" v-model="transaction.isPlanned" @change="updateTransaction(transaction)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
+            <input type="checkbox" v-model="transaction.isPlanned" @change="updateTransaction" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
         </td>
         <td class="px-6 py-4 whitespace-nowrap">{{ formatBalance(transaction.plannedAmount) }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ transaction.categoryId.childCategory.name }}</td>
@@ -23,6 +23,10 @@ export default {
         },
     },
     methods: {
+        formatDate(date) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(date).toLocaleDateString(undefined, options);
+        },
         formatBalance(balance) {
             if (balance === null || balance === undefined) {
                 return '$0.00';
@@ -30,12 +34,8 @@ export default {
             const formattedBalance = balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
             return balance < 0 ? `-$${formattedBalance.slice(1)}` : `$${formattedBalance}`;
         },
-        formatDate(date) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(date).toLocaleDateString(undefined, options);
-        },
-        updateTransaction(transaction) {
-            this.$emit('update-transaction', transaction);
+        updateTransaction() {
+            this.$emit('update-transaction', this.transaction);
         },
     },
 };
