@@ -11,8 +11,8 @@
         </div>
 
         <div>
-            <h3 class="text-lg font-semibold text-gray-800">{{ transaction.category.parentCategory.name }}</h3>
-            <h3 class="text-lg font-semibold text-gray-800">{{ transaction.category.childCategory.name }}</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ transaction.categoryId.parentCategory.name }}</h3>
+            <h3 class="text-lg font-semibold text-gray-800">{{ transaction.categoryId.childCategory.name }}</h3>
             <h2 class="text-md font-semibold text-gray-500">{{ formatDate(transaction.timeOfTransaction) }}</h2>
             <h2 class="text-md font-semibold text-gray-500">{{ transaction.user.username }}</h2>
             <p
@@ -26,8 +26,8 @@
             </p>
         </div>
         <div class="flex justify-between items-center mt-4">
-            <p class="text-sm text-gray-600">{{ transaction.bankAccount?.bankName }}</p>
-            <p class="text-sm text-gray-600">**** {{ getLastFourDigits(transaction.bankAccount?.accountNumber) }}</p>
+            <p class="text-sm text-gray-600">{{ transaction.bankAccountId?.bankName }}</p>
+            <p class="text-sm text-gray-600">**** {{ getLastFourDigits(transaction.bankAccountId?.accountNumber) }}</p>
         </div>
     </div>
 </template>
