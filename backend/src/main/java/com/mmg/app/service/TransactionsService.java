@@ -1,10 +1,12 @@
 package com.mmg.app.service;
 
 import com.mmg.app.dto.CategoryTotalDto;
+import com.mmg.app.dto.TransactionDto;
 import com.mmg.app.model.Transactions;
 import java.util.List;
 
 public interface TransactionsService {
+    Transactions createTransaction(TransactionDto transactionRequest);
     Transactions saveTransaction(Transactions transaction);
     Transactions updateTransaction(Transactions transaction);
     void deleteTransaction(Long id);

@@ -15,6 +15,7 @@
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('type')">Type</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('isPlanned')">Planned</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('plannedAmount')">Planned Amount</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('category')">Category</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -33,6 +34,7 @@
                                     class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">{{ formatBalance(transaction.plannedAmount) }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">{{ transaction.categoryId.childCategory.name }}</td>
                         </tr>
                         <tr class="text-sm text-left">
                             <td class="px-6 py-4">
@@ -56,6 +58,11 @@
                             </td>
                             <td class="px-6 py-4">
                                 <input type="number" v-model="newTransaction.plannedAmount" step="0.01" class="form-input w-full" placeholder="0.00" />
+                            </td>
+                            <td class="px-6 py-4">
+                                <select v-model="newTransaction.categoryId" class="form-select w-full">
+                                    <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.childCategory.name }}</option>
+                                </select>
                             </td>
                         </tr>
                     </tbody>
@@ -82,6 +89,7 @@ export default {
     data() {
         return {
             transactions: [],
+            categories: [], // New data property to store categories
             newTransaction: {
                 timeOfTransaction: '',
                 merchant: '',
@@ -91,10 +99,12 @@ export default {
                 isPlanned: true, // Set default value to true
                 plannedAmount: 0,
                 balance: 0,
+                categoryId: '', // New property to store selected category
             },
             loading: true,
             sortField: 'timeOfTransaction',
             sortOrder: 'asc',
+            userId: null,
         };
     },
     computed: {
@@ -109,6 +119,14 @@ export default {
     },
     mounted() {
         this.fetchTransactions();
+        this.fetchCategories(); // Fetch categories
+
+        const user = authService.getCurrentUser();
+        if (user && user.id) {
+            this.userId = user.id; // Set userId from authService
+        } else {
+            console.error('User not authenticated');
+        }
     },
     methods: {
         fetchTransactions() {
@@ -126,6 +144,20 @@ export default {
                 .catch((error) => {
                     console.error('Failed to fetch transactions:', error);
                     this.loading = false;
+                });
+        },
+        fetchCategories() {
+            axios
+                .get('http://localhost:8080/api/categories/relation', {
+                    headers: {
+                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                    },
+                })
+                .then((response) => {
+                    this.categories = response.data;
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch categories:', error);
                 });
         },
         calculateBalances() {
@@ -147,13 +179,6 @@ export default {
         formatDate(date) {
             const options = { year: 'numeric', month: 'short', day: 'numeric' };
             return new Date(date).toLocaleDateString(undefined, options);
-        },
-        formatCurrencyPlaceholder(value) {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 2,
-            }).format(value);
         },
         sortBy(field) {
             if (this.sortField === field) {
@@ -178,10 +203,41 @@ export default {
                 });
         },
         addNewTransaction() {
-            this.newTransaction.balance = this.calculateFutureBalance(this.newTransaction);
-            this.transactions.push({ ...this.newTransaction, id: Date.now() });
-            this.calculateBalances();
-            this.clearNewTransactionForm();
+            const userId = authService.getCurrentUser().userId;
+
+            const newTransactionDto = {
+                bankAccountId: this.accountId,
+                userId: userId,
+                categoryId: this.newTransaction.categoryId,
+                amount: this.newTransaction.amount,
+                description: this.newTransaction.description,
+                timeOfTransaction: this.newTransaction.timeOfTransaction,
+                notes: this.newTransaction.notes,
+                merchant: this.newTransaction.merchant,
+                recurring: this.newTransaction.recurring,
+                frequency: this.newTransaction.frequency,
+                included: this.newTransaction.included,
+                reviewed: this.newTransaction.reviewed,
+                type: this.newTransaction.type,
+                isPlanned: this.newTransaction.isPlanned,
+                plannedAmount: this.newTransaction.plannedAmount,
+            };
+
+            axios
+                .post('http://localhost:8080/api/transactions', newTransactionDto, {
+                    headers: {
+                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                    },
+                })
+                .then((response) => {
+                    this.transactions.push(response.data);
+                    this.calculateBalances();
+                    this.clearNewTransactionForm();
+                    console.log('New transaction added successfully');
+                })
+                .catch((error) => {
+                    console.error('Failed to add new transaction:', error);
+                });
         },
         calculateFutureBalance(newTransaction) {
             let balance = this.transactions.length ? this.transactions[this.transactions.length - 1].balance : 0;
@@ -194,9 +250,10 @@ export default {
                 description: '',
                 amount: 0,
                 type: '',
-                planned: false,
+                isPlanned: true,
                 plannedAmount: 0,
                 balance: 0,
+                categoryId: '',
             };
         },
     },

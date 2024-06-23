@@ -1,15 +1,25 @@
 package com.mmg.app.controller;
 
 import com.mmg.app.dto.CategoryTotalDto;
+import com.mmg.app.dto.TransactionDto;
+import com.mmg.app.exception.ResourceNotFoundException;
+import com.mmg.app.model.BankAccount;
 import com.mmg.app.model.Transactions;
+import com.mmg.app.model.User;
+import com.mmg.app.repository.BankAccountRepository;
+import com.mmg.app.repository.UserRepository;
+import com.mmg.app.service.BankAccountService;
 import com.mmg.app.service.TransactionsService;
 import com.mmg.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -17,13 +27,23 @@ import java.util.List;
 @RequestMapping("/api/transactions")
 public class TransactionsController {
 
-    @Autowired
-    private TransactionsService transactionsService;
+    private final TransactionsService transactionsService;
+    private final UserRepository userRepository;
+    private final BankAccountRepository bankAccountRepository;
+
+    public TransactionsController(TransactionsService transactionsService, UserRepository userRepository, BankAccountRepository bankAccountRepository) {
+        this.transactionsService = transactionsService;
+        this.userRepository = userRepository;
+        this.bankAccountRepository = bankAccountRepository;
+    }
+
 
     @PostMapping
-    public Transactions createTransaction(@RequestBody Transactions transaction) {
-        return transactionsService.saveTransaction(transaction);
+    public ResponseEntity<Transactions> createTransaction(@RequestBody TransactionDto transactionRequest) {
+        Transactions newTransaction = transactionsService.createTransaction(transactionRequest);
+        return new ResponseEntity<>(newTransaction, HttpStatus.CREATED);
     }
+
 
     @PutMapping("/{id}")
     public Transactions updateTransaction(@PathVariable Long id, @RequestBody Transactions transaction) {

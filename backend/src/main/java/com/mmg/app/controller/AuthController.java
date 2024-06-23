@@ -2,6 +2,8 @@ package com.mmg.app.controller;
 
 import com.mmg.app.dto.AuthenticationRequest;
 import com.mmg.app.dto.AuthenticationResponse;
+import com.mmg.app.model.User;
+import com.mmg.app.repository.UserRepository;
 import com.mmg.app.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +22,9 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @PostMapping("/authenticate")
     public AuthenticationResponse createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest)
             throws Exception {
@@ -32,7 +37,10 @@ public class AuthController {
         }
 
         final String jwt = jwtUtil.generateToken(authenticationRequest.getUsername());
+        User user = userRepository.findByUsername(authenticationRequest.getUsername());
+                //.orElseThrow(() -> new Exception("User not found"));
 
-        return new AuthenticationResponse(jwt);
+        return new AuthenticationResponse(jwt, user.getId(), user.getUsername());
     }
 }
+

@@ -1,26 +1,13 @@
-package com.mmg.app.model;
+package com.mmg.app.dto;
 
-import jakarta.persistence.*;
 import java.util.Date;
 
-@Entity
-@Table(name = "transactions")
-public class Transactions {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    @ManyToOne
-    @JoinColumn(name = "userid")
-    private User user;
-    @ManyToOne
-    @JoinColumn(name = "bankaccountid", nullable = false)
-    private BankAccount bankAccountId;
+public class TransactionDto {
+    private Long bankAccountId;
+    private Long userId;
     private double amount;
-    @ManyToOne
-    @JoinColumn(name = "categoryid", nullable = false)
-    private CategoryParentChildRelations categoryId;
+    private Long categoryId;
     private String description;
-    @Column(name = "timeoftransaction")
     private Date timeOfTransaction;
     private String notes;
     private String merchant;
@@ -28,34 +15,24 @@ public class Transactions {
     private String frequency;
     private boolean included;
     private String reviewed;
-    private String type; // Cr
-    @Column(name = "isplanned")// edit or Debit
+    private String type;
     private boolean isPlanned;
-    @Column(name = "plannedamount")
     private double plannedAmount;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public BankAccount getBankAccountId() {
+    public Long getBankAccountId() {
         return bankAccountId;
     }
 
-    public void setBankAccountId(BankAccount bankAccountId) {
+    public void setBankAccountId(Long bankAccountId) {
         this.bankAccountId = bankAccountId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public double getAmount() {
@@ -66,11 +43,11 @@ public class Transactions {
         this.amount = amount;
     }
 
-    public CategoryParentChildRelations getCategoryId() {
+    public Long getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(CategoryParentChildRelations categoryId) {
+    public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
 

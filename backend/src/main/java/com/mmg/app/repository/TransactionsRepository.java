@@ -14,7 +14,7 @@ public interface TransactionsRepository extends JpaRepository<Transactions, Long
     @Query("SELECT new com.mmg.app.dto.CategoryTotalDto(" +
             "c.id, p.id, p.name, ch.id, ch.name, SUM(t.amount), c.budget) " +
             "FROM Transactions t " +
-            "JOIN t.category c " +
+            "JOIN t.categoryId c " +
             "JOIN c.parentCategory p " +
             "JOIN c.childCategory ch " +
             "WHERE t.user.id = :userId " +
@@ -23,6 +23,6 @@ public interface TransactionsRepository extends JpaRepository<Transactions, Long
 
     List<Transactions> findByUserId(Long id);
 
-    @Query("SELECT t FROM Transactions t WHERE t.bankAccount.id = :accountId AND t.user.id = :userId")
+    @Query("SELECT t FROM Transactions t WHERE t.bankAccountId.id = :accountId AND t.user.id = :userId")
     List<Transactions> findTransactionsByAccountIdAndUserId(@Param("accountId") Long accountId, @Param("userId") Long userId);
 }
