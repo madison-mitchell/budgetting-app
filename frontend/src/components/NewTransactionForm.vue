@@ -1,34 +1,34 @@
 <template>
-    <tr class="text-sm text-left">
+    <tr class="text-sm text-left bg-gray-100">
         <td class="px-6 py-4">
-            <input type="date" v-model="newTransaction.timeOfTransaction" class="form-input w-full" />
+            <input type="date" v-model="newTransaction.timeOfTransaction" class="form-input w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1" />
         </td>
         <td class="px-6 py-4">
-            <input type="text" v-model="newTransaction.merchant" class="form-input w-full" />
+            <input type="text" v-model="newTransaction.merchant" class="form-input w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1" />
         </td>
         <td class="px-6 py-4">
-            <input type="text" v-model="newTransaction.description" class="form-input w-full" />
+            <input type="text" v-model="newTransaction.description" class="form-input w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1" />
         </td>
         <td class="px-6 py-4">
-            <input type="number" v-model="newTransaction.amount" step="0.01" class="form-input w-full" placeholder="0.00" />
+            <input type="number" v-model="newTransaction.amount" step="0.01" class="form-input w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1" placeholder="0.00" />
         </td>
         <td class="px-6 py-4"></td>
         <td class="px-6 py-4">
-            <input type="text" v-model="newTransaction.type" class="form-input w-full" />
+            <input type="text" v-model="newTransaction.type" class="form-input w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1" />
         </td>
         <td class="px-6 py-4 text-center">
-            <input type="checkbox" v-model="newTransaction.isPlanned" disabled class="form-checkbox h-4 w-4 text-green-600 transition duration-150 ease-in-out" />
+            <input type="checkbox" v-model="newTransaction.isPlanned" disabled class="form-checkbox h-4 w-4 transition duration-150 ease-in-out" />
         </td>
         <td class="px-6 py-4">
-            <input type="number" v-model="newTransaction.plannedAmount" step="0.01" class="form-input w-full" placeholder="0.00" />
+            <input type="number" v-model="newTransaction.plannedAmount" step="0.01" class="form-input w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1" placeholder="0.00" />
         </td>
         <td class="px-6 py-4">
-            <select v-model="newTransaction.categoryId" class="form-select w-full">
+            <select v-model="newTransaction.categoryId" class="form-select w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1">
                 <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.childCategory.name }}</option>
             </select>
         </td>
         <td class="pr-3">
-            <button @click="addTransaction" class="bg-blue-500 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-full">+</button>
+            <button @click="addTransaction" class="bg-sky-500 hover:bg-sky-700 text-white text-xs font-bold px-3 py-2 rounded-full">+</button>
         </td>
     </tr>
 </template>
