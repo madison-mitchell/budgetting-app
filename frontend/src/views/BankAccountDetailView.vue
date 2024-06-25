@@ -12,6 +12,7 @@
 import axios from 'axios';
 import authService from '../services/authService';
 import TransactionsTable from '../components/TransactionsTable.vue';
+import router from '../router';
 
 export default {
     components: {
@@ -43,22 +44,32 @@ export default {
         };
     },
     mounted() {
-        this.fetchTransactions();
-        this.fetchCategories();
-
         const user = authService.getCurrentUser();
-        if (user && user.id) {
-            this.userId = user.id;
+        if (user && user.userId) {
+            this.userId = user.userId;
+            this.fetchTransactions();
+            this.fetchCategories();
         } else {
+            console.log('user: ', user);
             console.error('User not authenticated');
+            router.push({ name: 'Login' });
         }
     },
     methods: {
         fetchTransactions() {
+            const user = authService.getCurrentUser();
+            console.log('fetchTransactions()');
+            if (!user || !user.jwt) {
+                console.log('user: ', user);
+                console.error('User not authenticated');
+                router.push({ name: 'Login' });
+                return;
+            }
+
             axios
                 .get(`http://localhost:8080/api/transactions/account/${this.accountId}`, {
                     headers: {
-                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                        Authorization: 'Bearer ' + user.jwt,
                     },
                 })
                 .then((response) => {
@@ -73,10 +84,17 @@ export default {
                 });
         },
         fetchCategories() {
+            const user = authService.getCurrentUser();
+            if (!user || !user.jwt) {
+                console.error('User not authenticated');
+                router.push({ name: 'Login' });
+                return;
+            }
+
             axios
                 .get('http://localhost:8080/api/categories/relation', {
                     headers: {
-                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                        Authorization: 'Bearer ' + user.jwt,
                     },
                 })
                 .then((response) => {
@@ -86,32 +104,17 @@ export default {
                     console.error('Failed to fetch categories:', error);
                 });
         },
-        updateTransaction(transaction) {
-            axios
-                .put(`http://localhost:8080/api/transactions/${transaction.id}`, transaction, {
-                    headers: {
-                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
-                    },
-                })
-                .then((response) => {
-                    console.log('Transaction updated successfully');
-                })
-                .catch((error) => {
-                    console.error('Failed to update transaction:', error);
-                });
-        },
         addNewTransaction(newTransaction) {
             const user = authService.getCurrentUser();
-            const userId = user && user.userId ? user.userId : null;
-
-            if (!userId) {
+            if (!user || !user.id) {
                 console.error('User ID not found');
+                router.push({ name: 'Login' });
                 return;
             }
 
             const newTransactionDto = {
                 bankAccountId: this.accountId,
-                userId: userId,
+                userId: user.id,
                 categoryId: newTransaction.categoryId,
                 amount: newTransaction.amount,
                 description: newTransaction.description,
@@ -132,7 +135,7 @@ export default {
             axios
                 .post('http://localhost:8080/api/transactions', newTransactionDto, {
                     headers: {
-                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                        Authorization: 'Bearer ' + user.jwt,
                     },
                 })
                 .then((response) => {
@@ -145,10 +148,17 @@ export default {
                 });
         },
         updateTransaction(transaction) {
+            const user = authService.getCurrentUser();
+            if (!user || !user.jwt) {
+                console.error('User not authenticated');
+                router.push({ name: 'Login' });
+                return;
+            }
+
             axios
                 .put(`http://localhost:8080/api/transactions/${transaction.id}`, transaction, {
                     headers: {
-                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                        Authorization: 'Bearer ' + user.jwt,
                     },
                 })
                 .then((response) => {

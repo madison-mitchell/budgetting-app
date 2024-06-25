@@ -18,8 +18,8 @@ const routes = [
     { path: '/transactions', name: 'Transactions', component: TransactionsView, meta: { requiresAuth: true } },
     { path: '/expenses', name: 'Expenses', component: ExpensesView, meta: { requiresAuth: true } },
     { path: '/profile', name: 'Profile', component: ProfileView, meta: { requiresAuth: true } },
-    { path: '/categories', name: 'Categories', component: CategoriesView },
-    { path: '/bank-accounts/:accountId', name: 'BankAccountDetail', component: BankAccountDetailView, props: true },
+    { path: '/categories', name: 'Categories', component: CategoriesView, meta: { requiresAuth: true } },
+    { path: '/bank-accounts/:accountId', name: 'BankAccountDetail', component: BankAccountDetailView, props: true, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
