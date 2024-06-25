@@ -19,14 +19,13 @@
                     <th class="pl-4 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('description')">Description</th>
                     <th class="pl-4 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('amount')">Amount</th>
                     <th class="pl-4 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('balance')">Balance</th>
-                    <!-- <th class="pl-4 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('type')">Type</th> -->
                     <th class="pl-4 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('isPlanned')">Planned</th>
                     <th class="pl-4 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('plannedAmount')">Planned Amount</th>
                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-600 tracking-wider cursor-pointer" @click="sortBy('category')">Category</th>
                 </tr>
             </thead>
             <tbody>
-                <TransactionRow v-for="transaction in filteredTransactions" :key="transaction.id" :transaction="transaction" @update-transaction="updateTransaction" />
+                <TransactionRow v-for="transaction in filteredTransactions" :key="transaction.id" :transaction="transaction" />
                 <NewTransactionForm :categories="categories" @add-transaction="addTransaction" />
             </tbody>
         </table>
@@ -57,6 +56,8 @@ export default {
         return {
             selectedMonth: '',
             availableMonths: [],
+            sortField: '',
+            sortOrder: 'asc',
         };
     },
     watch: {
@@ -156,6 +157,9 @@ export default {
                 balance += transaction.amount;
                 return { ...transaction, balance };
             });
+        },
+        addTransaction(newTransaction) {
+            this.$emit('add-transaction', newTransaction);
         },
     },
 };

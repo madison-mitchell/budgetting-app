@@ -1,7 +1,9 @@
 package com.mmg.app.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "transactions")
@@ -9,30 +11,46 @@ public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne
     @JoinColumn(name = "userid")
     private User user;
+
     @ManyToOne
     @JoinColumn(name = "bankaccountid", nullable = false)
     private BankAccount bankAccountId;
+
     private double amount;
+
+    @OneToMany(mappedBy = "transaction", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<TransactionSplit> splits;
+
     @ManyToOne
     @JoinColumn(name = "categoryid", nullable = false)
     private CategoryParentChildRelations categoryId;
+
     private String description;
+
     @Column(name = "timeoftransaction")
     private Date timeOfTransaction;
+
     private String notes;
     private String merchant;
     private boolean recurring;
     private String frequency;
     private boolean included;
     private String reviewed;
-    private String type; // Cr
-    @Column(name = "isplanned")// edit or Debit
+    private String type;
+
+    @Column(name = "isplanned")
     private boolean isPlanned;
+
     @Column(name = "plannedamount")
     private double plannedAmount;
+
+    @Column(name = "hassplit")
+    private boolean hasSplit;
 
     public Long getId() {
         return id;
@@ -64,6 +82,14 @@ public class Transactions {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public List<TransactionSplit> getSplits() {
+        return splits;
+    }
+
+    public void setSplits(List<TransactionSplit> splits) {
+        this.splits = splits;
     }
 
     public CategoryParentChildRelations getCategoryId() {
@@ -162,5 +188,13 @@ public class Transactions {
 
     public void setPlannedAmount(double plannedAmount) {
         this.plannedAmount = plannedAmount;
+    }
+
+    public boolean isHasSplit() {
+        return hasSplit;
+    }
+
+    public void setHasSplit(boolean hasSplit) {
+        this.hasSplit = hasSplit;
     }
 }

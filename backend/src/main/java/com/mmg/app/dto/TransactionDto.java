@@ -1,11 +1,14 @@
 package com.mmg.app.dto;
 
 import java.util.Date;
+import java.util.List;
 
 public class TransactionDto {
+    private Long id;
     private Long bankAccountId;
     private Long userId;
     private double amount;
+    private List<TransactionSplitDto> splits;
     private Long categoryId;
     private String description;
     private Date timeOfTransaction;
@@ -18,6 +21,14 @@ public class TransactionDto {
     private String type;
     private boolean isPlanned;
     private double plannedAmount;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public Long getBankAccountId() {
         return bankAccountId;
@@ -41,6 +52,14 @@ public class TransactionDto {
 
     public void setAmount(double amount) {
         this.amount = amount;
+    }
+
+    public List<TransactionSplitDto> getSplits() {
+        return splits;
+    }
+
+    public void setSplits(List<TransactionSplitDto> splits) {
+        this.splits = splits;
     }
 
     public Long getCategoryId() {

@@ -39,9 +39,9 @@ export default {
             const formattedBalance = balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
             return balance < 0 ? `-$${formattedBalance.slice(1)}` : `$${formattedBalance}`;
         },
-        updateTransaction() {
-            this.$emit('update-transaction', this.transaction);
-        },
+        // updateTransaction() {
+        //     this.$emit('update-transaction', this.transaction);
+        // },
     },
 };
 </script>

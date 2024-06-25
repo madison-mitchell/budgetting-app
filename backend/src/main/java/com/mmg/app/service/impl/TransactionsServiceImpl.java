@@ -2,10 +2,8 @@ package com.mmg.app.service.impl;
 
 import com.mmg.app.dto.CategoryTotalDto;
 import com.mmg.app.dto.TransactionDto;
-import com.mmg.app.model.BankAccount;
-import com.mmg.app.model.CategoryParentChildRelations;
-import com.mmg.app.model.Transactions;
-import com.mmg.app.model.User;
+import com.mmg.app.dto.TransactionSplitDto;
+import com.mmg.app.model.*;
 import com.mmg.app.repository.BankAccountRepository;
 import com.mmg.app.repository.CategoryParentChildRelationsRepository;
 import com.mmg.app.repository.TransactionsRepository;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class TransactionsServiceImpl implements TransactionsService {
@@ -57,10 +56,20 @@ public class TransactionsServiceImpl implements TransactionsService {
         transaction.setIncluded(transactionRequest.isIncluded());
         transaction.setReviewed(transactionRequest.getReviewed());
         transaction.setType(transactionRequest.getType());
-        transaction.setIsPlanned(transactionRequest.isPlanned()); // Set isPlanned
+        transaction.setIsPlanned(transactionRequest.isPlanned());
         transaction.setPlannedAmount(transactionRequest.getPlannedAmount());
 
-        System.out.println("isPlanned: " + transactionRequest.isPlanned());
+        if (transactionRequest.getSplits() != null && !transactionRequest.getSplits().isEmpty()) {
+            List<TransactionSplit> splits = transactionRequest.getSplits().stream().map(splitDto -> {
+                TransactionSplit split = new TransactionSplit();
+                split.setCategoryId(categoryRepository.findById(splitDto.getCategoryId()).orElseThrow());
+                split.setAmount(splitDto.getAmount());
+                split.setTransaction(transaction);
+                return split;
+            }).collect(Collectors.toList());
+            transaction.setSplits(splits);
+            transaction.setHasSplit(true); // Update has_split indicator
+        }
 
         return transactionsRepository.save(transaction);
     }
@@ -121,4 +130,23 @@ public class TransactionsServiceImpl implements TransactionsService {
         }
         return transactionsRepository.findTransactionsByAccountIdAndUserId(accountId, user.getId());
     }
+
+//    public TransactionSplitDto convertToDto(TransactionSplit split) {
+//        TransactionSplitDto dto = new TransactionSplitDto();
+//        dto.setId(split.getId());
+//        dto.setTransactionId(split.getTransaction().getId());
+//        dto.setCategoryId(split.getCategoryId().getId());
+//        dto.setAmount(split.getAmount());
+//        return dto;
+//    }
+//
+//    public TransactionDto convertToDto(Transactions transaction) {
+//        TransactionDto dto = new TransactionDto();
+//        dto.setId(transaction.getId());
+//        dto.setAmount(transaction.getAmount());
+//        dto.setDescription(transaction.getDescription());
+//        dto.setTimeOfTransaction(transaction.getTimeOfTransaction());
+//        dto.setSplits(transaction.getSplits().stream().map(this::convertToDto).collect(Collectors.toList()));
+//        return dto;
+//    }
 }
