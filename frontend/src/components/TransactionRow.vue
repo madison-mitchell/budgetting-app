@@ -1,6 +1,6 @@
 <template>
     <template v-if="transaction.hasSplit">
-        <tr v-for="split in transaction.splits" :key="split.id" class="border-b hover:bg-gray-50 text-left text-sm">
+        <tr v-for="(split, index) in transaction.splits" :key="split.id" class="border-b hover:bg-gray-50 text-left text-sm">
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
             <td class="pl-4 py-4 whitespace-nowrap">
                 <span
@@ -14,13 +14,13 @@
             </td>
             <td class="pl-4 py-4 whitespace-nowrap">{{ transaction.description }}</td>
             <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': split.amount > 0 }">{{ formatBalance(split.amount) }}</td>
-            <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': split.balance < 0 }">{{ formatBalance(transaction.balance - transaction.amount + split.amount) }}</td>
+            <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.balance < 0 }">{{ formatBalance(calculateSplitBalance(index, transaction)) }}</td>
             <td class="pl-4 py-4 whitespace-nowrap text-center">
                 <input type="checkbox" v-model="split.planned" @change="updateTransaction(split)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
             </td>
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(split.plannedAmount) }}</td>
             <td class="px-4 py-4 whitespace-nowrap flex items-center">
-                {{ split.categoryId.childCategory.name }} <i class="fa-solid fa-circle text-sky-500 text-supersmall ml-2" title="Split Transaction"></i>
+                {{ split.categoryId.childCategory.name }} <i class="fa-solid fa-circle text-supersmall text-sky-500 ml-2" title="Split Transaction"></i>
             </td>
         </tr>
     </template>
@@ -51,6 +51,7 @@ export default {
             required: true,
         },
     },
+    emits: ['update-transaction'],
     methods: {
         formatDate(date) {
             const options = { year: 'numeric', month: 'short', day: 'numeric' };
@@ -62,6 +63,13 @@ export default {
             }
             const formattedBalance = balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
             return balance < 0 ? `-$${formattedBalance.slice(1)}` : `$${formattedBalance}`;
+        },
+        calculateSplitBalance(index, transaction) {
+            let cumulativeBalance = transaction.balance - transaction.amount;
+            for (let i = 0; i <= index; i++) {
+                cumulativeBalance += transaction.splits[i].amount;
+            }
+            return cumulativeBalance;
         },
         updateTransaction(row) {
             this.$emit('update-transaction', row);
