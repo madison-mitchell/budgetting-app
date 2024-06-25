@@ -58,7 +58,7 @@ export default {
     methods: {
         fetchTransactions() {
             const user = authService.getCurrentUser();
-            console.log('fetchTransactions()');
+
             if (!user || !user.jwt) {
                 console.log('user: ', user);
                 console.error('User not authenticated');
@@ -106,7 +106,7 @@ export default {
         },
         addNewTransaction(newTransaction) {
             const user = authService.getCurrentUser();
-            if (!user || !user.id) {
+            if (!user || !user.userId) {
                 console.error('User ID not found');
                 router.push({ name: 'Login' });
                 return;
@@ -114,7 +114,7 @@ export default {
 
             const newTransactionDto = {
                 bankAccountId: this.accountId,
-                userId: user.id,
+                userId: user.userId,
                 categoryId: newTransaction.categoryId,
                 amount: newTransaction.amount,
                 description: newTransaction.description,
