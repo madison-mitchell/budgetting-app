@@ -25,7 +25,7 @@
                 </tr>
             </thead>
             <tbody>
-                <TransactionRow v-for="transaction in filteredTransactions" :key="transaction.id" :transaction="transaction" />
+                <TransactionRow v-for="transaction in filteredTransactions" :key="transaction.id" :transaction="transaction" @update-transaction="updateTransaction" />
                 <NewTransactionForm :categories="categories" @add-transaction="addTransaction" />
             </tbody>
         </table>
@@ -160,6 +160,10 @@ export default {
         },
         addTransaction(newTransaction) {
             this.$emit('add-transaction', newTransaction);
+        },
+        updateTransaction(updatedTransaction) {
+            // Handle the update logic here
+            this.$emit('update-transaction', updatedTransaction);
         },
     },
 };
