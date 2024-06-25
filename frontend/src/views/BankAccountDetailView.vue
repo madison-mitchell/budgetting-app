@@ -44,23 +44,23 @@ export default {
         };
     },
     mounted() {
-        const user = authService.getCurrentUser();
-        if (user && user.userId) {
-            this.userId = user.userId;
+        const auth = authService.getCurrentUser();
+        if (auth && auth.userId) {
+            this.userId = auth.userId;
             this.fetchTransactions();
             this.fetchCategories();
         } else {
-            console.log('user: ', user);
+            console.log('auth: ', auth);
             console.error('User not authenticated');
             router.push({ name: 'Login' });
         }
     },
     methods: {
         fetchTransactions() {
-            const user = authService.getCurrentUser();
+            const auth = authService.getCurrentUser();
 
-            if (!user || !user.jwt) {
-                console.log('user: ', user);
+            if (!auth || !auth.jwt) {
+                console.log('auth: ', auth);
                 console.error('User not authenticated');
                 router.push({ name: 'Login' });
                 return;
@@ -69,7 +69,7 @@ export default {
             axios
                 .get(`http://localhost:8080/api/transactions/account/${this.accountId}`, {
                     headers: {
-                        Authorization: 'Bearer ' + user.jwt,
+                        Authorization: 'Bearer ' + auth.jwt,
                     },
                 })
                 .then((response) => {
@@ -84,8 +84,8 @@ export default {
                 });
         },
         fetchCategories() {
-            const user = authService.getCurrentUser();
-            if (!user || !user.jwt) {
+            const auth = authService.getCurrentUser();
+            if (!auth || !auth.jwt) {
                 console.error('User not authenticated');
                 router.push({ name: 'Login' });
                 return;
@@ -94,7 +94,7 @@ export default {
             axios
                 .get('http://localhost:8080/api/categories/relation', {
                     headers: {
-                        Authorization: 'Bearer ' + user.jwt,
+                        Authorization: 'Bearer ' + auth.jwt,
                     },
                 })
                 .then((response) => {
@@ -105,16 +105,16 @@ export default {
                 });
         },
         addNewTransaction(newTransaction) {
-            const user = authService.getCurrentUser();
-            if (!user || !user.userId) {
-                console.error('User ID not found');
+            const auth = authService.getCurrentUser();
+            if (!auth || !auth.userId) {
+                console.error('auth ID not found');
                 router.push({ name: 'Login' });
                 return;
             }
 
             const newTransactionDto = {
                 bankAccountId: this.accountId,
-                userId: user.userId,
+                userId: auth.userId,
                 categoryId: newTransaction.categoryId,
                 amount: newTransaction.amount,
                 description: newTransaction.description,
@@ -135,7 +135,7 @@ export default {
             axios
                 .post('http://localhost:8080/api/transactions', newTransactionDto, {
                     headers: {
-                        Authorization: 'Bearer ' + user.jwt,
+                        Authorization: 'Bearer ' + auth.jwt,
                     },
                 })
                 .then((response) => {
@@ -148,8 +148,8 @@ export default {
                 });
         },
         updateTransaction(transaction) {
-            const user = authService.getCurrentUser();
-            if (!user || !user.jwt) {
+            const auth = authService.getCurrentUser();
+            if (!auth || !auth.jwt) {
                 console.error('User not authenticated');
                 router.push({ name: 'Login' });
                 return;
@@ -158,7 +158,7 @@ export default {
             axios
                 .put(`http://localhost:8080/api/transactions/${transaction.id}`, transaction, {
                     headers: {
-                        Authorization: 'Bearer ' + user.jwt,
+                        Authorization: 'Bearer ' + auth.jwt,
                     },
                 })
                 .then((response) => {

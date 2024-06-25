@@ -24,7 +24,7 @@ import authService from '../services/authService';
 export default {
     data() {
         return {
-            user: null,
+            auth: null,
             errorMessage: '',
         };
     },
@@ -49,7 +49,7 @@ export default {
                     },
                 })
                 .then((response) => {
-                    this.user = response.data;
+                    this.auth = response.data;
                 })
                 .catch((error) => {
                     console.error('Failed to fetch user profile:', error);

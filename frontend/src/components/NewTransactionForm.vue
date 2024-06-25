@@ -71,13 +71,13 @@ export default {
     },
     methods: {
         addTransaction() {
-            const user = authService.getCurrentUser();
-            console.log('user: ', user);
+            const auth = authService.getCurrentUser();
+            console.log('auth: ', auth);
 
-            if (user && user.userId) {
+            if (auth && auth.userId) {
                 const transaction = {
                     ...this.newTransaction,
-                    userId: user.userId, // Include user ID in the payload
+                    userId: auth.userId, // Include user ID in the payload
                 };
 
                 console.log('transaction to add: ', transaction);
