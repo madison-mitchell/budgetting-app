@@ -77,8 +77,13 @@ export default {
             console.log('auth: ', auth);
 
             if (auth && auth.userId) {
+                // Convert date to UTC
+                const localDate = new Date(this.newTransaction.timeOfTransaction);
+                const utcDate = new Date(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate(), localDate.getUTCHours(), localDate.getUTCMinutes(), localDate.getUTCSeconds());
+
                 const transaction = {
                     ...this.newTransaction,
+                    timeOfTransaction: utcDate.toISOString(), // Convert to ISO string for consistency
                     userId: auth.userId, // Include user ID in the payload
                 };
 
