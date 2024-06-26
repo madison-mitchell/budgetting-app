@@ -15,8 +15,8 @@
                 <input type="text" v-model="newAccount.accountNumber" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm" />
             </div>
             <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Initial Balance</label>
-                <input type="number" v-model="newAccount.balance" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm" />
+                <label class="block text-sm font-medium text-gray-700">Initial currentBalance</label>
+                <input type="number" v-model="newAccount.currentBalance" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm" />
             </div>
             <div class="flex justify-end mt-4">
                 <button @click="addAccount" class="bg-sky-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 mr-2">
@@ -46,7 +46,7 @@ export default {
                 name: '',
                 bankName: '',
                 accountNumber: '',
-                balance: 0,
+                currentBalance: 0,
             },
         };
     },
@@ -57,7 +57,7 @@ export default {
                 name: '',
                 bankName: '',
                 accountNumber: '',
-                balance: 0,
+                currentBalance: 0,
             };
         },
     },

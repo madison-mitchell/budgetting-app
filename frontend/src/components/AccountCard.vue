@@ -8,11 +8,11 @@
             <p
                 class="text-lg font-semibold mt-4"
                 :class="{
-                    'text-red-600': account.balance < 0,
-                    'text-orange-500': account.balance >= 0 && account.balance < 50,
-                    'text-sky-500': account.balance >= 50,
+                    'text-red-600': account.currentBalance < 0,
+                    'text-orange-500': account.currentBalance >= 0 && account.currentBalance < 50,
+                    'text-sky-500': account.currentBalance >= 50,
                 }">
-                {{ formatBalance(account.balance) }}
+                {{ formatBalance(account.currentBalance) }}
             </p>
         </div>
         <div class="flex justify-between items-center mt-4">

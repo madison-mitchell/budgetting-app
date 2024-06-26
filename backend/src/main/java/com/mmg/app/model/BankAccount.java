@@ -22,7 +22,6 @@ public class BankAccount {
     private String accountNumber;
 
     private String name;
-    private double balance;
 
     @Column(name = "account_type")
     private String accountType;
@@ -83,14 +82,6 @@ public class BankAccount {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(double balance) {
-        this.balance = balance;
     }
 
     public String getAccountType() {

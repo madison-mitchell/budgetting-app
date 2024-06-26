@@ -4,8 +4,8 @@
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
             <td class="pl-4 py-4 whitespace-nowrap">
                 <span
-                    class="font-mono text-xs border border-1 border-gray-400 px-1 mr-2 rounded-md cursor-default"
-                    :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-gray-400': true }"
+                    class="font-mono text-xs border border-1 px-1 mr-2 rounded-md cursor-default"
+                    :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-sky-400 border-sky-400': true }"
                     title="Transaction Type: Regular, Income, Transfer">
                     {{ transaction.type.substring(0, 1) }}
                 </span>
@@ -30,8 +30,8 @@
         <td class="pl-4 py-4 whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
         <td class="pl-4 py-4 whitespace-nowrap">
             <span
-                class="font-mono text-xs border border-1 border-gray-400 px-1 mr-2 rounded-md cursor-default"
-                :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-gray-400': true }">
+                class="font-mono text-xs border border-1 px-1 mr-2 rounded-md cursor-default"
+                :class="{ 'text-green-500 border-green-500': true, 'text-sky-400 border-sky-400': transaction.type !== 'Income' }">
                 {{ transaction.type.substring(0, 1) }}
             </span>
             {{ transaction.merchant }}
@@ -118,7 +118,7 @@ export default {
                 Donations: 'fa-hand-holding-heart text-gray-600',
                 // Personal Care
                 Spa: 'fa-spa text-teal-600',
-                Cosmetics: 'fa-makeup text-teal-600',
+                Cosmetics: 'fa-spa text-teal-600',
                 Haircuts: 'fa-cut text-teal-600',
                 'Gym Membership': 'fa-dumbbell text-teal-600',
                 // Shopping
