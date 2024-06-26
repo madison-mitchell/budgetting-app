@@ -14,7 +14,7 @@
             </td>
             <td class="pl-4 py-4 whitespace-nowrap">{{ transaction.description }}</td>
             <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': split.amount > 0 }">{{ formatBalance(split.amount) }}</td>
-            <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.balance < 0 }">{{ formatBalance(calculateSplitBalance(index, transaction)) }}</td>
+            <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.accountBalance < 0 }">{{ formatBalance(calculateSplitBalance(index, transaction)) }}</td>
             <td class="pl-4 py-4 whitespace-nowrap text-center">
                 <input type="checkbox" v-model="split.planned" @change="updateTransaction(split)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
             </td>
@@ -38,7 +38,8 @@
         </td>
         <td class="pl-4 py-4 whitespace-nowrap">{{ transaction.description }}</td>
         <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': transaction.amount > 0 }">{{ formatBalance(transaction.amount) }}</td>
-        <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.balance < 0 }">{{ formatBalance(transaction.balance) }}</td>
+        <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.accountBalance < 0 }">{{ formatBalance(transaction.accountBalance) }}</td>
+        <!-- <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.balance < 0 }">{{ formatBalance(transaction.balance) }}</td> -->
         <td class="pl-4 py-4 whitespace-nowrap text-center">
             <input type="checkbox" v-model="transaction.planned" @change="updateTransaction(transaction)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
         </td>
