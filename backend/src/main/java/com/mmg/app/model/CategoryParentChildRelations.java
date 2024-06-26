@@ -3,18 +3,18 @@ package com.mmg.app.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "categoryparentchildrelations")
+@Table(name = "category_parent_child_relation")
 public class CategoryParentChildRelations {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "parentcategoryid")
+    @JoinColumn(name = "parent_category_id")
     private CategoryParent parentCategory;
 
     @ManyToOne
-    @JoinColumn(name = "childcategoryid")
+    @JoinColumn(name = "child_category_id")
     private CategoryChild childCategory;
 
     private Double budget;

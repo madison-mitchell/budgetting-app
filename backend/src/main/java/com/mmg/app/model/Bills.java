@@ -5,26 +5,26 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "bills")
+@Table(name = "bill")
 public class Bills {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "user_id")
     private User user;
 
     private double amount;
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "categoryid")
+    @JoinColumn(name = "category_id")
     private CategoryParentChildRelations category;
 
     private String description;
 
-    @Column(name = "duedate")
+    @Column(name = "due_date")
     private Date dueDate;
 
     private boolean recurring;

@@ -5,21 +5,21 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "expenses")
+@Table(name = "expense")
 public class Expenses {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "user_id")
     private User user;
 
     private double amount;
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "categoryid")
+    @JoinColumn(name = "category_id")
     private CategoryParentChildRelations category;
 
     private String description;
@@ -27,8 +27,8 @@ public class Expenses {
     private String notes;
 
     @ManyToOne
-    @JoinColumn(name = "bankaccountid")
-    private BankAccount bankAccount;
+    @JoinColumn(name = "account_id")
+    private BankAccount accountId;
 
     private String merchant;
     private boolean recurring;
@@ -91,12 +91,12 @@ public class Expenses {
         this.notes = notes;
     }
 
-    public BankAccount getBankAccount() {
-        return bankAccount;
+    public BankAccount getAccountId() {
+        return accountId;
     }
 
-    public void setBankAccount(BankAccount bankAccount) {
-        this.bankAccount = bankAccount;
+    public void setAccountId(BankAccount accountId) {
+        this.accountId = accountId;
     }
 
     public String getMerchant() {

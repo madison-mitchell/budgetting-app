@@ -4,8 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
+
 @Entity
-@Table(name = "categoryparent")
+@Table(name = "category_parent")
 public class CategoryParent {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,11 +16,7 @@ public class CategoryParent {
     private String name;
 
     @ManyToMany
-    @JoinTable(
-            name = "categoryparentchildrelations",
-            joinColumns = @JoinColumn(name = "parentcategoryid"),
-            inverseJoinColumns = @JoinColumn(name = "childcategoryid")
-    )
+    @JoinTable(name = "category_parent_child_relation", joinColumns = @JoinColumn(name = "parent_category_id"), inverseJoinColumns = @JoinColumn(name = "child_category_id"))
     private List<CategoryChild> childCategories;
 
     public Long getId() {

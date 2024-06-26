@@ -2,17 +2,16 @@
     <div class="max-w-7xl mx-auto p-12">
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Profile</h2>
         <div v-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
-        <div v-if="user" class="bg-white shadow-md border border-grey-50 rounded-lg p-6 text-left">
-            <p><strong>Username:</strong> {{ user.username }}</p>
-            <p><strong>First Name:</strong> {{ user.firstName }}</p>
-            <p><strong>Last Name:</strong> {{ user.lastName }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Phone:</strong> {{ user.phoneNumber }}</p>
-            <p><strong>Address:</strong> {{ user.address }}</p>
-            <p><strong>Birthdate:</strong> {{ formatDate(user.dateOfBirth) }}</p>
-            <p><strong>Last Login:</strong> {{ user.lastLogin }}</p>
-            <p><strong>Role:</strong> {{ user.role }}</p>
-            <!-- Add more fields as necessary -->
+        <div v-if="auth" class="bg-white shadow-md border border-grey-50 rounded-lg p-6 text-left">
+            <p><strong>Username:</strong> {{ auth.username }}</p>
+            <p><strong>First Name:</strong> {{ auth.firstName }}</p>
+            <p><strong>Last Name:</strong> {{ auth.lastName }}</p>
+            <p><strong>Email:</strong> {{ auth.email }}</p>
+            <p><strong>Phone:</strong> {{ auth.phoneNumber }}</p>
+            <p><strong>Address:</strong> {{ auth.address }}</p>
+            <p><strong>Birthdate:</strong> {{ formatDate(auth.dateOfBirth) }}</p>
+            <p><strong>Last Login:</strong> {{ auth.lastLogin }}</p>
+            <p><strong>Role:</strong> {{ auth.role }}</p>
         </div>
     </div>
 </template>

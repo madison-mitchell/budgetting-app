@@ -44,7 +44,7 @@ public class TransactionsServiceImpl implements TransactionsService {
 
         Transactions transaction = new Transactions();
         transaction.setUser(user);
-        transaction.setBankAccountId(bankAccount);
+        transaction.setAccountId(bankAccount);
         transaction.setCategoryId(category);
         transaction.setAmount(transactionRequest.getAmount());
         transaction.setDescription(transactionRequest.getDescription());
@@ -130,23 +130,4 @@ public class TransactionsServiceImpl implements TransactionsService {
         }
         return transactionsRepository.findTransactionsByAccountIdAndUserId(accountId, user.getId());
     }
-
-//    public TransactionSplitDto convertToDto(TransactionSplit split) {
-//        TransactionSplitDto dto = new TransactionSplitDto();
-//        dto.setId(split.getId());
-//        dto.setTransactionId(split.getTransaction().getId());
-//        dto.setCategoryId(split.getCategoryId().getId());
-//        dto.setAmount(split.getAmount());
-//        return dto;
-//    }
-//
-//    public TransactionDto convertToDto(Transactions transaction) {
-//        TransactionDto dto = new TransactionDto();
-//        dto.setId(transaction.getId());
-//        dto.setAmount(transaction.getAmount());
-//        dto.setDescription(transaction.getDescription());
-//        dto.setTimeOfTransaction(transaction.getTimeOfTransaction());
-//        dto.setSplits(transaction.getSplits().stream().map(this::convertToDto).collect(Collectors.toList()));
-//        return dto;
-//    }
 }

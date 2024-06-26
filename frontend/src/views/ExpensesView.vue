@@ -64,6 +64,7 @@ export default {
                 })
                 .then((response) => {
                     this.expenses = response.data;
+                    console.log('response.data: ', response.data);
                 })
                 .catch((error) => {
                     this.errorMessage = 'Failed to fetch expenses.';

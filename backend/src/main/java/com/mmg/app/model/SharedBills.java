@@ -3,30 +3,34 @@ package com.mmg.app.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "sharedbills")
+@Table(name = "shared_bill")
 public class SharedBills {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "billid")
+    @JoinColumn(name = "bill_id")
     private Bills bill;
 
     @ManyToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "user_id")
     private User user;
 
     private String name;
 
-    @Column(name = "personaportion")
+    @Column(name = "person_a_portion")
     private double personAPortion;
-    @Column(name = "personbportion")
+
+    @Column(name = "person_b_portion")
     private double personBPortion;
-    @Column(name = "ispercentage")
+
+    @Column(name = "is_percentage")
     private boolean isPercentage;
-    @Column(name = "percentagesplit")
+
+    @Column(name = "percentage_split")
     private double percentageSplit;
+
     private String notes;
     private String reviewed;
 

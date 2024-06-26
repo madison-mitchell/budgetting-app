@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "categorychild")
+@Table(name = "category_child")
 public class CategoryChild {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

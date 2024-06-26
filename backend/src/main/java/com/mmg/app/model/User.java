@@ -10,43 +10,44 @@ import java.util.Date;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
-    @Column(name = "firstname")
+//    @Column(name = "firstname")
     private String firstName;
 
-    @Column(name = "lastname")
+//    @Column(name = "lastname")
     private String lastName;
 
-    @Column(name = "username")
+//    @Column(name = "username")
     private String username;
 
-    @Column(name = "passwordhash")
+//    @Column(name = "passwordhash")
     private String passwordHash;
 
-    @Column(name = "email")
+//    @Column(name = "email")
     private String email;
 
-    @Column(name = "phonenumber")
+//    @Column(name = "phonenumber")
     private String phoneNumber;
 
     private String address;
 
-    @Column(name = "dateofbirth")
+//    @Column(name = "dateofbirth")
     private LocalDateTime dateOfBirth;
 
-    @Column(name = "createdat")
-    private Date createdAt;
+//    @Column(name = "createdate")
+    private Date createdDate;
 
-    @Column(name = "lastlogin")
+//    @Column(name = "lastlogin")
     private Date lastLogin;
 
-    @Column(name = "profilepicture")
+//    @Column(name = "profilepicture")
     private String profilePicture;
 
     private String role;
 
-    @Column(name = "isactive")
+//    @Column(name = "isactive")
     private boolean isActive;
 
     public Long getId() {
@@ -121,12 +122,12 @@ public class User {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public Date getCreatedDate() {
+        return createdDate;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
     public Date getLastLogin() {

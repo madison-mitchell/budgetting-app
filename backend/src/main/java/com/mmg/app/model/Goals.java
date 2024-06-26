@@ -4,25 +4,25 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "goals")
+@Table(name = "goal")
 public class Goals {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "userid", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "targetamount", nullable = false)
+    @Column(name = "target_amount", nullable = false)
     private double targetAmount;
 
-    @Column(name = "savedamount", nullable = false)
+    @Column(name = "saved_amount", nullable = false)
     private double savedAmount;
 
-    @Column(name = "duedate")
+    @Column(name = "due_date")
     private Date dueDate;
     private String notes;
     private String priority;

@@ -37,8 +37,8 @@
             <p class="text-sm text-gray-600">{{ expense.dueDate }}</p>
         </div>
         <div class="flex justify-between items-center mt-4">
-            <p class="text-sm text-gray-600">{{ expense.bankAccount.bankName }}</p>
-            <p class="text-sm text-gray-600">**** {{ getLastFourDigits(expense.bankAccount.accountNumber) }}</p>
+            <p class="text-sm text-gray-600">{{ expense.accountId.bankName }}</p>
+            <p class="text-sm text-gray-600">**** {{ getLastFourDigits(expense.accountId.accountNumber) }}</p>
         </div>
     </div>
 </template>

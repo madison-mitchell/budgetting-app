@@ -6,19 +6,19 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "transaction")
 public class Transactions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "bankaccountid", nullable = false)
-    private BankAccount bankAccountId;
+    @JoinColumn(name = "account_id", nullable = false)
+    private BankAccount accountId;
 
     private double amount;
 
@@ -27,12 +27,12 @@ public class Transactions {
     private List<TransactionSplit> splits;
 
     @ManyToOne
-    @JoinColumn(name = "categoryid", nullable = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private CategoryParentChildRelations categoryId;
 
     private String description;
 
-    @Column(name = "timeoftransaction")
+    @Column(name = "time_of_transaction")
     private Date timeOfTransaction;
 
     private String notes;
@@ -43,14 +43,17 @@ public class Transactions {
     private String reviewed;
     private String type;
 
-    @Column(name = "isplanned")
+    @Column(name = "is_planned")
     private boolean isPlanned;
 
-    @Column(name = "plannedamount")
+    @Column(name = "planned_amount")
     private double plannedAmount;
 
-    @Column(name = "hassplit")
+    @Column(name = "has_split")
     private boolean hasSplit;
+
+    @Column(name = "account_balance")
+    private double accountBalance;
 
     public Long getId() {
         return id;
@@ -68,12 +71,12 @@ public class Transactions {
         this.user = user;
     }
 
-    public BankAccount getBankAccountId() {
-        return bankAccountId;
+    public BankAccount getAccountId() {
+        return accountId;
     }
 
-    public void setBankAccountId(BankAccount bankAccountId) {
-        this.bankAccountId = bankAccountId;
+    public void setAccountId(BankAccount accountId) {
+        this.accountId = accountId;
     }
 
     public double getAmount() {
@@ -196,5 +199,13 @@ public class Transactions {
 
     public void setHasSplit(boolean hasSplit) {
         this.hasSplit = hasSplit;
+    }
+
+    public double getAccountBalance() {
+        return accountBalance;
+    }
+
+    public void setAccountBalance(double accountBalance) {
+        this.accountBalance = accountBalance;
     }
 }

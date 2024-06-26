@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "transactionsplit")
+@Table(name = "transaction_split")
 public class TransactionSplit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,11 +12,11 @@ public class TransactionSplit {
 
     @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "transactionid")
+    @JoinColumn(name = "transaction_id")
     private Transactions transaction;
 
     @ManyToOne
-    @JoinColumn(name = "categoryid")
+    @JoinColumn(name = "category_id")
     private CategoryParentChildRelations categoryId;
 
     private Double amount;

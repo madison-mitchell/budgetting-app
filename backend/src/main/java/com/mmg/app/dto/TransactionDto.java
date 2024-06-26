@@ -5,7 +5,7 @@ import java.util.List;
 
 public class TransactionDto {
     private Long id;
-    private Long bankAccountId;
+    private Long accountId;
     private Long userId;
     private double amount;
     private List<TransactionSplitDto> splits;
@@ -31,11 +31,11 @@ public class TransactionDto {
     }
 
     public Long getBankAccountId() {
-        return bankAccountId;
+        return accountId;
     }
 
-    public void setBankAccountId(Long bankAccountId) {
-        this.bankAccountId = bankAccountId;
+    public void setBankAccountId(Long accountId) {
+        this.accountId = accountId;
     }
 
     public Long getUserId() {

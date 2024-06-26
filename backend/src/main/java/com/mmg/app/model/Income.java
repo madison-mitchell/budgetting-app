@@ -11,13 +11,13 @@ public class Income {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "user_id")
     private User user;
 
     private double amount;
 
     @ManyToOne
-    @JoinColumn(name = "categoryid")
+    @JoinColumn(name = "category_id")
     private CategoryParentChildRelations category;
 
     private String source;

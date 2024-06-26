@@ -5,39 +5,45 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bankaccounts")
+@Table(name = "bank_account")
 public class BankAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "bankname")
+    @Column(name = "bank_name")
     private String bankName;
 
-    @Column(name = "accountnumber")
+    @Column(name = "account_number")
     private String accountNumber;
 
     private String name;
     private double balance;
 
-    @Column(name = "accounttype")
+    @Column(name = "account_type")
     private String accountType;
 
-    @Column(name = "paymentmethod")
+    @Column(name = "payment_method")
     private String paymentMethod;
 
-    @Column(name = "createdat")
-    private LocalDateTime createdAt;
+    @Column(name = "created_date")
+    private LocalDateTime created_date;
 
     private String notes;
 
-    @Column(name = "lastupdated")
+    @Column(name = "last_updated")
     private LocalDateTime lastUpdated;
     private String reviewed;
+
+    @Column(name = "initial_balance")
+    private double initialBalance;
+
+    @Column(name = "current_balance")
+    private double currentBalance;
 
     public Long getId() {
         return id;
@@ -103,12 +109,12 @@ public class BankAccount {
         this.paymentMethod = paymentMethod;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public LocalDateTime getCreatedDate() {
+        return created_date;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setCreatedDate(LocalDateTime created_date) {
+        this.created_date = created_date;
     }
 
     public String getNotes() {
@@ -135,4 +141,19 @@ public class BankAccount {
         this.reviewed = reviewed;
     }
 
+    public double getInitialBalance() {
+        return initialBalance;
+    }
+
+    public void setInitialBalance(double initialBalance) {
+        this.initialBalance = initialBalance;
+    }
+
+    public double getCurrentBalance() {
+        return currentBalance;
+    }
+
+    public void setCurrentBalance(double currentBalance) {
+        this.currentBalance = currentBalance;
+    }
 }
