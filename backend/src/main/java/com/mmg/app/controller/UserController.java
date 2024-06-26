@@ -1,5 +1,6 @@
 package com.mmg.app.controller;
 
+import com.mmg.app.dto.AuthenticationRequest;
 import com.mmg.app.model.User;
 import com.mmg.app.repository.UserRepository;
 import com.mmg.app.service.UserService;
@@ -74,5 +75,15 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(user);
+    }
+
+    @PostMapping("/{id}/update-password")
+    public ResponseEntity<?> updatePassword(@PathVariable Long id, @RequestBody AuthenticationRequest passwordUpdateRequest) {
+        try {
+            userService.updatePassword(id, passwordUpdateRequest.getPassword());
+            return ResponseEntity.ok("Password updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating password: " + e.getMessage());
+        }
     }
 }

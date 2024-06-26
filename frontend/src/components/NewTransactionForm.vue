@@ -33,14 +33,16 @@
         <td class="pl-4 py-4">
             <input type="number" v-model="newTransaction.plannedAmount" step="0.01" class="form-input w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1" placeholder="0.00" />
         </td>
-        <td class="px-4 py-4">
+        <td class="px-4 py-4 flex justify-between space-x-1">
             <select v-model="newTransaction.categoryId" class="form-select w-full bg-gray-100 border border-gray-300 border-1 rounded-lg px-1">
                 <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.childCategory.name }}</option>
             </select>
-        </td>
-        <td class="pr-3">
+
             <button @click="addTransaction" class="bg-sky-500 hover:bg-sky-700 text-white text-xs font-bold px-3 py-2 rounded-full">+</button>
         </td>
+        <!-- <td class="pr-3">
+            <button @click="addTransaction" class="bg-sky-500 hover:bg-sky-700 text-white text-xs font-bold px-3 py-2 rounded-full">+</button>
+        </td> -->
     </tr>
 </template>
 

@@ -4,7 +4,7 @@
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
             <td class="pl-4 py-4 whitespace-nowrap">
                 <span
-                    class="font-mono text-xs border border-1 border-gray-400 px-1 mr-2 rounded-md"
+                    class="font-mono text-xs border border-1 border-gray-400 px-1 mr-2 rounded-md cursor-default"
                     :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-gray-400': true }"
                     title="Transaction Type: Regular, Income, Transfer">
                     {{ transaction.type.substring(0, 1) }}
@@ -20,8 +20,8 @@
             </td>
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(split.plannedAmount) }}</td>
             <td class="px-4 py-4 whitespace-nowrap flex items-center">
-                <i :class="`fa ${getCategoryIcon(split.categoryId.childCategory.name)}`" class="mr-2"></i>
-                <!-- {{ split.categoryId.childCategory.name }} -->
+                <i :class="`fa ${getCategoryIcon(split.categoryId.childCategory.name)} text-lg`" class="mr-2"></i>
+                {{ split.categoryId.childCategory.name }}
                 <i class="fa-solid fa-circle text-supersmall text-sky-500 ml-2" title="Split Transaction"></i>
             </td>
         </tr>
@@ -29,7 +29,9 @@
     <tr v-else class="border-b hover:bg-gray-50 text-left text-sm">
         <td class="pl-4 py-4 whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
         <td class="pl-4 py-4 whitespace-nowrap">
-            <span class="font-mono text-xs border border-1 border-gray-400 px-1 mr-2 rounded-md" :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-gray-400': true }">
+            <span
+                class="font-mono text-xs border border-1 border-gray-400 px-1 mr-2 rounded-md cursor-default"
+                :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-gray-400': true }">
                 {{ transaction.type.substring(0, 1) }}
             </span>
             {{ transaction.merchant }}
@@ -42,8 +44,8 @@
         </td>
         <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(transaction.plannedAmount) }}</td>
         <td class="px-4 py-4 whitespace-nowrap flex items-center">
-            <i :class="`fa ${getCategoryIcon(transaction.categoryId.childCategory.name)}`" class="mr-2"></i>
-            <!-- {{ transaction.categoryId.childCategory.name }} -->
+            <i :class="`fa ${getCategoryIcon(transaction.categoryId.childCategory.name)}  text-lg`" class="mr-2" :title="transaction.categoryId.childCategory.name"></i>
+            {{ transaction.categoryId.childCategory.name }}
         </td>
     </tr>
 </template>
