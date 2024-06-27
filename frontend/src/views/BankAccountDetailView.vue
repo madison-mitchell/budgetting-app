@@ -112,13 +112,18 @@ export default {
                 return;
             }
 
+            if (!newTransaction.category_id || !newTransaction.time_of_transaction) {
+                console.error('All required fields must be filled out.');
+                return;
+            }
+
             const newTransactionDto = {
                 bankAccountId: this.accountId,
                 userId: auth.userId,
-                categoryId: newTransaction.categoryId,
+                categoryId: newTransaction.category_id,
                 amount: newTransaction.amount,
                 description: newTransaction.description,
-                timeOfTransaction: newTransaction.timeOfTransaction,
+                timeOfTransaction: newTransaction.time_of_transaction,
                 notes: newTransaction.notes,
                 merchant: newTransaction.merchant,
                 recurring: newTransaction.recurring,
@@ -126,8 +131,8 @@ export default {
                 included: newTransaction.included,
                 reviewed: newTransaction.reviewed,
                 type: newTransaction.type,
-                isPlanned: newTransaction.isPlanned,
-                plannedAmount: newTransaction.plannedAmount,
+                isPlanned: newTransaction.is_planned,
+                plannedAmount: newTransaction.planned_amount,
             };
 
             console.log('newTransactionDto: ', newTransactionDto);

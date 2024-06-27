@@ -1,126 +1,111 @@
 <template>
     <div v-if="show" class="fixed inset-0 z-50 overflow-auto bg-smoke-light flex items-center justify-center text-sm">
-        <div class="relative p-8 bg-white w-full max-w-2xl m-auto flex-col flex rounded-lg shadow-lg">
+        <div class="relative p-8 bg-white w-full max-w-4xl m-auto flex-col flex rounded-lg shadow-lg">
             <h2 class="text-2xl font-semibold mb-4">{{ isUpdate ? 'Update' : 'Add New' }} Transaction</h2>
-            <form @submit.prevent="handleSubmit" class="grid grid-cols-2 gap-4">
-                <div>
-                    <label for="amount" class="block font-medium text-gray-700">Amount</label>
-                    <input
-                        type="number"
-                        v-model="transaction.amount"
-                        step="0.01"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                        required />
-                </div>
-                <div>
-                    <label for="category_id" class="block font-medium text-gray-700">Category</label>
-                    <select
-                        v-model="transaction.category_id"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                        required>
-                        <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.childCategory.name }}</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="description" class="block font-medium text-gray-700">Description</label>
-                    <input
-                        type="text"
-                        v-model="transaction.description"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                        required />
-                </div>
-                <div>
-                    <label for="time_of_transaction" class="block font-medium text-gray-700">Date</label>
-                    <input
-                        type="datetime-local"
-                        v-model="transaction.time_of_transaction"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                        required />
-                </div>
-                <div>
-                    <label for="notes" class="block font-medium text-gray-700">Notes</label>
-                    <input
-                        type="text"
-                        v-model="transaction.notes"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div class="flex items-center mt-4 mx-auto">
-                    <label for="recurring" class="block font-medium text-gray-700">Recurring</label>
-                    <input
-                        type="checkbox"
-                        v-model="transaction.recurring"
-                        class="ml-2 mt-1 rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div>
-                    <label for="merchant" class="block font-medium text-gray-700">Merchant</label>
-                    <input
-                        type="text"
-                        v-model="transaction.merchant"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                        required />
-                </div>
-                <div class="flex items-center mt-4 mx-auto">
-                    <label for="included" class="block font-medium text-gray-700">Included</label>
-                    <input
-                        type="checkbox"
-                        v-model="transaction.included"
-                        class="ml-2 mt-1 rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div>
-                    <label for="frequency" class="block font-medium text-gray-700">Frequency</label>
-                    <input
-                        type="text"
-                        v-model="transaction.frequency"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div class="flex items-center mt-4 mx-auto">
-                    <label for="reviewed" class="block font-medium text-gray-700">Reviewed</label>
-                    <input
-                        type="checkbox"
-                        v-model="transaction.reviewed"
-                        class="ml-2 mt-1 rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div>
-                    <label for="type" class="block font-medium text-gray-700">Type</label>
-                    <select
-                        v-model="transaction.type"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50"
-                        required>
-                        <option value="Regular">Regular</option>
-                        <option value="Income">Income</option>
-                    </select>
-                </div>
-                <div class="flex items-center mt-4 mx-auto">
-                    <label for="is_planned" class="block font-medium text-gray-700">Is Planned</label>
-                    <input
-                        type="checkbox"
-                        v-model="transaction.is_planned"
-                        class="ml-2 mt-1 rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div>
-                    <label for="planned_amount" class="block font-medium text-gray-700">Planned Amount</label>
-                    <input
-                        type="number"
-                        v-model="transaction.planned_amount"
-                        step="0.01"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div class="flex items-center mt-4 mx-auto">
-                    <label for="has_split" class="block font-medium text-gray-700">Has Split</label>
-                    <input
-                        type="checkbox"
-                        v-model="transaction.has_split"
-                        class="ml-2 mt-1 rounded border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div>
-                    <label for="account_balance" class="block font-medium text-gray-700">Account Balance</label>
-                    <input
-                        type="number"
-                        v-model="transaction.account_balance"
-                        step="0.01"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" />
-                </div>
-                <div class="col-span-2 flex justify-end mt-4">
+            <form @submit.prevent="handleSubmit" class="grid grid-cols-4 gap-4">
+                <label for="amount" class="block font-medium text-gray-700 text-left">Amount</label>
+                <input
+                    type="text"
+                    v-model="formattedAmount"
+                    @input="updateAmount"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1"
+                    placeholder="$0.00"
+                    required />
+
+                <label for="time_of_transaction" class="block font-medium text-gray-700 text-left">Date</label>
+                <input
+                    type="datetime-local"
+                    v-model="transaction.time_of_transaction"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1"
+                    required />
+
+                <label for="merchant" class="block font-medium text-gray-700 text-left">Merchant</label>
+                <input
+                    type="text"
+                    v-model="transaction.merchant"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1"
+                    required />
+
+                <label for="category_id" class="block font-medium text-gray-700 text-left">Category</label>
+                <select
+                    v-model="transaction.category_id"
+                    @change="logCategory"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1"
+                    required>
+                    <option v-for="category in sortedCategories" :key="category.id" :value="category.id">{{ category.childCategory.name }}</option>
+                </select>
+
+                <label for="recurring" class="block font-medium text-gray-700 text-left">Recurring</label>
+                <input
+                    type="checkbox"
+                    v-model="transaction.recurring"
+                    class="rounded border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1 w-4" />
+
+                <label for="frequency" class="block font-medium text-gray-700 text-left">Frequency</label>
+                <select
+                    v-model="transaction.frequency"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1">
+                    <option value="Daily">Daily</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Bi-Weekly">Bi-weekly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Yearly">Yearly</option>
+                </select>
+
+                <label for="is_planned" class="block font-medium text-gray-700 text-left">Is Planned</label>
+                <input
+                    type="checkbox"
+                    v-model="transaction.is_planned"
+                    class="rounded border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1 w-4" />
+
+                <label for="planned_amount" class="block font-medium text-gray-700 text-left">Planned Amount</label>
+                <input
+                    type="number"
+                    v-model="transaction.planned_amount"
+                    step="0.01"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1" />
+
+                <label for="has_split" class="block font-medium text-gray-700 text-left">Has Split</label>
+                <input
+                    type="checkbox"
+                    v-model="transaction.has_split"
+                    class="rounded border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1 w-4" />
+
+                <label for="description" class="block font-medium text-gray-700 text-left">Description</label>
+                <input
+                    type="text"
+                    v-model="transaction.description"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1"
+                    required />
+
+                <label for="reviewed" class="block font-medium text-gray-700 text-left">Reviewed</label>
+                <input
+                    type="checkbox"
+                    v-model="transaction.reviewed"
+                    class="rounded border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1 w-4" />
+
+                <label for="notes" class="block font-medium text-gray-700 text-left">Notes</label>
+                <input
+                    type="text"
+                    v-model="transaction.notes"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1" />
+
+                <label for="included" class="block font-medium text-gray-700 text-left">Included</label>
+                <input
+                    type="checkbox"
+                    v-model="transaction.included"
+                    class="rounded border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1 w-4" />
+
+                <label for="type" class="block font-medium text-gray-700 text-left">Type</label>
+                <select
+                    v-model="transaction.type"
+                    class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1"
+                    required>
+                    <option value="Regular">Regular</option>
+                    <option value="Income">Income</option>
+                </select>
+
+                <div class="col-span-4 flex justify-end mt-4">
                     <button
                         type="button"
                         @click="close"
@@ -167,11 +152,25 @@ export default {
                 has_split: false,
                 account_balance: 0.0,
             },
+            formattedAmount: '',
         };
     },
     computed: {
         isUpdate() {
             return this.transactionData && this.transactionData.id;
+        },
+        sortedCategories() {
+            return this.categories.sort((a, b) => {
+                const nameA = a.childCategory.name.toUpperCase();
+                const nameB = b.childCategory.name.toUpperCase();
+                if (nameA < nameB) {
+                    return -1;
+                }
+                if (nameA > nameB) {
+                    return 1;
+                }
+                return 0;
+            });
         },
     },
     watch: {
@@ -179,6 +178,7 @@ export default {
             handler(newVal) {
                 if (newVal) {
                     this.transaction = { ...newVal };
+                    this.formattedAmount = this.formatAmount(this.transaction.amount);
                 }
             },
             immediate: true,
@@ -190,6 +190,11 @@ export default {
             this.$emit('close');
         },
         handleSubmit() {
+            if (!this.transaction.category_id || !this.transaction.time_of_transaction) {
+                console.error('All required fields must be filled out.');
+                return;
+            }
+
             const auth = authService.getCurrentUser();
             if (auth && auth.userId) {
                 const localDate = new Date(this.transaction.time_of_transaction);
@@ -197,14 +202,31 @@ export default {
 
                 const newTransaction = {
                     ...this.transaction,
+                    amount: this.transaction.amount / 100, // Convert to actual amount
                     time_of_transaction: utcDate.toISOString(),
                     user_id: auth.userId,
                 };
+
+                console.log('New Transaction:', newTransaction); // Log the new transaction object
                 this.$emit('save', newTransaction);
                 this.close();
             } else {
                 console.error('User not authenticated');
             }
+        },
+        updateAmount(event) {
+            const value = event.target.value.replace(/\D/g, '');
+            this.transaction.amount = parseInt(value, 10) || 0;
+            this.formattedAmount = this.formatAmount(this.transaction.amount);
+        },
+        formatAmount(amount) {
+            const stringAmount = amount.toString().padStart(3, '0');
+            const dollars = stringAmount.slice(0, -2);
+            const cents = stringAmount.slice(-2);
+            return `$${dollars}.${cents}`;
+        },
+        logCategory(event) {
+            console.log('Selected Category ID:', this.transaction.category_id);
         },
     },
 };
