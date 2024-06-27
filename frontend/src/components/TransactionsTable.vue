@@ -2,29 +2,29 @@
     <div>
         <div class="mb-4 flex items-center justify-between">
             <div>
-                <label for="month-selector" class="text-sm font-medium text-gray-700 w-40">Time Period</label>
+                <label for="month-selector" class="font-sans text-xs font-medium text-gray-800 w-40 mr-3">TIME PERIOD:</label>
                 <select
                     id="month-selector"
                     v-model="selectedMonth"
                     @change="filterTransactionsByMonth"
-                    class="flex-grow border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    class="font-sans flex-grow border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-500 text-xs rounded-md">
                     <option v-for="month in availableMonths" :key="month.value" :value="month.value">{{ month.text }}</option>
                 </select>
             </div>
-            <button @click="openModal" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">New Transaction</button>
+            <button @click="openModal" class="bg-green-300 hover:bg-green-500 text-white text-sm font-bold py-2 px-3.5 rounded-full">+</button>
         </div>
 
         <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
             <thead>
-                <tr class="w-full bg-gray-100 border-b text-left text-sm font-medium text-gray-600 tracking-wider">
+                <tr class="w-full bg-gray-100 border-b text-left text-xs font-medium text-gray-600 tracking-wider">
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('timeOfTransaction')">Date</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('merchant')">Merchant</th>
+                    <th class="px-4 py-3 cursor-pointer text-gray-100" @click="sortBy('category')">Category</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('description')">Description</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('amount')">Amount</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('balance')">Balance</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('isPlanned')">Planned</th>
-                    <th class="pl-4 py-3 cursor-pointer" @click="sortBy('plannedAmount')">Planned Amount</th>
-                    <th class="px-4 py-3 cursor-pointer" @click="sortBy('category')">Category</th>
+                    <th class="pl-4 py-3 cursor-pointer" @click="sortBy('plannedAmount')">Planned<br />Amount</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,7 +40,6 @@
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 import TransactionRow from './TransactionRow.vue';
 import NewTransactionModal from './NewTransactionModal.vue';
-import authService from '../services/authService';
 
 export default {
     components: {

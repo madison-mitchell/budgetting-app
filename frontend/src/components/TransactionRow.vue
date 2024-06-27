@@ -1,6 +1,6 @@
 <template>
     <template v-if="transaction.hasSplit">
-        <tr v-for="(split, index) in transaction.splits" :key="split.id" class="border-b hover:bg-gray-50 text-left text-sm">
+        <tr v-for="(split, index) in transaction.splits" :key="split.id" class="border-b hover:bg-gray-50 text-left text-xxs">
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
             <td class="pl-4 py-4 whitespace-nowrap">
                 <span
@@ -20,13 +20,15 @@
             </td>
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(split.plannedAmount) }}</td>
             <td class="px-4 py-4 whitespace-nowrap flex items-center">
-                <i :class="`fa ${getCategoryIcon(split.categoryId.childCategory.name)} text-lg`" class="mr-2"></i>
-                {{ split.categoryId.childCategory.name }}
-                <i class="fa-solid fa-circle text-supersmall text-sky-500 ml-2" title="Split Transaction"></i>
+                <div :class="`${getCategoryBgColor(transaction.categoryId.childCategory.name)} px-2 py-0.5 rounded-xl`">
+                    <i :class="`fa ${getCategoryIcon(split.categoryId.childCategory.name)} text-xxs`" class="mr-2"></i>
+                    {{ split.categoryId.childCategory.name }}
+                    <i class="fa-solid fa-circle text-xxxs text-sky-500 ml-2" title="Split Transaction"></i>
+                </div>
             </td>
         </tr>
     </template>
-    <tr v-else class="border-b hover:bg-gray-50 text-left text-sm">
+    <tr v-else class="border-b hover:bg-gray-50 text-left text-xxs">
         <td class="pl-4 py-4 whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
         <td class="pl-4 py-4 whitespace-nowrap">
             <span
@@ -35,19 +37,21 @@
                 {{ transaction.type.substring(0, 1) }}
             </span>
             {{ transaction.merchant }}
+            <span class="text-gray-400 ml-2">{{ transaction.accountId.bankName }}</span>
+        </td>
+        <td class="px-4 py-4 whitespace-nowrap flex justify-end">
+            <div :class="`${getCategoryBgColor(transaction.categoryId.childCategory.name)} px-2 py-0.5 rounded-xl`">
+                <i :class="`fa ${getCategoryIcon(transaction.categoryId.childCategory.name)}  text-xxs`" class="mr-2" :title="transaction.categoryId.childCategory.name"></i>
+                {{ transaction.categoryId.childCategory.name }}
+            </div>
         </td>
         <td class="pl-4 py-4 whitespace-nowrap">{{ transaction.description }}</td>
         <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': transaction.amount > 0 }">{{ formatBalance(transaction.amount) }}</td>
         <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.accountBalance < 0 }">{{ formatBalance(transaction.accountBalance) }}</td>
-        <!-- <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.balance < 0 }">{{ formatBalance(transaction.balance) }}</td> -->
-        <td class="pl-4 py-4 whitespace-nowrap text-center">
+        <td class="py-4 whitespace-nowrap flex justify-around">
             <input type="checkbox" v-model="transaction.planned" @change="updateTransaction(transaction)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
         </td>
         <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(transaction.plannedAmount) }}</td>
-        <td class="px-4 py-4 whitespace-nowrap flex items-center">
-            <i :class="`fa ${getCategoryIcon(transaction.categoryId.childCategory.name)}  text-lg`" class="mr-2" :title="transaction.categoryId.childCategory.name"></i>
-            {{ transaction.categoryId.childCategory.name }}
-        </td>
     </tr>
 </template>
 
@@ -138,12 +142,72 @@ export default {
             };
             return categoryIcons[categoryName] || 'fa-circle'; // Default icon if category not found
         },
+        getCategoryBgColor(categoryName) {
+            const categoryBgColor = {
+                // Dining
+                Restaurants: 'text-indigo-700 bg-indigo-200',
+                Groceries: 'text-indigo-700 bg-indigo-200',
+                'Fast Food': 'text-indigo-700 bg-indigo-200',
+                // Education
+                'Online Courses': 'text-amber-700 bg-amber-200',
+                Books: 'text-amber-700 bg-amber-200',
+                Tuition: 'text-amber-700 bg-amber-200',
+                Supplies: 'text-amber-700 bg-amber-200',
+                // Entertainment
+                Hobbies: 'text-purple-700 bg-purple-200',
+                Subscription: 'text-purple-700 bg-purple-200',
+                Concerts: 'text-purple-700 bg-purple-200',
+                Movies: 'text-purple-700 bg-purple-200',
+                Games: 'text-purple-700 bg-purple-200',
+                // Flight
+                Materials: 'text-sky-700 fa-box bg-sky-200',
+                'Flight Time': 'text-sky-700 bg-sky-200',
+                'Instructor Time': 'text-sky-700 bg-sky-200',
+                // Healthcare
+                Dental: 'text-cyan-700 bg-cyan-200',
+                'Medical Bills': 'text-cyan-700 bg-cyan-200',
+                Prescriptions: 'text-cyan-700 bg-cyan-200',
+                Vision: 'text-cyan-700 bg-cyan-200',
+                'Health Insurance': 'text-cyan-700 bg-cyan-200',
+                // Housing
+                Rent: 'text-orange-700 bg-orange-200',
+                //Income
+                Salary: 'text-green-700 bg-green-200',
+                // Miscellaneous
+                Other: 'text-gray-700 bg-gray-200',
+                Donations: 'text-gray-700 bg-gray-200',
+                // Personal Care
+                Spa: 'text-teal-700 bg-teal-200',
+                Cosmetics: 'text-teal-700 bg-teal-200',
+                Haircuts: 'text-teal-700 bg-teal-200',
+                'Gym Membership': 'text-teal-700 bg-teal-200',
+                // Shopping
+                Clothing: 'text-rose-700 bg-rose-200',
+                Electronics: 'text-rose-700 bg-rose-200',
+                'Home Goods': 'text-rose-700 bg-rose-200',
+                Gifts: 'text-rose-700 bg-rose-200',
+                Toys: 'text-rose-700 bg-rose-200',
+                // Split Transaction
+                'Split Transaction': 'text-slate-700 bg-slate-200',
+                // Transportation
+                'Car Insurance': 'text-red-700 bg-red-200',
+                'Car Payment': 'text-red-700 bg-red-200',
+                Fuel: 'text-red-700 bg-red-200',
+                Repairs: 'text-red-700 bg-red-200',
+                'Public Transport': 'text-red-700 bg-red-200',
+            };
+            return categoryBgColor[categoryName] || '';
+        },
     },
 };
 </script>
 
 <style scoped>
-.text-supersmall {
+.text-xxxs {
     font-size: 4pt;
+}
+
+.text-xxs {
+    font-size: 9pt;
 }
 </style>
