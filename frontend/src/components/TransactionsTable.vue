@@ -1,14 +1,17 @@
 <template>
     <div>
-        <div class="mb-4 flex items-center">
-            <label for="month-selector" class="text-sm font-medium text-gray-700 w-40">Time Period</label>
-            <select
-                id="month-selector"
-                v-model="selectedMonth"
-                @change="filterTransactionsByMonth"
-                class="flex-grow border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
-                <option v-for="month in availableMonths" :key="month.value" :value="month.value">{{ month.text }}</option>
-            </select>
+        <div class="mb-4 flex items-center justify-between">
+            <div>
+                <label for="month-selector" class="text-sm font-medium text-gray-700 w-40">Time Period</label>
+                <select
+                    id="month-selector"
+                    v-model="selectedMonth"
+                    @change="filterTransactionsByMonth"
+                    class="flex-grow border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <option v-for="month in availableMonths" :key="month.value" :value="month.value">{{ month.text }}</option>
+                </select>
+            </div>
+            <button @click="openModal" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">New Transaction</button>
         </div>
 
         <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
@@ -26,21 +29,23 @@
             </thead>
             <tbody>
                 <TransactionRow v-for="transaction in filteredTransactions" :key="transaction.id" :transaction="transaction" @update-transaction="updateTransaction" />
-                <NewTransactionForm :categories="categories" @add-transaction="addTransaction" />
             </tbody>
         </table>
+
+        <NewTransactionModal v-if="showModal" :show="showModal" :categories="categories" @close="closeModal" @save="addTransaction" />
     </div>
 </template>
 
 <script>
 import { format, startOfMonth, endOfMonth, parseISO } from 'date-fns';
 import TransactionRow from './TransactionRow.vue';
-import NewTransactionForm from './NewTransactionForm.vue';
+import NewTransactionModal from './NewTransactionModal.vue';
+import authService from '../services/authService';
 
 export default {
     components: {
         TransactionRow,
-        NewTransactionForm,
+        NewTransactionModal,
     },
     props: {
         transactions: {
@@ -58,6 +63,7 @@ export default {
             availableMonths: [],
             sortField: '',
             sortOrder: 'asc',
+            showModal: false,
         };
     },
     watch: {
@@ -157,6 +163,12 @@ export default {
                 balance += transaction.amount;
                 return { ...transaction, balance };
             });
+        },
+        openModal() {
+            this.showModal = true;
+        },
+        closeModal() {
+            this.showModal = false;
         },
         addTransaction(newTransaction) {
             this.$emit('add-transaction', newTransaction);

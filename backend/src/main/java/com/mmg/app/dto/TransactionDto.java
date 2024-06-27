@@ -17,7 +17,7 @@ public class TransactionDto {
     private boolean recurring;
     private String frequency;
     private boolean included;
-    private String reviewed;
+    private boolean reviewed;
     private String type;
     private boolean isPlanned;
     private double plannedAmount;
@@ -126,11 +126,11 @@ public class TransactionDto {
         this.included = included;
     }
 
-    public String getReviewed() {
+    public boolean isReviewed() {
         return reviewed;
     }
 
-    public void setReviewed(String reviewed) {
+    public void setReviewed(boolean reviewed) {
         this.reviewed = reviewed;
     }
 

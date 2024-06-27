@@ -2,7 +2,6 @@ package com.mmg.app.service.impl;
 
 import com.mmg.app.dto.CategoryTotalDto;
 import com.mmg.app.dto.TransactionDto;
-import com.mmg.app.dto.TransactionSplitDto;
 import com.mmg.app.model.*;
 import com.mmg.app.repository.BankAccountRepository;
 import com.mmg.app.repository.CategoryParentChildRelationsRepository;
@@ -54,7 +53,7 @@ public class TransactionsServiceImpl implements TransactionsService {
         transaction.setRecurring(transactionRequest.isRecurring());
         transaction.setFrequency(transactionRequest.getFrequency());
         transaction.setIncluded(transactionRequest.isIncluded());
-        transaction.setReviewed(transactionRequest.getReviewed());
+        transaction.setReviewed(transactionRequest.isReviewed());  // Set reviewed
         transaction.setType(transactionRequest.getType());
         transaction.setIsPlanned(transactionRequest.isPlanned());
         transaction.setPlannedAmount(transactionRequest.getPlannedAmount());
@@ -102,6 +101,9 @@ public class TransactionsServiceImpl implements TransactionsService {
     @Override
     public List<Transactions> findByUsername(String username) {
         User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with username: " + username);
+        }
         return transactionsRepository.findByUserId(user.getId());
     }
 

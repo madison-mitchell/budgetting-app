@@ -40,7 +40,7 @@ public class Transactions {
     private boolean recurring;
     private String frequency;
     private boolean included;
-    private String reviewed;
+    private boolean reviewed;
     private String type;
 
     @Column(name = "is_planned")
@@ -159,11 +159,11 @@ public class Transactions {
         this.included = included;
     }
 
-    public String getReviewed() {
+    public boolean isReviewed() {
         return reviewed;
     }
 
-    public void setReviewed(String reviewed) {
+    public void setReviewed(boolean reviewed) {
         this.reviewed = reviewed;
     }
 
