@@ -164,6 +164,38 @@ CREATE OR REPLACE TRIGGER trg_set_fullname
     EXECUTE FUNCTION public.set_fullname();
 
 
+
+-- Table: public.category_budget
+
+-- DROP TABLE IF EXISTS public.category_budget;
+
+CREATE SEQUENCE category_budget_id_seq;
+
+CREATE TABLE IF NOT EXISTS public.category_budget
+(
+    id bigint NOT NULL DEFAULT nextval('category_budget_id_seq'::regclass),
+    category_id bigint NOT NULL,
+    year integer NOT NULL,
+    month integer NOT NULL,
+    budget_amount double precision NOT NULL,
+    created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    amount_spent double precision DEFAULT 0,
+    CONSTRAINT unique_category_month_year UNIQUE (category_id, year, month),
+    CONSTRAINT fk_category FOREIGN KEY (category_id)
+        REFERENCES public.category_parent_child_relation (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.category_budget
+    OWNER to postgres;
+
+
+
+
 -- Table: public.expense
 
 -- DROP TABLE IF EXISTS public.expense;
@@ -472,6 +504,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.users
     OWNER to postgres;
+
+    
 
 
 

@@ -7,20 +7,19 @@ public class CategoryTotalDto {
     private Long childCategoryId;
     private String childName;
     private double totalAmount;
-    private double budget;
 
-    // Constructor
-    public CategoryTotalDto(Long relationId, Long parentCategoryId, String parentName, Long childCategoryId, String childName, double totalAmount, double budget) {
+
+    public CategoryTotalDto(Long relationId, Long parentCategoryId, String parentName, Long childCategoryId, String childName, double totalAmount) {
         this.relationId = relationId;
         this.parentCategoryId = parentCategoryId;
         this.parentName = parentName;
         this.childCategoryId = childCategoryId;
         this.childName = childName;
         this.totalAmount = totalAmount;
-        this.budget = budget;
     }
 
-    // Getters and Setters
+
+
     public Long getRelationId() {
         return relationId;
     }
@@ -67,13 +66,5 @@ public class CategoryTotalDto {
 
     public void setTotalAmount(double totalAmount) {
         this.totalAmount = totalAmount;
-    }
-
-    public double getBudget() {
-        return budget;
-    }
-
-    public void setBudget(double budget) {
-        this.budget = budget;
     }
 }

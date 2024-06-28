@@ -17,7 +17,8 @@ public class CategoryParentChildRelations {
     @JoinColumn(name = "child_category_id")
     private CategoryChild childCategory;
 
-    private Double budget;
+
+
 
     public Long getId() {
         return id;
@@ -41,13 +42,5 @@ public class CategoryParentChildRelations {
 
     public void setChildCategory(CategoryChild childCategory) {
         this.childCategory = childCategory;
-    }
-
-    public Double getBudget() {
-        return budget;
-    }
-
-    public void setBudget(Double budget) {
-        this.budget = budget;
     }
 }

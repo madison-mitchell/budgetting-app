@@ -75,7 +75,6 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (optionalRelation.isPresent()) {
             CategoryParentChildRelations relation = optionalRelation.get();
-            relation.setBudget(newBudget);
             categoryParentChildRelationsRepository.save(relation);
             return true;
         }

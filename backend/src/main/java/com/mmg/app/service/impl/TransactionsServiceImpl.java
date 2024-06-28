@@ -119,7 +119,7 @@ public class TransactionsServiceImpl implements TransactionsService {
         // Calculate parent category totals based on child categories
         Map<Long, Double> parentCategoryBudgets = new HashMap<>();
         for (CategoryTotalDto dto : categoryTotals) {
-            parentCategoryBudgets.put(dto.getParentCategoryId(), parentCategoryBudgets.getOrDefault(dto.getParentCategoryId(), 0.0) + dto.getBudget());
+            //parentCategoryBudgets.put(dto.getParentCategoryId(), parentCategoryBudgets.getOrDefault(dto.getParentCategoryId(), 0.0) + dto.getBudget());
         }
         return categoryTotals;
     }
