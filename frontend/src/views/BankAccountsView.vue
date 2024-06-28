@@ -21,12 +21,31 @@
         <div v-if="selectedAccount" class="mt-6">
             <!-- <h2 class="text-2xl font-semibold text-gray-900 my-6 text-left">Transactions for {{ selectedAccount.name }}</h2> -->
             <div v-if="loadingTransactions" class="text-center">Loading...</div>
-            <div v-else>
+            <div v-else class="mt-10">
+                <div class="text-xl">{{ selectedAccount.bankName }}</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left border border-1 border-gray-300 rounded-lg shadow-md my-4 text-sm">
+                    <div class="text-right text-gray-800 rounded-r-lg p-4">
+                        <p>Name</p>
+                        <p>Type</p>
+                        <p>Account Number</p>
+                        <p>Payment Method</p>
+                        <p>Notes</p>
+                    </div>
+                    <div class="bg-gray-50 text-gray-800 p-4 rounded-r-lg">
+                        <p>{{ selectedAccount.name }}</p>
+                        <p>{{ selectedAccount.accountType }}</p>
+                        <p>{{ selectedAccount.accountNumber }}</p>
+                        <p>{{ selectedAccount.paymentMethod }}</p>
+                        <p>{{ selectedAccount.notes }}</p>
+                    </div>
+                </div>
+
                 <TransactionsTable
                     :transactions="filteredTransactions"
                     :categories="categories"
                     :selected-month="selectedMonth"
                     :available-months="availableMonths"
+                    class="mt-10"
                     @update-transaction="updateTransaction"
                     @change-month="handleMonthChange" />
             </div>
