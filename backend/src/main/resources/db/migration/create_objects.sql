@@ -135,7 +135,6 @@ CREATE TABLE IF NOT EXISTS public.category_parent_child_relation
     full_name character varying(120) COLLATE pg_catalog."default" NOT NULL,
     parent_category_id bigint NOT NULL,
     child_category_id bigint NOT NULL,
-    budget double precision,
     CONSTRAINT categoryparentchildrelations_pkey PRIMARY KEY (id),
     CONSTRAINT categoryparentchildrelations_fullname_key UNIQUE (full_name),
     CONSTRAINT categoryparentchildrelations_childcategoryid_fkey FOREIGN KEY (child_category_id)
