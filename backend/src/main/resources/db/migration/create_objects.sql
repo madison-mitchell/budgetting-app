@@ -168,8 +168,6 @@ CREATE OR REPLACE TRIGGER trg_set_fullname
 
 -- DROP TABLE IF EXISTS public.category_budget;
 
-CREATE SEQUENCE category_budget_id_seq;
-
 CREATE TABLE IF NOT EXISTS public.category_budget
 (
     id bigint NOT NULL DEFAULT nextval('category_budget_id_seq'::regclass),
@@ -180,11 +178,16 @@ CREATE TABLE IF NOT EXISTS public.category_budget
     created_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     amount_spent double precision DEFAULT 0,
+    user_id bigint NOT NULL,
     CONSTRAINT unique_category_month_year UNIQUE (category_id, year, month),
     CONSTRAINT fk_category FOREIGN KEY (category_id)
         REFERENCES public.category_parent_child_relation (id) MATCH SIMPLE
         ON UPDATE NO ACTION
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_user FOREIGN KEY (user_id)
+        REFERENCES public.users (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
 )
 
 TABLESPACE pg_default;

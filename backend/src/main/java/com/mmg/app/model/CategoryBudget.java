@@ -16,6 +16,10 @@ public class CategoryBudget {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryParentChildRelations category;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     private int year;
     private int month;
     private double budgetAmount;
@@ -53,6 +57,14 @@ public class CategoryBudget {
 
     public void setCategory(CategoryParentChildRelations category) {
         this.category = category;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public int getYear() {

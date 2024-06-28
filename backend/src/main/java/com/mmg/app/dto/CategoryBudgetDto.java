@@ -5,6 +5,8 @@ public class CategoryBudgetDto {
     private int year;
     private int month;
     private double budgetAmount;
+    private Long userId;
+
 
     // Getters and Setters
     public Long getCategoryId() {
@@ -37,5 +39,13 @@ public class CategoryBudgetDto {
 
     public void setBudgetAmount(double budgetAmount) {
         this.budgetAmount = budgetAmount;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }
