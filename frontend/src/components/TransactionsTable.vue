@@ -5,8 +5,8 @@
                 <label for="month-selector" class="font-sans text-xs font-medium text-gray-800 w-40 mr-3">TIME PERIOD:</label>
                 <select
                     id="month-selector"
-                    v-model="selectedMonth"
-                    @change="filterTransactionsByMonth"
+                    :value="selectedMonth"
+                    @change="handleMonthChange"
                     class="font-sans flex-grow border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-500 text-xs rounded-md">
                     <option v-for="month in availableMonths" :key="month.value" :value="month.value">{{ month.text }}</option>
                 </select>
@@ -55,12 +55,18 @@ export default {
             type: Array,
             required: true,
         },
+        selectedMonth: {
+            type: String,
+            required: true,
+        },
+        availableMonths: {
+            type: Array,
+            required: true,
+        },
     },
     data() {
         const currentMonth = format(new Date(), 'yyyy-MM');
         return {
-            selectedMonth: currentMonth,
-            availableMonths: [],
             sortField: '',
             sortOrder: 'asc',
             showModal: false,
@@ -69,14 +75,15 @@ export default {
     watch: {
         transactions: {
             handler(newTransactions) {
-                this.setupAvailableMonths();
                 this.filterTransactionsByMonth();
             },
             deep: true,
         },
+        selectedMonth() {
+            this.filterTransactionsByMonth();
+        },
     },
     mounted() {
-        this.setupAvailableMonths();
         this.filterTransactionsByMonth();
     },
     computed: {
@@ -107,43 +114,11 @@ export default {
         },
     },
     methods: {
-        setupAvailableMonths() {
-            const monthsSet = new Set();
-            this.transactions.forEach((transaction) => {
-                const transactionMonth = format(parseISO(transaction.timeOfTransaction), 'yyyy-MM');
-                monthsSet.add(transactionMonth);
-            });
-
-            this.availableMonths = [...monthsSet]
-                .sort()
-                .reverse()
-                .map((month) => {
-                    return {
-                        value: month,
-                        text: format(parseISO(`${month}-01`), 'MMMM yyyy'),
-                    };
-                });
-
-            // Ensure the selectedMonth is set to the current month if available
-            const currentMonth = format(new Date(), 'yyyy-MM');
-            if (this.availableMonths.some((month) => month.value === currentMonth)) {
-                this.selectedMonth = currentMonth;
-            } else if (!this.selectedMonth && this.availableMonths.length > 0) {
-                this.selectedMonth = this.availableMonths[0].value;
-            }
-        },
         filterTransactionsByMonth() {
-            const selectedMonth = this.selectedMonth;
-            if (selectedMonth) {
-                const start = startOfMonth(parseISO(`${selectedMonth}-01`));
-                const end = endOfMonth(parseISO(`${selectedMonth}-01`));
-                this.sortedTransactions = this.transactions.filter((transaction) => {
-                    const transactionDate = parseISO(transaction.timeOfTransaction);
-                    return transactionDate >= start && transactionDate <= end;
-                });
-            } else {
-                this.sortedTransactions = this.transactions;
-            }
+            this.$emit('filter-transactions');
+        },
+        handleMonthChange(event) {
+            this.$emit('change-month', event.target.value);
         },
         sortBy(field) {
             if (this.sortField === field) {
@@ -178,7 +153,6 @@ export default {
             this.$emit('add-transaction', newTransaction);
         },
         updateTransaction(updatedTransaction) {
-            // Handle the update logic here
             this.$emit('update-transaction', updatedTransaction);
         },
     },

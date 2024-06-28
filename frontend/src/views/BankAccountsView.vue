@@ -1,14 +1,35 @@
-<!-- src/views/BankAccountView.vue -->
 <template>
     <div class="max-w-7xl mx-auto p-12">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Bank Accounts</h2>
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-900">Bank Accounts</h2>
+            <!-- Add New Account Card -->
+            <AddButton @click="showModal = true" class="" />
+        </div>
         <div v-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AccountCard v-for="account in bankAccounts" :key="account.id" :account="account">
-                <router-link :to="{ name: 'BankAccountDetail', params: { accountId: account.id } }" class="text-blue-500 hover:underline"> View Details </router-link>
+            <AccountCard
+                v-for="account in bankAccounts"
+                :key="account.id"
+                :account="account"
+                @click="selectAccount(account)"
+                :class="{ 'bg-gradient-to-br from-sky-50 to-sky-200': selectedAccount && selectedAccount.id === account.id, 'cursor-pointer': true }">
+                <span class="text-blue-500 hover:underline cursor-pointer">View Details</span>
             </AccountCard>
-            <!-- Add New Account Card -->
-            <AddButton @click="showModal = true" />
+        </div>
+
+        <!-- Transactions Table for selected account -->
+        <div v-if="selectedAccount" class="mt-6">
+            <!-- <h2 class="text-2xl font-semibold text-gray-900 my-6 text-left">Transactions for {{ selectedAccount.name }}</h2> -->
+            <div v-if="loadingTransactions" class="text-center">Loading...</div>
+            <div v-else>
+                <TransactionsTable
+                    :transactions="filteredTransactions"
+                    :categories="categories"
+                    :selected-month="selectedMonth"
+                    :available-months="availableMonths"
+                    @update-transaction="updateTransaction"
+                    @change-month="handleMonthChange" />
+            </div>
         </div>
 
         <!-- Modal -->
@@ -22,12 +43,15 @@ import authService from '../services/authService';
 import AccountCard from '../components/AccountCard.vue';
 import AddButton from '../components/AddButton.vue';
 import AddItemModal from '../components/AddItemModal.vue';
+import TransactionsTable from '../components/TransactionsTable.vue';
+import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 
 export default {
     components: {
         AccountCard,
         AddButton,
         AddItemModal,
+        TransactionsTable,
     },
     data() {
         return {
@@ -42,9 +66,17 @@ export default {
                 { name: 'accountType', label: 'Account Type', type: 'text', required: true },
                 { name: 'paymentMethod', label: 'Payment Method', type: 'text', required: true },
             ],
+            selectedAccount: null,
+            transactions: [],
+            categories: [],
+            loadingTransactions: false,
+            selectedMonth: format(new Date(), 'yyyy-MM'),
+            availableMonths: [],
         };
     },
     mounted() {
+        console.log('------------------ BankAccountView.vue --------------------');
+
         this.fetchBankAccounts();
     },
     methods: {
@@ -66,6 +98,97 @@ export default {
         handleAddAccount(newAccount) {
             this.bankAccounts.push(newAccount);
             this.showModal = false;
+        },
+        selectAccount(account) {
+            this.selectedAccount = account;
+            this.fetchTransactions(account.id);
+            this.fetchCategories();
+        },
+        fetchTransactions(accountId) {
+            this.loadingTransactions = true;
+            axios
+                .get(`http://localhost:8080/api/transactions/account/${accountId}`, {
+                    headers: {
+                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                    },
+                })
+                .then((response) => {
+                    this.transactions = response.data;
+                    this.setupAvailableMonths();
+                    this.loadingTransactions = false;
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch transactions:', error);
+                    this.loadingTransactions = false;
+                });
+        },
+        fetchCategories() {
+            axios
+                .get('http://localhost:8080/api/categories/relation', {
+                    headers: {
+                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                    },
+                })
+                .then((response) => {
+                    this.categories = response.data;
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch categories:', error);
+                });
+        },
+        setupAvailableMonths() {
+            const monthsSet = new Set();
+            this.transactions.forEach((transaction) => {
+                const transactionMonth = format(parseISO(transaction.timeOfTransaction), 'yyyy-MM');
+                monthsSet.add(transactionMonth);
+            });
+
+            this.availableMonths = [...monthsSet]
+                .sort()
+                .reverse()
+                .map((month) => {
+                    return {
+                        value: month,
+                        text: format(parseISO(`${month}-01`), 'MMMM yyyy'),
+                    };
+                });
+
+            // Ensure the selectedMonth is set to the current month if available
+            const currentMonth = format(new Date(), 'yyyy-MM');
+            if (this.availableMonths.some((month) => month.value === currentMonth)) {
+                this.selectedMonth = currentMonth;
+            } else if (!this.selectedMonth && this.availableMonths.length > 0) {
+                this.selectedMonth = this.availableMonths[0].value;
+            }
+        },
+        handleMonthChange(newMonth) {
+            this.selectedMonth = newMonth;
+            this.filterTransactionsByMonth();
+        },
+        filterTransactionsByMonth() {
+            const selectedMonth = this.selectedMonth;
+            if (selectedMonth) {
+                const start = startOfMonth(parseISO(`${selectedMonth}-01`));
+                const end = endOfMonth(parseISO(`${selectedMonth}-01`));
+                return this.transactions.filter((transaction) => {
+                    const transactionDate = parseISO(transaction.timeOfTransaction);
+                    return transactionDate >= start && transactionDate <= end;
+                });
+            } else {
+                return this.transactions;
+            }
+        },
+        updateTransaction(updatedTransaction) {
+            const index = this.transactions.findIndex((t) => t.id === updatedTransaction.id);
+            if (index !== -1) {
+                this.transactions.splice(index, 1, updatedTransaction);
+                this.setupAvailableMonths();
+            }
+        },
+    },
+    computed: {
+        filteredTransactions() {
+            return this.filterTransactionsByMonth();
         },
     },
 };
