@@ -1,14 +1,14 @@
 <template>
     <div class="max-w-7xl mx-auto p-12">
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Categories</h2>
-        <div class="flex space-x-4 items-center shadow-md border border-grey-50 rounded-lg p-6 bg-gray-100 mb-4">
-            <label for="monthSelect" class="text-sm font-medium text-gray-700">Select Month</label>
-            <div class="relative w-full">
+        <div class="flex justify-start space-x-4 items-center shadow-md border border-grey-50 rounded-lg p-6 bg-gray-100 mb-4">
+            <label for="monthSelect" class="font-sans text-xs font-medium text-gray-800">TIME PERIOD:</label>
+            <div class="relative">
                 <select
                     v-model="selectedMonth"
                     @change="fetchCategories"
                     id="monthSelect"
-                    class="text-sm appearance-none w-full bg-white border border-gray-300 hover:border-gray-500 px-4 py-2 pr-8 rounded leading-tight focus:outline-none focus:shadow-outline">
+                    class="font-sans flex-grow bg-gray-100 border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-500 text-xs rounded-md">
                     <option v-for="month in availableMonths" :key="month.value" :value="month.value">{{ month.text }}</option>
                 </select>
             </div>
