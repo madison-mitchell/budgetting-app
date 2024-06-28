@@ -57,8 +57,9 @@ export default {
         },
     },
     data() {
+        const currentMonth = format(new Date(), 'yyyy-MM');
         return {
-            selectedMonth: '',
+            selectedMonth: currentMonth,
             availableMonths: [],
             sortField: '',
             sortOrder: 'asc',
@@ -123,7 +124,11 @@ export default {
                     };
                 });
 
-            if (!this.selectedMonth && this.availableMonths.length > 0) {
+            // Ensure the selectedMonth is set to the current month if available
+            const currentMonth = format(new Date(), 'yyyy-MM');
+            if (this.availableMonths.some((month) => month.value === currentMonth)) {
+                this.selectedMonth = currentMonth;
+            } else if (!this.selectedMonth && this.availableMonths.length > 0) {
                 this.selectedMonth = this.availableMonths[0].value;
             }
         },
