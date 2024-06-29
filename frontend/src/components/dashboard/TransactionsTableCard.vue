@@ -1,8 +1,8 @@
 <!-- src/components/dashboard/TransactionsTableCard.vue -->
 <template>
-    <div>
+    <div class="flex flex-col justify-center">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Unreviewed Transactions</h3>
-        <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
+        <table v-if="sortedTransactions.length > 0" class="min-w-full bg-white rounded-lg shadow overflow-hidden">
             <thead>
                 <tr class="w-full bg-gray-100 border-b text-left text-xs font-medium text-gray-600 tracking-wider">
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('timeOfTransaction')">Date</th>
@@ -15,6 +15,8 @@
                 <TransactionRow v-for="transaction in sortedTransactions" :key="transaction.id" :transaction="transaction" />
             </tbody>
         </table>
+
+        <p v-else class="text-green-700 font-medium italic mt-2">No transactions to review.</p>
     </div>
 </template>
 
