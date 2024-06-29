@@ -1,61 +1,16 @@
 <!-- src/views/DashboardView.vue -->
 <template>
     <div class="max-w-7xl mx-auto p-12 text-gray-600">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Dashboard</h2>
         <div class="grid gap-6 auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             <!-- Bank Accounts Overview -->
             <AccountsOverviewCard :accounts="accounts" :totalBalance="totalBalance" />
 
-            <!-- Recent Transactions -->
-            <!-- <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800">Recent Transactions</h3>
-                <ul>
-                    <li v-for="transaction in recentTransactions" :key="transaction.id">{{ transaction.description }}: {{ formatBalance(transaction.amount) }}</li>
-                </ul>
-            </div> -->
+            <!-- Simplified Transactions Table -->
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
+                <TransactionsTableCard :transactions="filteredTransactions" @update-transaction="updateTransaction" />
+            </div>
 
-            <!-- Expenses Overview -->
-            <!-- <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800">Expenses Overview</h3>
-                <ul>
-                    <li v-for="expense in expenses" :key="expense.id">{{ expense.description }}: {{ formatBalance(expense.amount) }}</li>
-                </ul>
-            </div> -->
-
-            <!-- Budget Overview -->
-            <!-- <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800">Budget Overview</h3>
-                <table class="table-auto w-full">
-                    <tbody>
-                        <tr v-for="category in budgetCategories" :key="category.id">
-                            <td class="text-left px-4 w-full">{{ category.name }}</td>
-                            <td class="text-right tracking-wide px-4">{{ formatBalance(category.spent) }} / {{ formatBalance(category.budget) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div> -->
-
-            <!-- Income vs. Expenses -->
-            <!-- <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800">Income vs. Expenses</h3>
-                <canvas id="incomeVsExpensesChart"></canvas>
-            </div> -->
-
-            <!-- Top Spending Categories -->
-            <!-- <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800">Top Spending Categories</h3>
-                <ul>
-                    <li v-for="category in topSpendingCategories" :key="category.id">{{ category.name }}: {{ formatBalance(category.amount) }}</li>
-                </ul>
-            </div> -->
-
-            <!-- Upcoming Bills/Payments -->
-            <!-- <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-800">Upcoming Bills/Payments</h3>
-                <ul>
-                    <li v-for="bill in upcomingBills" :key="bill.id">{{ bill.description }}: {{ formatBalance(bill.amount) }} (Due: {{ formatDate(bill.dueDate) }})</li>
-                </ul>
-            </div> -->
+            <!-- Other dashboard components (Expenses Overview, etc.) -->
         </div>
     </div>
 </template>
@@ -63,37 +18,31 @@
 <script>
 import axios from 'axios';
 import authService from '@/services/authService';
-import { format } from 'date-fns';
-import { Chart } from 'chart.js';
+import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 import AccountsOverviewCard from '@/components/dashboard/AccountsOverviewCard.vue';
+import TransactionsTableCard from '@/components/dashboard/TransactionsTableCard.vue';
 
 export default {
     components: {
         AccountsOverviewCard,
+        TransactionsTableCard,
     },
     data() {
         return {
             accounts: [],
             totalBalance: 0,
-            recentTransactions: [],
-            expenses: [],
-            budgetCategories: [],
-            topSpendingCategories: [],
-            upcomingBills: [],
+            transactions: [],
+            availableMonths: [],
+            currentMonth: format(new Date(), 'yyyy-MM'),
         };
     },
     mounted() {
         this.fetchData();
-        // this.renderIncomeVsExpensesChart();
     },
     methods: {
         fetchData() {
             this.fetchBankAccounts();
-            // this.fetchRecentTransactions();
-            // this.fetchExpenses();
-            // this.fetchBudgetCategories();
-            // this.fetchTopSpendingCategories();
-            // this.fetchUpcomingBills();
+            this.fetchTransactions();
         },
         fetchBankAccounts() {
             axios
@@ -108,100 +57,72 @@ export default {
                     console.error('Failed to fetch bank accounts:', error);
                 });
         },
-        // fetchRecentTransactions() {
-        //     axios
-        //         .get('http://localhost:8080/api/transactions/recent', {
-        //             headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
-        //         })
-        //         .then((response) => {
-        //             this.recentTransactions = response.data;
-        //         })
-        //         .catch((error) => {
-        //             console.error('Failed to fetch recent transactions:', error);
-        //         });
-        // },
-        // fetchExpenses() {
-        //     axios
-        //         .get('http://localhost:8080/api/expenses', {
-        //             headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
-        //         })
-        //         .then((response) => {
-        //             this.expenses = response.data;
-        //         })
-        //         .catch((error) => {
-        //             console.error('Failed to fetch expenses:', error);
-        //         });
-        // },
-        // fetchBudgetCategories() {
-        //     axios
-        //         .get('http://localhost:8080/api/budget-categories', {
-        //             headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
-        //         })
-        //         .then((response) => {
-        //             this.budgetCategories = response.data;
-        //         })
-        //         .catch((error) => {
-        //             console.error('Failed to fetch budget categories:', error);
-        //         });
-        // },
-        // fetchTopSpendingCategories() {
-        //     axios
-        //         .get('http://localhost:8080/api/spending-categories/top', {
-        //             headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
-        //         })
-        //         .then((response) => {
-        //             this.topSpendingCategories = response.data;
-        //         })
-        //         .catch((error) => {
-        //             console.error('Failed to fetch top spending categories:', error);
-        //         });
-        // },
-        // fetchUpcomingBills() {
-        //     axios
-        //         .get('http://localhost:8080/api/upcoming-bills', {
-        //             headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
-        //         })
-        //         .then((response) => {
-        //             this.upcomingBills = response.data;
-        //         })
-        //         .catch((error) => {
-        //             console.error('Failed to fetch upcoming bills:', error);
-        //         });
-        // },
-        formatBalance(balance) {
-            if (balance === null || balance === undefined) {
-                return '$0.00';
+        fetchTransactions() {
+            const [year, month] = this.currentMonth.split('-');
+            axios
+                .get('http://localhost:8080/api/transactions', {
+                    params: { month: parseInt(month), year: parseInt(year) },
+                    headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
+                })
+                .then((response) => {
+                    this.transactions = response.data;
+                    this.setupAvailableMonths();
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch transactions:', error);
+                });
+        },
+        setupAvailableMonths() {
+            const monthsSet = new Set();
+            this.transactions.forEach((transaction) => {
+                const transactionMonth = format(parseISO(transaction.timeOfTransaction), 'yyyy-MM');
+                monthsSet.add(transactionMonth);
+            });
+
+            this.availableMonths = [...monthsSet]
+                .sort()
+                .reverse()
+                .map((month) => {
+                    return {
+                        value: month,
+                        text: format(parseISO(`${month}-01`), 'MMMM yyyy'),
+                    };
+                });
+
+            const currentMonth = format(new Date(), 'yyyy-MM');
+            if (this.availableMonths.some((month) => month.value === currentMonth)) {
+                this.currentMonth = currentMonth;
+            } else if (!this.currentMonth && this.availableMonths.length > 0) {
+                this.currentMonth = this.availableMonths[0].value;
             }
-            const formattedBalance = balance.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-            return balance < 0 ? `-$${formattedBalance.slice(1)}` : `$${formattedBalance}`;
         },
-        formatDate(date) {
-            const options = { year: 'numeric', month: 'short', day: 'numeric' };
-            return new Date(date).toLocaleDateString(undefined, options);
+        handleMonthChange(newMonth) {
+            this.currentMonth = newMonth;
+            this.fetchTransactions();
         },
-        // renderIncomeVsExpensesChart() {
-        //     const ctx = document.getElementById('incomeVsExpensesChart').getContext('2d');
-        //     new Chart(ctx, {
-        //         type: 'pie',
-        //         data: {
-        //             labels: ['Income', 'Expenses'],
-        //             datasets: [
-        //                 {
-        //                     data: [this.income, this.expensesTotal],
-        //                     backgroundColor: ['#36a2eb', '#ff6384'],
-        //                 },
-        //             ],
-        //         },
-        //     });
-        // },
+        updateTransaction(updatedTransaction) {
+            const index = this.transactions.findIndex((t) => t.id === updatedTransaction.id);
+            if (index !== -1) {
+                this.transactions.splice(index, 1, updatedTransaction);
+            }
+        },
     },
     computed: {
-        // income() {
-        //     return this.budgetCategories.find((category) => category.name === 'Income')?.spent || 0;
-        // },
-        // expensesTotal() {
-        //     return this.budgetCategories.reduce((total, category) => (category.name !== 'Income' ? total + category.spent : total), 0);
-        // },
+        filteredTransactions() {
+            const selectedMonth = this.currentMonth;
+            let filteredTransactions = this.transactions;
+
+            if (selectedMonth) {
+                const start = startOfMonth(parseISO(`${selectedMonth}-01`));
+                const end = endOfMonth(parseISO(`${selectedMonth}-01`));
+                filteredTransactions = this.transactions.filter((transaction) => {
+                    const transactionDate = parseISO(transaction.timeOfTransaction);
+                    return transactionDate >= start && transactionDate <= end && !transaction.reviewed;
+                });
+            }
+
+            return filteredTransactions;
+        },
     },
 };
 </script>

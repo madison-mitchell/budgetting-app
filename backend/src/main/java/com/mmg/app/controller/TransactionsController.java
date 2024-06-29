@@ -20,14 +20,9 @@ import java.util.List;
 public class TransactionsController {
 
     private final TransactionsService transactionsService;
-    private final UserRepository userRepository;
-    private final BankAccountRepository bankAccountRepository;
 
-    public TransactionsController(TransactionsService transactionsService, UserRepository userRepository,
-            BankAccountRepository bankAccountRepository) {
+    public TransactionsController(TransactionsService transactionsService) {
         this.transactionsService = transactionsService;
-        this.userRepository = userRepository;
-        this.bankAccountRepository = bankAccountRepository;
     }
 
     @PostMapping
@@ -51,11 +46,6 @@ public class TransactionsController {
     public Transactions getTransactionById(@PathVariable Long id) {
         return transactionsService.getTransactionById(id);
     }
-
-    // @GetMapping
-    // public List<Transactions> getAllTransactions() {
-    // return transactionsService.getAllTransactions();
-    // }
 
     @GetMapping
     public List<Transactions> getTransactionsForCurrentUser() {
@@ -87,5 +77,14 @@ public class TransactionsController {
                 currentUsername);
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
+
+    @PutMapping("/{id}/reviewed")
+    public ResponseEntity<Transactions> updateTransactionReviewed(@PathVariable Long id, @RequestBody Boolean reviewed) {
+        Transactions transaction = transactionsService.getTransactionById(id);
+        transaction.setReviewed(reviewed);
+        Transactions updatedTransaction = transactionsService.updateTransaction(transaction);
+        return new ResponseEntity<>(updatedTransaction, HttpStatus.OK);
+    }
+
 
 }
