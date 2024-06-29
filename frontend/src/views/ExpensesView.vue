@@ -14,7 +14,7 @@
 
 <script>
 import axios from 'axios';
-import authService from '../services/authService';
+import authService from '@/services/authService';
 import ExpenseCard from '../components/ExpenseCard.vue';
 import AddButton from '../components/AddButton.vue';
 import AddItemModal from '../components/AddItemModal.vue';

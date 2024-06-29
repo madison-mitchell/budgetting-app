@@ -20,7 +20,7 @@
 <script>
 import axios from 'axios';
 import { format, subMonths, addMonths } from 'date-fns';
-import authService from '../services/authService';
+import authService from '@/services/authService';
 import CategoryList from '@/components/CategoryList.vue';
 
 export default {

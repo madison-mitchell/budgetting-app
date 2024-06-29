@@ -58,11 +58,11 @@
 
 <script>
 import axios from 'axios';
-import authService from '../services/authService';
-import AccountCard from '../components/AccountCard.vue';
+import authService from '@/services/authService';
+import AccountCard from '../components/accounts/AccountCard.vue';
 import AddButton from '../components/AddButton.vue';
 import AddItemModal from '../components/AddItemModal.vue';
-import TransactionsTable from '../components/TransactionsTable.vue';
+import TransactionsTable from '../components/transactions/TransactionsTable.vue';
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 
 export default {

@@ -26,7 +26,7 @@
 
 <script>
 import axios from 'axios';
-import authService from '../services/authService';
+import authService from '@/services/authService';
 
 export default {
     props: {

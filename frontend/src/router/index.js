@@ -6,7 +6,7 @@ import TransactionsView from '../views/TransactionsView.vue';
 import ExpensesView from '../views/ExpensesView.vue';
 import DashboardView from '../views/DashboardView.vue';
 import ProfileView from '../views/ProfileView.vue';
-import authService from '../services/authService';
+import authService from '@/services/authService';
 import CategoriesView from '../views/CategoriesView.vue';
 
 const routes = [

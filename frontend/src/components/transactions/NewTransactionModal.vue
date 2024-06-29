@@ -122,7 +122,7 @@
 </template>
 
 <script>
-import authService from '../services/authService';
+import authService from '@/services/authService';
 
 export default {
     props: {

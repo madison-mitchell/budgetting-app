@@ -20,9 +20,9 @@
 <script>
 import axios from 'axios';
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
-import authService from '../services/authService';
-import TransactionsTable from '../components/TransactionsTable.vue';
-import NewTransactionModal from '../components/NewTransactionModal.vue';
+import authService from '@/services/authService';
+import TransactionsTable from '../components/transactions/TransactionsTable.vue';
+import NewTransactionModal from '../components/transactions/NewTransactionModal.vue';
 
 export default {
     components: {
