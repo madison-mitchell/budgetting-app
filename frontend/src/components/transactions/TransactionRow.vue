@@ -20,9 +20,9 @@
             </td>
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(split.plannedAmount) }}</td>
             <td class="px-4 py-4 whitespace-nowrap flex items-center">
-                <div :class="`${getCategoryBgColor(transaction.categoryId.childCategory.name)} px-2 py-0.5 rounded-xl`">
-                    <i :class="`fa ${getCategoryIcon(split.categoryId.childCategory.name)} text-xxs`" class="mr-2"></i>
-                    {{ split.categoryId.childCategory.name }}
+                <div :class="`${getCategoryBgColor(split.categoryId?.childCategory?.name || 'Unknown')} px-2 py-0.5 rounded-xl`">
+                    <i :class="`fa ${getCategoryIcon(split.categoryId?.childCategory?.name || 'Unknown')} text-xxs`" class="mr-2"></i>
+                    {{ split.categoryId?.childCategory?.name || 'Unknown Category' }}
                     <i class="fa-solid fa-circle text-xxxs text-sky-500 ml-2" title="Split Transaction"></i>
                 </div>
             </td>
@@ -33,16 +33,19 @@
         <td class="pl-4 py-4 whitespace-nowrap">
             <span
                 class="font-mono text-xs border border-1 px-1 mr-2 rounded-md cursor-default"
-                :class="{ 'text-green-500 border-green-500': true, 'text-sky-400 border-sky-400': transaction.type !== 'Income' }">
+                :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-sky-400 border-sky-400': transaction.type !== 'Income' }">
                 {{ transaction.type.substring(0, 1) }}
             </span>
             {{ transaction.merchant }}
-            <span class="text-gray-400 ml-2">{{ transaction.accountId.bankName }}</span>
+            <span class="text-gray-400 ml-2">{{ transaction.bank_name || 'Unknown Bank' }}</span>
         </td>
         <td class="px-4 py-4 whitespace-nowrap flex justify-end">
-            <div :class="`${getCategoryBgColor(transaction.categoryId.childCategory.name)} px-2 py-0.5 rounded-xl`">
-                <i :class="`fa ${getCategoryIcon(transaction.categoryId.childCategory.name)}  text-xxs`" class="mr-2" :title="transaction.categoryId.childCategory.name"></i>
-                {{ transaction.categoryId.childCategory.name }}
+            <div :class="`${getCategoryBgColor(transaction.categoryId?.childCategory?.name || 'Unknown')} px-2 py-0.5 rounded-xl`">
+                <i
+                    :class="`fa ${getCategoryIcon(transaction.categoryId?.childCategory?.name || 'Unknown')} text-xxs`"
+                    class="mr-2"
+                    :title="transaction.categoryId?.childCategory?.name || 'Unknown Category'"></i>
+                {{ transaction.categoryId?.childCategory?.name || 'Unknown Category' }}
             </div>
         </td>
         <td class="pl-4 py-4 whitespace-nowrap">{{ transaction.description }}</td>
@@ -165,7 +168,7 @@ export default {
                 'Instructor Time': 'text-sky-700 bg-sky-200',
                 // Healthcare
                 Dental: 'text-cyan-700 bg-cyan-200',
-                'Medical Bills': 'text-cyan-700 bg-cyan-200',
+                'Medical Bills': 'text-cyan-200 bg-cyan-200',
                 Prescriptions: 'text-cyan-700 bg-cyan-200',
                 Vision: 'text-cyan-700 bg-cyan-200',
                 'Health Insurance': 'text-cyan-700 bg-cyan-200',

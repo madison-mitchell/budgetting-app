@@ -8,7 +8,7 @@
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Bank Name</label>
-                <input type="text" v-model="newAccount.bankName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm" />
+                <input type="text" v-model="newAccount.bank_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-sky-500 focus:ring-sky-500 sm:text-sm" />
             </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700">Account Number</label>
@@ -44,7 +44,7 @@ export default {
         return {
             newAccount: {
                 name: '',
-                bankName: '',
+                bank_name: '',
                 accountNumber: '',
                 currentBalance: 0,
             },
@@ -55,7 +55,7 @@ export default {
             this.$emit('add-account', this.newAccount);
             this.newAccount = {
                 name: '',
-                bankName: '',
+                bank_name: '',
                 accountNumber: '',
                 currentBalance: 0,
             };

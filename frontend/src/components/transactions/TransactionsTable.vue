@@ -1,3 +1,4 @@
+<!-- src/components/transactions/TransactionsTable.vue -->
 <template>
     <div>
         <div class="mb-4 flex items-center justify-between">
@@ -95,8 +96,17 @@ export default {
                 const start = startOfMonth(parseISO(`${selectedMonth}-01`));
                 const end = endOfMonth(parseISO(`${selectedMonth}-01`));
                 filteredTransactions = this.transactions.filter((transaction) => {
-                    const transactionDate = parseISO(transaction.timeOfTransaction);
-                    return transactionDate >= start && transactionDate <= end;
+                    try {
+                        const transactionDate = parseISO(transaction.timeOfTransaction);
+                        if (isNaN(transactionDate)) {
+                            console.error(`Invalid date format for transaction: ${transaction.timeOfTransaction}`);
+                            return false;
+                        }
+                        return transactionDate >= start && transactionDate <= end;
+                    } catch (error) {
+                        console.error(`Error parsing date for transaction: ${transaction.timeOfTransaction}`, error);
+                        return false;
+                    }
                 });
             }
 
@@ -150,6 +160,7 @@ export default {
             this.showModal = false;
         },
         addTransaction(newTransaction) {
+            console.log('Emitting add-transaction:', newTransaction);
             this.$emit('add-transaction', newTransaction);
         },
         updateTransaction(updatedTransaction) {

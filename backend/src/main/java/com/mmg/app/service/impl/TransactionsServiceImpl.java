@@ -34,12 +34,23 @@ public class TransactionsServiceImpl implements TransactionsService {
 
     @Override
     public Transactions createTransaction(TransactionDto transactionRequest) {
+        System.out.println("Creating transaction with request: " + transactionRequest);
+
+        System.out.println("User ID: " + transactionRequest.getUserId());
+        System.out.println("Account ID: " + transactionRequest.getAccountId());
+        System.out.println("Category ID: " + transactionRequest.getCategoryId());
+
         User user = userRepository.findById(transactionRequest.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        BankAccount bankAccount = bankAccountRepository.findById(transactionRequest.getBankAccountId())
+        System.out.println("User found: " + user.getId());
+
+        BankAccount bankAccount = bankAccountRepository.findById(transactionRequest.getAccountId())
                 .orElseThrow(() -> new RuntimeException("Bank Account not found"));
+        System.out.println("BankAccount found: " + bankAccount.getId());
+
         CategoryParentChildRelations category = categoryRepository.findById(transactionRequest.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
+        System.out.println("Category found: " + category.getId());
 
         Transactions transaction = new Transactions();
         transaction.setUser(user);
@@ -53,7 +64,7 @@ public class TransactionsServiceImpl implements TransactionsService {
         transaction.setRecurring(transactionRequest.isRecurring());
         transaction.setFrequency(transactionRequest.getFrequency());
         transaction.setIncluded(transactionRequest.isIncluded());
-        transaction.setReviewed(transactionRequest.isReviewed());  // Set reviewed
+        transaction.setReviewed(transactionRequest.isReviewed());
         transaction.setType(transactionRequest.getType());
         transaction.setIsPlanned(transactionRequest.isPlanned());
         transaction.setPlannedAmount(transactionRequest.getPlannedAmount());
@@ -67,7 +78,7 @@ public class TransactionsServiceImpl implements TransactionsService {
                 return split;
             }).collect(Collectors.toList());
             transaction.setSplits(splits);
-            transaction.setHasSplit(true); // Update has_split indicator
+            transaction.setHasSplit(true);
         }
 
         return transactionsRepository.save(transaction);

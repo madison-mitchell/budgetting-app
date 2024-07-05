@@ -27,6 +27,10 @@ public class TransactionsController {
 
     @PostMapping
     public ResponseEntity<Transactions> createTransaction(@RequestBody TransactionDto transactionRequest) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Authenticated user: " + authentication.getName());
+        System.out.println("Incoming transaction request: " + transactionRequest);
+
         Transactions newTransaction = transactionsService.createTransaction(transactionRequest);
         return new ResponseEntity<>(newTransaction, HttpStatus.CREATED);
     }

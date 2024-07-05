@@ -2,8 +2,7 @@
     <div class="max-w-7xl mx-auto p-12">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold text-gray-900">Bank Accounts</h2>
-            <!-- Add New Account Card -->
-            <AddButton @click="showModal = true" class="" />
+            <AddButton @click="showModal = true" />
         </div>
         <div v-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -17,15 +16,14 @@
             </AccountCard>
         </div>
 
-        <!-- Transactions Table for selected account -->
         <div v-if="selectedAccount" class="mt-6">
-            <!-- <h2 class="text-2xl font-semibold text-gray-900 my-6 text-left">Transactions for {{ selectedAccount.name }}</h2> -->
             <div v-if="loadingTransactions" class="text-center">Loading...</div>
             <div v-else class="mt-10">
-                <div class="text-xl">{{ selectedAccount.bankName }}</div>
+                <div class="text-xl">{{ selectedAccount.bank_name }}</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left border border-1 border-gray-300 rounded-lg shadow-md my-4 text-sm">
                     <div class="text-right text-gray-800 rounded-r-lg p-4">
                         <p>Name</p>
+                        <p>Id</p>
                         <p>Type</p>
                         <p>Account Number</p>
                         <p>Payment Method</p>
@@ -33,6 +31,7 @@
                     </div>
                     <div class="bg-gray-50 text-gray-800 p-4 rounded-r-lg">
                         <p>{{ selectedAccount.name }}</p>
+                        <p>{{ selectedAccount.id }}</p>
                         <p>{{ selectedAccount.accountType }}</p>
                         <p>{{ selectedAccount.accountNumber }}</p>
                         <p>{{ selectedAccount.paymentMethod }}</p>
@@ -46,13 +45,20 @@
                     :selected-month="selectedMonth"
                     :available-months="availableMonths"
                     class="mt-10"
+                    @add-transaction="handleAddTransaction"
                     @update-transaction="updateTransaction"
                     @change-month="handleMonthChange" />
             </div>
         </div>
 
-        <!-- Modal -->
         <AddItemModal v-if="showModal" :show="showModal" itemType="Account" :fields="accountFields" @close="showModal = false" @add-item="handleAddAccount" />
+        <NewTransactionModal
+            v-if="showTransactionModal"
+            :show="showTransactionModal"
+            :categories="categories"
+            :selectedAccountId="selectedAccount.id"
+            @close="showTransactionModal = false"
+            @save="handleAddTransaction" />
     </div>
 </template>
 
@@ -63,6 +69,7 @@ import AccountCard from '../components/accounts/AccountCard.vue';
 import AddButton from '../components/AddButton.vue';
 import AddItemModal from '../components/AddItemModal.vue';
 import TransactionsTable from '../components/transactions/TransactionsTable.vue';
+import NewTransactionModal from '../components/transactions/NewTransactionModal.vue';
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 
 export default {
@@ -71,15 +78,17 @@ export default {
         AddButton,
         AddItemModal,
         TransactionsTable,
+        NewTransactionModal,
     },
     data() {
         return {
             bankAccounts: [],
             showModal: false,
+            showTransactionModal: false,
             errorMessage: '',
             accountFields: [
                 { name: 'name', label: 'Name', type: 'text', required: true },
-                { name: 'bankName', label: 'Bank Name', type: 'text', required: true },
+                { name: 'bank_name', label: 'Bank Name', type: 'text', required: true },
                 { name: 'accountNumber', label: 'Account Number', type: 'text', required: true },
                 { name: 'balance', label: 'Balance', type: 'number', required: true },
                 { name: 'accountType', label: 'Account Type', type: 'text', required: true },
@@ -95,7 +104,6 @@ export default {
     },
     mounted() {
         console.log('------------------ BankAccountView.vue --------------------');
-
         this.fetchBankAccounts();
     },
     methods: {
@@ -117,6 +125,33 @@ export default {
         handleAddAccount(newAccount) {
             this.bankAccounts.push(newAccount);
             this.showModal = false;
+        },
+        handleAddTransaction(newTransaction) {
+            console.log('New transaction in BankAccountsView:', newTransaction);
+            console.log('account_id: this.selectedAccount.id:', this.selectedAccount.id);
+
+            const transaction = {
+                ...newTransaction,
+                accountId: this.selectedAccount.id,
+                //bank_name: this.selectedAccount.bank_name,
+            };
+
+            console.log('Transaction in BankAccountsView:', transaction);
+
+            axios
+                .post('http://localhost:8080/api/transactions', transaction, {
+                    headers: {
+                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                    },
+                })
+                .then((response) => {
+                    this.transactions.push(response.data);
+                    this.setupAvailableMonths();
+                    this.filterTransactionsByMonth();
+                })
+                .catch((error) => {
+                    console.error('Failed to add transaction:', error);
+                });
         },
         selectAccount(account) {
             this.selectedAccount = account;
@@ -172,7 +207,6 @@ export default {
                     };
                 });
 
-            // Ensure the selectedMonth is set to the current month if available
             const currentMonth = format(new Date(), 'yyyy-MM');
             if (this.availableMonths.some((month) => month.value === currentMonth)) {
                 this.selectedMonth = currentMonth;
@@ -190,8 +224,23 @@ export default {
                 const start = startOfMonth(parseISO(`${selectedMonth}-01`));
                 const end = endOfMonth(parseISO(`${selectedMonth}-01`));
                 return this.transactions.filter((transaction) => {
-                    const transactionDate = parseISO(transaction.timeOfTransaction);
-                    return transactionDate >= start && transactionDate <= end;
+                    try {
+                        if (!transaction.timeOfTransaction) {
+                            console.error(`Transaction missing timeOfTransaction: ${JSON.stringify(transaction)}`);
+                            return false;
+                        }
+
+                        const transactionDate = parseISO(transaction.timeOfTransaction);
+                        if (isNaN(transactionDate)) {
+                            console.error(`Invalid date format for transaction: ${transaction.timeOfTransaction}`);
+                            return false;
+                        }
+
+                        return transactionDate >= start && transactionDate <= end;
+                    } catch (error) {
+                        console.error(`Error parsing date for transaction: ${transaction.timeOfTransaction}`, error);
+                        return false;
+                    }
                 });
             } else {
                 return this.transactions;

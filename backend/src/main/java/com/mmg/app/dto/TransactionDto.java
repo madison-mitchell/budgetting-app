@@ -30,11 +30,11 @@ public class TransactionDto {
         this.id = id;
     }
 
-    public Long getBankAccountId() {
+    public Long getAccountId() {
         return accountId;
     }
 
-    public void setBankAccountId(Long accountId) {
+    public void setAccountId(Long accountId) {
         this.accountId = accountId;
     }
 

@@ -12,10 +12,10 @@
                     placeholder="$0.00"
                     required />
 
-                <label for="time_of_transaction" class="block font-medium text-gray-700 text-left">Date</label>
+                <label for="timeOfTransaction" class="block font-medium text-gray-700 text-left">Date</label>
                 <input
                     type="datetime-local"
-                    v-model="transaction.time_of_transaction"
+                    v-model="transaction.timeOfTransaction"
                     class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1"
                     required />
 
@@ -28,7 +28,7 @@
 
                 <label for="category_id" class="block font-medium text-gray-700 text-left">Category</label>
                 <select
-                    v-model="transaction.category_id"
+                    v-model="transaction.categoryId"
                     @change="logCategory"
                     class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1"
                     required>
@@ -55,20 +55,20 @@
                 <label for="is_planned" class="block font-medium text-gray-700 text-left">Is Planned</label>
                 <input
                     type="checkbox"
-                    v-model="transaction.is_planned"
+                    v-model="transaction.isPlanned"
                     class="rounded border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1 w-4" />
 
                 <label for="planned_amount" class="block font-medium text-gray-700 text-left">Planned Amount</label>
                 <input
                     type="number"
-                    v-model="transaction.planned_amount"
+                    v-model="transaction.plannedAmount"
                     step="0.01"
                     class="block w-full rounded-md border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1" />
 
                 <label for="has_split" class="block font-medium text-gray-700 text-left">Has Split</label>
                 <input
                     type="checkbox"
-                    v-model="transaction.has_split"
+                    v-model="transaction.hasSplit"
                     class="rounded border border-gray-200 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50 px-1 w-4" />
 
                 <label for="description" class="block font-medium text-gray-700 text-left">Description</label>
@@ -129,28 +129,30 @@ export default {
         show: Boolean,
         categories: Array,
         transactionData: Object,
+        selectedAccountId: Number, // Receive the selected account ID as a prop
     },
     data() {
         return {
             transaction: {
                 id: null,
-                account_id: '',
+                userId: authService.getCurrentUser().id,
+                accountId: this.selectedAccountId, // Set account ID from the prop
                 amount: 0,
-                category_id: '',
+                categoryId: '',
                 description: '',
-                time_of_transaction: '',
+                timeOfTransaction: '',
                 notes: '',
                 merchant: '',
                 recurring: false,
                 frequency: '',
                 included: true,
-                reviewed: false, // Default to false for boolean field
+                reviewed: true,
                 type: 'Debit',
-                user_id: '',
-                is_planned: false,
-                planned_amount: 0.0,
-                has_split: false,
-                account_balance: 0.0,
+                isPlanned: false,
+                plannedAmount: 0.0,
+                hasSplit: false,
+                splits: [],
+                accountBalance: 0.0,
             },
             formattedAmount: '',
         };
@@ -184,27 +186,32 @@ export default {
             immediate: true,
             deep: true,
         },
+        selectedAccountId(newVal) {
+            this.transaction.accountId = newVal;
+        },
     },
     methods: {
         close() {
             this.$emit('close');
         },
         handleSubmit() {
-            if (!this.transaction.category_id || !this.transaction.time_of_transaction) {
+            if (!this.transaction.categoryId || !this.transaction.timeOfTransaction) {
                 console.error('All required fields must be filled out.');
                 return;
             }
 
             const auth = authService.getCurrentUser();
             if (auth && auth.userId) {
-                const localDate = new Date(this.transaction.time_of_transaction);
+                const localDate = new Date(this.transaction.timeOfTransaction);
                 const utcDate = new Date(localDate.getUTCFullYear(), localDate.getUTCMonth(), localDate.getUTCDate(), localDate.getUTCHours(), localDate.getUTCMinutes(), localDate.getUTCSeconds());
+
+                console.log('accountId: this.transaction.accountId:', this.transaction.accountId);
 
                 const newTransaction = {
                     ...this.transaction,
                     amount: this.transaction.amount / 100, // Convert to actual amount
-                    time_of_transaction: utcDate.toISOString(),
-                    user_id: auth.userId,
+                    timeOfTransaction: utcDate.toISOString(),
+                    userId: auth.userId, // Ensure user ID is set
                 };
 
                 console.log('New Transaction:', newTransaction); // Log the new transaction object
@@ -226,7 +233,7 @@ export default {
             return `$${dollars}.${cents}`;
         },
         logCategory(event) {
-            console.log('Selected Category ID:', this.transaction.category_id);
+            console.log('Selected Category ID:', this.transaction.categoryId);
         },
     },
 };
