@@ -8,7 +8,7 @@
                 <tbody>
                     <tr v-for="account in accounts" :key="account.id">
                         <td class="text-left px-4 w-full">
-                            {{ account.bank_name }}
+                            {{ account.bankName }}
                             <span class="text-gray-400 text-xs ml-2 italic">**** {{ getLastFourDigits(account.accountNumber) }}</span>
                         </td>
                         <td :class="{ 'text-red-600': account.currentBalance < 0, 'text-right tracking-wide px-4': true }" class="text-right w-40">

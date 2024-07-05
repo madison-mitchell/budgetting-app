@@ -23,9 +23,9 @@
                         <td class="text-left pl-6">{{ childCategory.name }}</td>
                         <td
                             :class="{
-                                'text-red-600': childCategory.name !== 'Salary' && childCategory.totalAmount < childCategory.budget,
-                                'text-green-600': childCategory.name === 'Salary' && childCategory.totalAmount >= childCategory.budget,
-                                'text-amber-600': childCategory.name !== 'Salary' && childCategory.totalAmount == childCategory.budget,
+                                'text-red-600': childCategory.name !== 'Paycheck' && childCategory.totalAmount < childCategory.budget,
+                                'text-green-600': childCategory.name === 'Paycheck' && childCategory.totalAmount >= childCategory.budget,
+                                'text-amber-600': childCategory.name !== 'Paycheck' && childCategory.totalAmount == childCategory.budget,
                             }"
                             class="text-right tracking-wide">
                             {{ formatBalance(childCategory.totalAmount) }} /

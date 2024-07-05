@@ -37,7 +37,7 @@
                 {{ transaction.type.substring(0, 1) }}
             </span>
             {{ transaction.merchant }}
-            <span class="text-gray-400 ml-2">{{ transaction.bank_name || 'Unknown Bank' }}</span>
+            <span class="text-gray-400 ml-2">{{ transaction.accountId.bankName || 'Unknown Bank' }}</span>
         </td>
         <td class="px-4 py-4 whitespace-nowrap flex justify-end">
             <div :class="`${getCategoryBgColor(transaction.categoryId?.childCategory?.name || 'Unknown')} px-2 py-0.5 rounded-xl`">
@@ -119,7 +119,7 @@ export default {
                 // Housing
                 Rent: 'fa-home text-orange-600',
                 //Income
-                Salary: 'fa-money-bill-wave text-green-600',
+                Paycheck: 'fa-money-bill-wave text-green-600',
                 // Miscellaneous
                 Other: 'fa-ellipsis-h text-gray-600',
                 Donations: 'fa-hand-holding-heart text-gray-600',
@@ -175,7 +175,7 @@ export default {
                 // Housing
                 Rent: 'text-orange-700 bg-orange-200',
                 //Income
-                Salary: 'text-green-700 bg-green-200',
+                Paycheck: 'text-green-700 bg-green-200',
                 // Miscellaneous
                 Other: 'text-gray-700 bg-gray-200',
                 Donations: 'text-gray-700 bg-gray-200',

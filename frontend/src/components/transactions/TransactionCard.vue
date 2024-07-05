@@ -26,7 +26,7 @@
             </p>
         </div>
         <div class="flex justify-between items-center mt-4">
-            <p class="text-sm text-gray-600">{{ transaction.accountId?.bank_name }}</p>
+            <p class="text-sm text-gray-600">{{ transaction.accountId?.bankName }}</p>
             <p class="text-sm text-gray-600">**** {{ getLastFourDigits(transaction.accountId?.accountNumber) }}</p>
         </div>
     </div>

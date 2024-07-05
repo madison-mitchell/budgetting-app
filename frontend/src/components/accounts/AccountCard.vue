@@ -2,7 +2,6 @@
     <div class="cursor-pointer bg-white shadow-md border border-grey-50 rounded-lg p-6 flex flex-col justify-between">
         <div>
             <h3 class="text-lg font-semibold text-gray-800">{{ account.name }}</h3>
-            <h2 class="text-md font-semibold text-gray-500">{{ account.user.username }}</h2>
             <p
                 class="text-lg font-semibold mt-4"
                 :class="{
@@ -14,7 +13,7 @@
             </p>
         </div>
         <div class="flex justify-between items-center mt-4">
-            <p class="text-sm text-gray-600">{{ account.bank_name }}</p>
+            <p class="text-sm text-gray-600">{{ account.bankName }}</p>
             <p class="text-sm text-gray-600">**** {{ getLastFourDigits(account.accountNumber) }}</p>
         </div>
     </div>
