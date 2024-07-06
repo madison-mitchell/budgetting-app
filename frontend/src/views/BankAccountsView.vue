@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-7xl mx-auto p-12">
+    <div class="relative max-w-7xl mx-auto p-12">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold text-gray-900">Bank Accounts</h2>
             <AddButton @click="showModal = true" />
@@ -17,8 +17,9 @@
         </div>
 
         <div v-if="selectedAccount" class="mt-6">
-            <div v-if="loadingTransactions" class="text-center">Loading...</div>
-            <div v-else class="mt-10">
+            <!-- <div v-if="loadingTransactions" class="text-center"></div> -->
+            <Spinner :visible="loadingTransactions" />
+            <div v-if="!loadingTransactions" class="mt-10">
                 <div class="text-xl">{{ selectedAccount.bankName }}</div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left border border-1 border-gray-300 rounded-lg shadow-md my-4 text-sm">
                     <div class="text-right text-gray-800 rounded-r-lg p-4">
@@ -61,6 +62,7 @@ import AddButton from '../components/AddButton.vue';
 import AddItemModal from '../components/AddItemModal.vue';
 import TransactionsTable from '../components/transactions/TransactionsTable.vue';
 import NewTransactionModal from '../components/transactions/NewTransactionModal.vue';
+import Spinner from '../components/utility/Spinner.vue';
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 
 export default {
@@ -70,10 +72,12 @@ export default {
         AddItemModal,
         TransactionsTable,
         NewTransactionModal,
+        Spinner,
     },
     data() {
         return {
             bankAccounts: [],
+            accountOrder: {},
             showModal: false,
             showTransactionModal: false,
             errorMessage: '',
@@ -93,6 +97,11 @@ export default {
             availableMonths: [],
         };
     },
+    computed: {
+        filteredTransactions() {
+            return this.filterTransactionsByMonth();
+        },
+    },
     mounted() {
         console.log('------------------ BankAccountView.vue --------------------');
         this.fetchBankAccounts();
@@ -106,7 +115,12 @@ export default {
                     },
                 })
                 .then((response) => {
-                    this.bankAccounts = response.data;
+                    // Sort the accounts by their ID and add an order property
+                    this.bankAccounts = response.data
+                        .sort((a, b) => a.id - b.id)
+                        .map((account, index) => {
+                            return { ...account, order: index + 1 };
+                        });
                 })
                 .catch((error) => {
                     this.errorMessage = 'Failed to fetch bank accounts.';
@@ -160,11 +174,15 @@ export default {
                 .then((response) => {
                     this.transactions = response.data;
                     this.setupAvailableMonths();
-                    this.loadingTransactions = false;
                 })
                 .catch((error) => {
                     console.error('Failed to fetch transactions:', error);
                     this.loadingTransactions = false;
+                })
+                .finally(() => {
+                    setTimeout(() => {
+                        this.loadingTransactions = false;
+                    }, 500);
                 });
         },
         fetchCategories() {
@@ -243,11 +261,6 @@ export default {
                 this.transactions.splice(index, 1, updatedTransaction);
                 this.setupAvailableMonths();
             }
-        },
-    },
-    computed: {
-        filteredTransactions() {
-            return this.filterTransactionsByMonth();
         },
     },
 };
