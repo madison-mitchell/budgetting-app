@@ -1,5 +1,5 @@
 <template>
-    <div class="relative max-w-7xl mx-auto p-12">
+    <div class="max-w-7xl mx-auto p-12">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold text-gray-900">Bank Accounts</h2>
             <AddButton @click="showModal = true" />
@@ -15,7 +15,7 @@
             </AccountCard>
         </div>
 
-        <div v-if="selectedAccount" class="mt-6">
+        <div v-if="selectedAccount" class="relative mt-6">
             <Spinner :visible="loadingTransactions" />
             <transition
                 enter-active-class="transition-opacity duration-500"
