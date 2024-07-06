@@ -23,7 +23,6 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left border border-1 border-gray-300 rounded-lg shadow-md my-4 text-sm">
                     <div class="text-right text-gray-800 rounded-r-lg p-4">
                         <p>Name</p>
-                        <p>Id</p>
                         <p>Type</p>
                         <p>Account Number</p>
                         <p>Payment Method</p>
@@ -31,7 +30,6 @@
                     </div>
                     <div class="bg-gray-50 text-gray-800 p-4 rounded-r-lg">
                         <p>{{ selectedAccount.name }}</p>
-                        <p>{{ selectedAccount.id }}</p>
                         <p>{{ selectedAccount.accountType }}</p>
                         <p>{{ selectedAccount.accountNumber }}</p>
                         <p>{{ selectedAccount.paymentMethod }}</p>
@@ -52,13 +50,6 @@
         </div>
 
         <AddItemModal v-if="showModal" :show="showModal" itemType="Account" :fields="accountFields" @close="showModal = false" @add-item="handleAddAccount" />
-        <NewTransactionModal
-            v-if="showTransactionModal"
-            :show="showTransactionModal"
-            :categories="categories"
-            :selectedAccountId="selectedAccount.id"
-            @close="showTransactionModal = false"
-            @save="handleAddTransaction" />
     </div>
 </template>
 

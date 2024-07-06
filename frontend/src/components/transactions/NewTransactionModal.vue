@@ -129,7 +129,7 @@ export default {
         show: Boolean,
         categories: Array,
         transactionData: Object,
-        selectedAccountId: Number, // Receive the selected account ID as a prop
+        selectedAccountId: Number,
     },
     data() {
         return {
