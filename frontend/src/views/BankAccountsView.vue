@@ -12,42 +12,48 @@
                 :account="account"
                 @click="selectAccount(account)"
                 :class="{ 'bg-gradient-to-br from-sky-50 to-sky-200': selectedAccount && selectedAccount.id === account.id, 'cursor-pointer': true }">
-                <span class="text-blue-500 hover:underline cursor-pointer">View Details</span>
             </AccountCard>
         </div>
 
         <div v-if="selectedAccount" class="mt-6">
-            <!-- <div v-if="loadingTransactions" class="text-center"></div> -->
             <Spinner :visible="loadingTransactions" />
-            <div v-if="!loadingTransactions" class="mt-10">
-                <div class="text-xl">{{ selectedAccount.bankName }}</div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left border border-1 border-gray-300 rounded-lg shadow-md my-4 text-sm">
-                    <div class="text-right text-gray-800 rounded-r-lg p-4">
-                        <p>Name</p>
-                        <p>Type</p>
-                        <p>Account Number</p>
-                        <p>Payment Method</p>
-                        <p>Notes</p>
+            <transition
+                enter-active-class="transition-opacity duration-500"
+                enter-from-class="opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="transition-opacity duration-500"
+                leave-from-class="opacity-100"
+                leave-to-class="opacity-0">
+                <div v-if="!loadingTransactions" class="mt-10">
+                    <div class="text-xl">{{ selectedAccount.bankName }}</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left border border-1 border-gray-300 rounded-lg shadow-md my-4 text-sm">
+                        <div class="text-right text-gray-800 rounded-r-lg p-4">
+                            <p>Name</p>
+                            <p>Type</p>
+                            <p>Account Number</p>
+                            <p>Payment Method</p>
+                            <p>Notes</p>
+                        </div>
+                        <div class="bg-gray-50 text-gray-800 p-4 rounded-r-lg">
+                            <p>{{ selectedAccount.name }}</p>
+                            <p>{{ selectedAccount.accountType }}</p>
+                            <p>{{ selectedAccount.accountNumber }}</p>
+                            <p>{{ selectedAccount.paymentMethod }}</p>
+                            <p>{{ selectedAccount.notes }}</p>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 text-gray-800 p-4 rounded-r-lg">
-                        <p>{{ selectedAccount.name }}</p>
-                        <p>{{ selectedAccount.accountType }}</p>
-                        <p>{{ selectedAccount.accountNumber }}</p>
-                        <p>{{ selectedAccount.paymentMethod }}</p>
-                        <p>{{ selectedAccount.notes }}</p>
-                    </div>
-                </div>
 
-                <TransactionsTable
-                    :transactions="filteredTransactions"
-                    :categories="categories"
-                    :selected-month="selectedMonth"
-                    :available-months="availableMonths"
-                    class="mt-10"
-                    @add-transaction="handleAddTransaction"
-                    @update-transaction="updateTransaction"
-                    @change-month="handleMonthChange" />
-            </div>
+                    <TransactionsTable
+                        :transactions="filteredTransactions"
+                        :categories="categories"
+                        :selected-month="selectedMonth"
+                        :available-months="availableMonths"
+                        class="mt-10"
+                        @add-transaction="handleAddTransaction"
+                        @update-transaction="updateTransaction"
+                        @change-month="handleMonthChange" />
+                </div>
+            </transition>
         </div>
 
         <AddItemModal v-if="showModal" :show="showModal" itemType="Account" :fields="accountFields" @close="showModal = false" @add-item="handleAddAccount" />
