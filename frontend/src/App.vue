@@ -1,14 +1,19 @@
 <template>
-    <div id="app">
-        <navigation />
-        <router-view />
+    <div id="app" class="flex">
+        <LeftSidebar />
+        <div class="flex-1 ml-60">
+            <Navigation />
+            <router-view />
+        </div>
     </div>
 </template>
 
 <script>
-import Navigation from './components/Navigation.vue';
+import Navigation from '@/components/utility/Navigation.vue';
+import LeftSidebar from '@/components/utility/LeftSidebar.vue';
+
 export default {
-    components: { Navigation },
+    components: { Navigation, LeftSidebar },
     name: 'App',
 };
 </script>
@@ -32,6 +37,6 @@ nav a {
 }
 
 nav a.router-link-exact-active {
-    color: rgb(14 165 233);
+    color: rgb(2 132 199);
 }
 </style>

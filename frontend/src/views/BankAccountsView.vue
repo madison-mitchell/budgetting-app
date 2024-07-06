@@ -114,6 +114,7 @@ export default {
     },
     methods: {
         fetchBankAccounts() {
+            console.log('authService.getCurrentUser(): ', authService.getCurrentUser());
             axios
                 .get('http://localhost:8080/api/bank-accounts', {
                     headers: {
