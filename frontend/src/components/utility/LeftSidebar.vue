@@ -74,7 +74,6 @@ export default {
             this.$router.push('/login');
         },
         fetchBankAccounts() {
-            console.log('authService.getCurrentUser(): ', authService.getCurrentUser());
             axios
                 .get('http://localhost:8080/api/bank-accounts', {
                     headers: {
@@ -98,9 +97,9 @@ export default {
         },
         filterAccountByType() {
             this.creditCards = this.bankAccounts.filter((account) => account.accountType === 'Credit Card');
-            console.log('creditCards: ', this.creditCards);
+            console.log('Credit Cards: ', this.creditCards);
             this.depositories = this.bankAccounts.filter((account) => account.accountType === 'Checking' || account.accountType === 'Savings');
-            console.log('depositories: ', this.depositories);
+            console.log('Depositories: ', this.depositories);
         },
         formatBalance(balance) {
             if (balance === null || balance === undefined) {

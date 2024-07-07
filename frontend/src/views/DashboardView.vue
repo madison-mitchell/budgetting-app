@@ -1,4 +1,3 @@
-<!-- src/views/DashboardView.vue -->
 <template>
     <div class="max-w-7xl mx-auto p-12 text-gray-600">
         <div class="grid gap-6 auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -7,8 +6,10 @@
 
             <!-- Simplified Transactions Table -->
             <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
-                <TransactionsTableCard :transactions="filteredTransactions" @update-transaction="updateTransaction" />
+                <TransactionsTableCard :transactions="currentMonthUnreviewedTransactions" @update-transaction="updateTransaction" />
             </div>
+
+            <IncomeOverviewCard :incomeTransactions="currentMonthIncomeTransactions" :estimatedIncome="estimatedIncome" @update-estimated-income="setEstimatedIncome" />
 
             <!-- Other dashboard components (Expenses Overview, etc.) -->
         </div>
@@ -21,28 +22,34 @@ import authService from '@/services/authService';
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 import AccountsOverviewCard from '@/components/dashboard/AccountsOverviewCard.vue';
 import TransactionsTableCard from '@/components/dashboard/TransactionsTableCard.vue';
+import IncomeOverviewCard from '@/components/dashboard/IncomeOverviewCard.vue';
 
 export default {
     components: {
         AccountsOverviewCard,
         TransactionsTableCard,
+        IncomeOverviewCard,
     },
     data() {
         return {
             accounts: [],
+            budgets: [],
             totalBalance: 0,
             transactions: [],
             availableMonths: [],
             currentMonth: format(new Date(), 'yyyy-MM'),
+            estimatedIncome: 0, // Define estimatedIncome in data
         };
     },
     mounted() {
+        console.log('------------------ DashboardView.vue --------------------');
         this.fetchData();
     },
     methods: {
         fetchData() {
             this.fetchBankAccounts();
             this.fetchTransactions();
+            this.fetchBudgets();
         },
         fetchBankAccounts() {
             axios
@@ -70,6 +77,27 @@ export default {
                 })
                 .catch((error) => {
                     console.error('Failed to fetch transactions:', error);
+                });
+        },
+        fetchBudgets() {
+            const [year, month] = this.currentMonth.split('-');
+            const token = authService.getCurrentUser().jwt;
+
+            console.log('year, month: ', year, ' ', month);
+
+            axios
+                .get('http://localhost:8080/api/category-budgets', {
+                    params: { month: parseInt(month), year: parseInt(year) },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    console.log('Budgets: ', response.data);
+                    this.budgets = response.data;
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch categories:', error);
                 });
         },
         setupAvailableMonths() {
@@ -106,9 +134,12 @@ export default {
                 this.transactions.splice(index, 1, updatedTransaction);
             }
         },
+        setEstimatedIncome(amount) {
+            this.estimatedIncome = Number(amount); // Ensure the amount is a number
+        },
     },
     computed: {
-        filteredTransactions() {
+        currentMonthTransactions() {
             const selectedMonth = this.currentMonth;
             let filteredTransactions = this.transactions;
 
@@ -117,16 +148,34 @@ export default {
                 const end = endOfMonth(parseISO(`${selectedMonth}-01`));
                 filteredTransactions = this.transactions.filter((transaction) => {
                     const transactionDate = parseISO(transaction.timeOfTransaction);
-                    return transactionDate >= start && transactionDate <= end && !transaction.reviewed;
+                    return transactionDate >= start && transactionDate <= end;
                 });
             }
 
             return filteredTransactions;
         },
+        currentMonthIncomeTransactions() {
+            return this.currentMonthTransactions.filter((transaction) => transaction.type === 'Income');
+        },
+        estimatedIncome() {
+            const incomeBudget = this.budgets.filter((budget) => budget.category.parentCategory.id === 1);
+            console.log('incomeBudget: ', incomeBudget);
+            console.log(
+                'this.budgets.filter((budget) => budget.category.parentCategory.id === 1): ',
+                this.budgets.filter((budget) => budget.category.parentCategory.id === 1)
+            );
+
+            // Summing up the budgetAmount for all matched budgets
+            const totalBudgetAmount = incomeBudget.reduce((total, budget) => {
+                return total + budget.budgetAmount;
+            }, 0);
+
+            console.log('Total Budget Amount: ', totalBudgetAmount);
+            return totalBudgetAmount;
+        },
+        currentMonthUnreviewedTransactions() {
+            return this.currentMonthTransactions.filter((transaction) => !transaction.reviewed);
+        },
     },
 };
 </script>
-
-<style scoped>
-/* Add any scoped styles here if needed */
-</style>
