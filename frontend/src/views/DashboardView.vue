@@ -57,12 +57,16 @@ export default {
                 })
                 .then((response) => {
                     this.accounts = response.data;
-                    this.totalBalance = this.accounts.reduce((acc, account) => acc + account.currentBalance, 0);
+                    this.totalBalance = this.accounts.reduce((acc, account) => {
+                        const balance = account.accountType === 'Credit Card' ? -account.currentBalance : account.currentBalance;
+                        return acc + balance;
+                    }, 0);
                 })
                 .catch((error) => {
                     console.error('Failed to fetch bank accounts:', error);
                 });
         },
+
         fetchTransactions() {
             const [year, month] = this.currentMonth.split('-');
             axios
