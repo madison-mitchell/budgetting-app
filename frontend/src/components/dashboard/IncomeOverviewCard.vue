@@ -2,30 +2,69 @@
     <div class="bg-white shadow-md border border-grey-50 rounded-lg p-4">
         <h2 class="text-lg font-semibold mb-4">Income</h2>
         <div class="mb-4">
-            <div class="flex w-full justify-center text-gray-400 text-xs">
-                <h4 class="w-20 text-right">earned</h4>
-                <h4 class="px-2">|</h4>
-                <h4 class="w-20 text-left">estimated</h4>
+            <div class="flex justify-between w-full items-center mb-4">
+                <h2 class="text-sm text-left w-20" :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }">{{ formatAmount(totalIncomeEarned) }}</h2>
+                <div class="relative">
+                    <div
+                        class="overflow-hidden h-3 text-xs flex rounded-xl border w-32 mx-auto bg-sky-200"
+                        :class="{ 'border-green-500': progressPercentage >= 100, 'border-sky-500': progressPercentage < 100 }">
+                        <div
+                            :style="{ width: progressPercentage + '%' }"
+                            :class="{ 'bg-green-500': progressPercentage >= 100, 'bg-sky-500': progressPercentage < 100 }"
+                            class="shadow-none flex flex-col text-center text-gray-800 whitespace-nowrap justify-center"></div>
+                    </div>
+                </div>
+                <div class="relative flex items-center">
+                    <input
+                        :value="inputValue"
+                        @input="onInput"
+                        @blur="onBlur"
+                        @focus="onFocus"
+                        type="text"
+                        placeholder="Enter estimated income"
+                        class="border-none text-sm text-right w-20 rounded-md focus:outline-none focus:ring focus:ring-sky-500 focus:border-sky-800"
+                        :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }"
+                        :style="{ width: inputWidth + 'px' }" />
+                    <span ref="textWidthHelper" class="absolute invisible whitespace-nowrap">{{ inputValue }}</span>
+                </div>
             </div>
-            <div class="flex justify-center w-full">
-                <h2 class="text-2xl w-32 text-right" :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }">{{ formatAmount(totalIncomeEarned) }}</h2>
-                <h2 class="text-2xl px-2 text-gray-400" :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }">|</h2>
-                <input
-                    :value="inputValue"
-                    @input="onInput"
-                    @blur="onBlur"
-                    @focus="onFocus"
-                    type="text"
-                    placeholder="Enter estimated income"
-                    class="border-none text-2xl text-left rounded-md focus:outline-none focus:ring focus:ring-sky-500 focus:border-sky-800 w-32"
-                    :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }" />
-            </div>
+
+            <table v-if="incomeTransactions.length > 0" class="min-w-full bg-white rounded-lg overflow-hidden">
+                <!-- <thead>
+                    <tr class="w-full bg-gray-100 border-b text-left text-xs font-medium text-gray-600 tracking-wider">
+                        <th class="pl-4 py-3 cursor-pointer" @click="sortBy('timeOfTransaction')">Date</th>
+                        <th class="pl-4 py-3 cursor-pointer" @click="sortBy('merchant')">Merchant</th>
+                        <th class="pl-4 py-3 cursor-pointer" @click="sortBy('amount')">Amount</th>
+                    </tr>
+                </thead> -->
+                <tbody>
+                    <tr v-for="transaction in incomeTransactions" :key="transaction.id" class="hover:bg-gray-50 text-left text-xs flex justify-between py-1">
+                        <td class="whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
+                        <td class="w-40 whitespace-nowrap">
+                            <span
+                                class="font-mono text-xs border border-1 px-1 mr-2 rounded-md cursor-default"
+                                :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-sky-400 border-sky-400': transaction.type !== 'Income' }">
+                                {{ transaction.type.substring(0, 1) }}
+                            </span>
+                            {{ transaction.merchant }}
+                        </td>
+                        <td class="whitespace-nowrap" :class="{ 'text-green-600': transaction.amount > 0 }">{{ formatAmount(transaction.amount) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p v-else class="text-green-700 font-medium italic mt-2">No transactions to review.</p>
         </div>
     </div>
 </template>
 
 <script>
+import TransactionRow from '@/components/dashboard/TransactionRow.vue';
+
 export default {
+    components: {
+        TransactionRow,
+    },
     props: {
         incomeTransactions: {
             type: Array,
@@ -40,18 +79,32 @@ export default {
         return {
             localEstimatedIncome: this.estimatedIncome,
             inputValue: this.formatAmount(this.estimatedIncome),
+            inputWidth: 0,
         };
     },
     computed: {
         totalIncomeEarned() {
             return this.incomeTransactions.reduce((total, transaction) => total + transaction.amount, 0);
         },
+        progressPercentage() {
+            if (this.localEstimatedIncome === 0) {
+                return 0;
+            }
+            return Math.min((this.totalIncomeEarned / this.localEstimatedIncome) * 100, 100).toFixed(2);
+        },
     },
     watch: {
         estimatedIncome(newVal) {
             this.localEstimatedIncome = newVal;
             this.inputValue = this.formatAmount(newVal);
+            this.updateInputWidth();
         },
+        inputValue() {
+            this.$nextTick(this.updateInputWidth);
+        },
+    },
+    mounted() {
+        this.updateInputWidth();
     },
     methods: {
         formatAmount(amount) {
@@ -79,6 +132,18 @@ export default {
         },
         onFocus(event) {
             event.target.value = this.localEstimatedIncome.toFixed(2);
+        },
+        updateInputWidth() {
+            if (this.$refs.textWidthHelper) {
+                this.inputWidth = this.$refs.textWidthHelper.offsetWidth;
+            }
+        },
+        formatDate(date) {
+            const options = {
+                month: 'short',
+                day: 'numeric',
+            };
+            return new Date(date).toLocaleDateString(undefined, options);
         },
     },
 };

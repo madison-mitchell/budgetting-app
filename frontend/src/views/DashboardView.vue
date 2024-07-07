@@ -38,7 +38,6 @@ export default {
             transactions: [],
             availableMonths: [],
             currentMonth: format(new Date(), 'yyyy-MM'),
-            estimatedIncome: 0, // Define estimatedIncome in data
         };
     },
     mounted() {
