@@ -34,12 +34,16 @@
                     <h3 class="mt-4 text-sm">Other</h3>
                     <!-- Add other accounts here if needed -->
                 </div>
+                <div class="mt-4 flex justify-between text-md">
+                    <h3>Net Worth</h3>
+                    <div>{{ formatBalance(netWorth) }}</div>
+                </div>
             </div>
         </div>
         <div class="flex justify-evenly mt-4">
             <router-link v-if="!isAuthenticated" to="/login" class="px-4 py-2 hover:text-sky-300">LOGIN</router-link>
             <router-link v-else to="/profile" class="py-2 hover:text-sky-600">PROFILE</router-link>
-            <button v-if="isAuthenticated" @click="logout" class="py-2 text-red-600 hover:text-sky-300">
+            <button v-if="isAuthenticated" @click="logout" class="py-2 hover:text-sky-300">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </button>
         </div>
@@ -66,6 +70,19 @@ export default {
             realEstate: [],
             other: [],
         };
+    },
+    computed: {
+        netWorth() {
+            let netWorth = 0;
+            this.depositories.forEach((account) => {
+                netWorth += account.currentBalance;
+            });
+
+            this.creditCards.forEach((card) => {
+                netWorth += -card.currentBalance;
+            });
+            return netWorth;
+        },
     },
     methods: {
         logout() {
@@ -118,6 +135,7 @@ export default {
         if (this.isAuthenticated) {
             this.fetchBankAccounts();
         }
+        this.calculateNetWorth;
     },
     watch: {
         $route() {

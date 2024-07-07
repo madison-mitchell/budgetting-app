@@ -93,7 +93,7 @@ export default {
                     },
                 })
                 .then((response) => {
-                    console.log('Budgets: ', response.data);
+                    console.log('Budgets: ', response.data[0]);
                     this.budgets = response.data;
                 })
                 .catch((error) => {
@@ -159,12 +159,6 @@ export default {
         },
         estimatedIncome() {
             const incomeBudget = this.budgets.filter((budget) => budget.category.parentCategory.id === 1);
-            console.log('incomeBudget: ', incomeBudget);
-            console.log(
-                'this.budgets.filter((budget) => budget.category.parentCategory.id === 1): ',
-                this.budgets.filter((budget) => budget.category.parentCategory.id === 1)
-            );
-
             // Summing up the budgetAmount for all matched budgets
             const totalBudgetAmount = incomeBudget.reduce((total, budget) => {
                 return total + budget.budgetAmount;
