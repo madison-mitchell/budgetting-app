@@ -30,15 +30,8 @@
             </div>
 
             <table v-if="incomeTransactions.length > 0" class="min-w-full bg-white rounded-lg overflow-hidden">
-                <!-- <thead>
-                    <tr class="w-full bg-gray-100 border-b text-left text-xs font-medium text-gray-600 tracking-wider">
-                        <th class="pl-4 py-3 cursor-pointer" @click="sortBy('timeOfTransaction')">Date</th>
-                        <th class="pl-4 py-3 cursor-pointer" @click="sortBy('merchant')">Merchant</th>
-                        <th class="pl-4 py-3 cursor-pointer" @click="sortBy('amount')">Amount</th>
-                    </tr>
-                </thead> -->
                 <tbody>
-                    <tr v-for="transaction in incomeTransactions" :key="transaction.id" class="hover:bg-gray-50 text-left text-xs flex justify-between py-1">
+                    <tr v-for="transaction in incomeTransactions" :key="transaction.id" class="hover:bg-gray-50 rounded text-left text-xs flex justify-between py-1">
                         <td class="whitespace-nowrap">{{ formatDate(transaction.timeOfTransaction) }}</td>
                         <td class="w-40 whitespace-nowrap">
                             <span

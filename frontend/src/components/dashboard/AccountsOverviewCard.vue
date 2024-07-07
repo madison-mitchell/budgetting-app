@@ -6,7 +6,7 @@
 
             <table class="table-auto w-full">
                 <tbody>
-                    <tr v-for="account in accounts" :key="account.id">
+                    <tr v-for="account in accounts" :key="account.id" class="hover:bg-gray-50 rounded text-sm">
                         <td class="text-left px-4 w-full">
                             {{ account.bankName }}
                             <span class="text-gray-400 text-xs ml-2 italic">**** {{ getLastFourDigits(account.accountNumber) }}</span>
