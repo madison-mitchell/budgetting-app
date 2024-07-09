@@ -21,6 +21,33 @@ public class TransactionDto {
     private String type;
     private boolean isPlanned;
     private double plannedAmount;
+    private boolean hasSplit;
+    private double accountBalance;
+
+    @Override
+    public String toString() {
+        return "TransactionDto{" +
+                "id=" + id +
+                ", accountId=" + accountId +
+                ", userId=" + userId +
+                ", amount=" + amount +
+                ", splits=" + splits +
+                ", categoryId=" + categoryId +
+                ", description='" + description + '\'' +
+                ", timeOfTransaction=" + timeOfTransaction +
+                ", notes='" + notes + '\'' +
+                ", merchant='" + merchant + '\'' +
+                ", recurring=" + recurring +
+                ", frequency='" + frequency + '\'' +
+                ", included=" + included +
+                ", reviewed=" + reviewed +
+                ", type='" + type + '\'' +
+                ", isPlanned=" + isPlanned +
+                ", plannedAmount=" + plannedAmount +
+                ", hasSplit=" + hasSplit +
+                ", accountBalance=" + accountBalance +
+                '}';
+    }
 
     public Long getId() {
         return id;
@@ -147,9 +174,7 @@ public class TransactionDto {
     }
 
     public void setIsPlanned(boolean isPlanned) {
-        System.out.println("planned argument: " + isPlanned);
         this.isPlanned = isPlanned;
-        System.out.println("this.isPlanned argument: " + this.isPlanned);
     }
 
     public double getPlannedAmount() {
@@ -158,5 +183,21 @@ public class TransactionDto {
 
     public void setPlannedAmount(double plannedAmount) {
         this.plannedAmount = plannedAmount;
+    }
+
+    public boolean isHasSplit() {
+        return hasSplit;
+    }
+
+    public void setHasSplit(boolean hasSplit) {
+        this.hasSplit = hasSplit;
+    }
+
+    public double getAccountBalance() {
+        return accountBalance;
+    }
+
+    public void setAccountBalance(double accountBalance) {
+        this.accountBalance = accountBalance;
     }
 }

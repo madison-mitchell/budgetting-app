@@ -12,6 +12,7 @@ public interface CategoryService {
     CategoryParentChildRelations saveCategoryParentChildRelations(CategoryParentChildRelations categoryParentChildRelations);
     List<CategoryParent> getAllCategoryParents();
     List<CategoryChild> getAllCategoryChildren();
+    List<CategoryParentChildRelations> findAllByOrderByChildCategoryNameAsc();
     List<CategoryParentChildRelations> getAllCategoryParentChildRelations();
     CategoryParent getCategoryParentById(Long id);
     CategoryChild getCategoryChildById(Long id);

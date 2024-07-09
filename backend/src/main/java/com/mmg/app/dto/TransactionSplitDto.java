@@ -1,7 +1,5 @@
 package com.mmg.app.dto;
 
-import java.util.List;
-
 public class TransactionSplitDto {
     private Long id;
     private Long transactionId;

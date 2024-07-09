@@ -19,11 +19,18 @@
                 <input type="checkbox" v-model="split.planned" @change="updateTransaction(split)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
             </td>
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(split.plannedAmount) }}</td>
-            <td class="px-4 py-4 whitespace-nowrap flex items-center">
+            <td class="px-4 py-4 whitespace-nowrap flex items-center relative" @click="toggleCategoryMenu(split)">
                 <div :class="`${getCategoryBgColor(split.categoryId?.childCategory?.name || 'Unknown')} px-2 py-0.5 rounded-xl`">
                     <i :class="`fa ${getCategoryIcon(split.categoryId?.childCategory?.name || 'Unknown')} text-xxs`" class="mr-2"></i>
                     {{ split.categoryId?.childCategory?.name || 'Unknown Category' }}
                     <i class="fa-solid fa-circle text-xxxs text-sky-500 ml-2" title="Split Transaction"></i>
+                </div>
+                <div v-if="showCategoryMenu && selectedTransaction === split" class="absolute z-10 bg-white border mt-1">
+                    <ul>
+                        <li v-for="category in sortedCategories" :key="category.id" @click="changeCategory(split, category)">
+                            {{ category.childCategory.name }}
+                        </li>
+                    </ul>
                 </div>
             </td>
         </tr>
@@ -39,13 +46,17 @@
             {{ transaction.merchant }}
             <span class="text-gray-400 ml-2">{{ transaction.accountId.bankName || 'Unknown Bank' }}</span>
         </td>
-        <td class="px-4 py-4 whitespace-nowrap flex justify-end">
+        <td class="category px-4 py-4 whitespace-nowrap flex items-center relative" @click="toggleCategoryMenu(transaction)">
             <div :class="`${getCategoryBgColor(transaction.categoryId?.childCategory?.name || 'Unknown')} px-2 py-0.5 rounded-xl`">
-                <i
-                    :class="`fa ${getCategoryIcon(transaction.categoryId?.childCategory?.name || 'Unknown')} text-xxs`"
-                    class="mr-2"
-                    :title="transaction.categoryId?.childCategory?.name || 'Unknown Category'"></i>
+                <i :class="`fa ${getCategoryIcon(transaction.categoryId?.childCategory?.name || 'Unknown')} text-xxs`" class="mr-2"></i>
                 {{ transaction.categoryId?.childCategory?.name || 'Unknown Category' }}
+            </div>
+            <div v-if="showCategoryMenu && selectedTransaction === transaction" ref="categoryMenu" class="category-menu">
+                <ul>
+                    <li v-for="category in sortedCategories" :key="category.id" @click="changeCategory(transaction, category)" class="p-2 hover:bg-gray-200 cursor-pointer">
+                        {{ category.childCategory.name }}
+                    </li>
+                </ul>
             </div>
         </td>
         <td class="pl-4 py-4 whitespace-nowrap">{{ transaction.description }}</td>
@@ -59,7 +70,16 @@
 </template>
 
 <script>
+import axios from 'axios';
+import authService from '@/services/authService';
+
 export default {
+    data() {
+        return {
+            showCategoryMenu: false,
+            sortedCategories: [],
+        };
+    },
     props: {
         transaction: {
             type: Object,
@@ -68,6 +88,69 @@ export default {
     },
     emits: ['update-transaction'],
     methods: {
+        toggleCategoryMenu(transaction) {
+            this.showCategoryMenu = !this.showCategoryMenu;
+            this.selectedTransaction = transaction;
+
+            this.$nextTick(() => {
+                const menu = this.$refs.categoryMenu;
+                const rect = menu.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+
+                if (rect.bottom > viewportHeight) {
+                    menu.classList.add('bottom');
+                    menu.classList.remove('top');
+                } else {
+                    menu.classList.add('top');
+                    menu.classList.remove('bottom');
+                }
+            });
+        },
+        async fetchCategories() {
+            try {
+                const response = await axios.get('http://localhost:8080/api/categories/relation', {
+                    headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
+                });
+                this.sortedCategories = response.data.sort((a, b) => a.childCategory.name.localeCompare(b.childCategory.name));
+            } catch (error) {
+                console.error('Error fetching categories', error);
+            }
+        },
+        async changeCategory(transaction, category) {
+            try {
+                const updatedTransaction = {
+                    id: transaction.id,
+                    userId: transaction.user.id, // Convert nested user object to user ID
+                    accountId: transaction.accountId.id, // Convert nested account object to account ID
+                    amount: transaction.amount,
+                    splits: transaction.splits,
+                    categoryId: category.id, // Ensure this is the correct ID format expected by the backend
+                    description: transaction.description,
+                    timeOfTransaction: transaction.timeOfTransaction,
+                    notes: transaction.notes,
+                    merchant: transaction.merchant,
+                    recurring: transaction.recurring,
+                    frequency: transaction.frequency,
+                    included: transaction.included,
+                    reviewed: transaction.reviewed,
+                    type: transaction.type,
+                    plannedAmount: transaction.plannedAmount,
+                    hasSplit: transaction.hasSplit,
+                    accountBalance: transaction.accountBalance,
+                    planned: transaction.planned,
+                    balance: transaction.balance,
+                };
+
+                console.log('Updated Transaction JSON: ', JSON.stringify(updatedTransaction, null, 2)); // Log JSON
+                const response = await axios.put(`http://localhost:8080/api/transactions/${transaction.id}`, updatedTransaction, {
+                    headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
+                });
+                this.$emit('update-transaction', response.data);
+                this.showCategoryMenu = false;
+            } catch (error) {
+                console.error('Error updating transaction', error);
+            }
+        },
         formatDate(date) {
             const options = { year: 'numeric', month: 'short', day: 'numeric' };
             return new Date(date).toLocaleDateString(undefined, options);
@@ -86,8 +169,18 @@ export default {
             }
             return cumulativeBalance;
         },
-        updateTransaction(row) {
-            this.$emit('update-transaction', row);
+        updateTransaction(transaction) {
+            axios
+                .put(`http://localhost:8080/api/transactions/${transaction.id}`, transaction, {
+                    headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
+                })
+                .then((response) => {
+                    this.$emit('update-transaction', transaction);
+                    console.log('updateTransaction response: ', response);
+                })
+                .catch((error) => {
+                    console.error('Error updating transaction', error);
+                });
         },
         getCategoryIcon(categoryName) {
             const categoryIcons = {
@@ -106,6 +199,10 @@ export default {
                 Concerts: 'fa-music text-purple-600',
                 Movies: 'fa-film text-purple-600',
                 Games: 'fa-gamepad text-purple-600',
+                Gambling: 'fa-dice text-purple-600',
+                // Financial
+                'Credit Card Payment': 'fa-coins text-gray-600',
+                'Internal Transfer': 'fa-coins text-gray-600',
                 // Flight
                 Materials: 'fa-box text-sky-600',
                 'Flight Time': 'fa-plane text-sky-600',
@@ -162,6 +259,10 @@ export default {
                 Concerts: 'text-purple-700 bg-purple-200',
                 Movies: 'text-purple-700 bg-purple-200',
                 Games: 'text-purple-700 bg-purple-200',
+                Gambling: 'text-purple-700 bg-purple-200',
+                // Financial
+                'Credit Card Payment': 'text-gray-700 bg-gray-200',
+                'Internal Transfer': 'text-gray-700 bg-gray-200',
                 // Flight
                 Materials: 'text-sky-700 fa-box bg-sky-200',
                 'Flight Time': 'text-sky-700 bg-sky-200',
@@ -202,6 +303,9 @@ export default {
             return categoryBgColor[categoryName] || '';
         },
     },
+    mounted() {
+        this.fetchCategories();
+    },
 };
 </script>
 
@@ -212,5 +316,17 @@ export default {
 
 .text-xxs {
     font-size: 9pt;
+}
+
+.category-menu {
+    @apply absolute z-10 bg-white border border-gray-300 shadow-lg max-h-72 overflow-y-auto;
+}
+
+.category-menu.bottom {
+    @apply top-auto bottom-full;
+}
+
+.category-menu.top {
+    @apply top-full bottom-auto;
 }
 </style>

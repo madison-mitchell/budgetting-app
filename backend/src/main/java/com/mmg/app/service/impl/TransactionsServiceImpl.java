@@ -90,8 +90,48 @@ public class TransactionsServiceImpl implements TransactionsService {
     }
 
     @Override
-    public Transactions updateTransaction(Transactions transaction) {
-        return transactionsRepository.save(transaction);
+    public Transactions updateTransaction(Long id, TransactionDto transactionDto) {
+        Transactions existingTransaction = transactionsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
+
+        User user = userRepository.findById(transactionDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        BankAccount bankAccount = bankAccountRepository.findById(transactionDto.getAccountId())
+                .orElseThrow(() -> new RuntimeException("Bank Account not found"));
+        CategoryParentChildRelations category = categoryRepository.findById(transactionDto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        existingTransaction.setUser(user);
+        existingTransaction.setAccountId(bankAccount);
+        existingTransaction.setCategoryId(category);
+        existingTransaction.setAmount(transactionDto.getAmount());
+        existingTransaction.setDescription(transactionDto.getDescription());
+        existingTransaction.setTimeOfTransaction(transactionDto.getTimeOfTransaction());
+        existingTransaction.setNotes(transactionDto.getNotes());
+        existingTransaction.setMerchant(transactionDto.getMerchant());
+        existingTransaction.setRecurring(transactionDto.isRecurring());
+        existingTransaction.setFrequency(transactionDto.getFrequency());
+        existingTransaction.setIncluded(transactionDto.isIncluded());
+        existingTransaction.setReviewed(transactionDto.isReviewed());
+        existingTransaction.setType(transactionDto.getType());
+        existingTransaction.setIsPlanned(transactionDto.isPlanned());
+        existingTransaction.setPlannedAmount(transactionDto.getPlannedAmount());
+        existingTransaction.setAccountBalance(transactionDto.getAccountBalance());
+
+        if (transactionDto.getSplits() != null) {
+            List<TransactionSplit> splits = transactionDto.getSplits().stream()
+                    .map(splitDto -> {
+                        TransactionSplit split = new TransactionSplit();
+                        split.setId(splitDto.getId());
+                        split.setTransaction(existingTransaction);
+                        split.setCategoryId(categoryRepository.findById(splitDto.getCategoryId()).orElseThrow());
+                        split.setAmount(splitDto.getAmount());
+                        return split;
+                    }).collect(Collectors.toList());
+            existingTransaction.setSplits(splits);
+        }
+
+        return transactionsRepository.save(existingTransaction);
     }
 
     @Override

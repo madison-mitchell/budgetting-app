@@ -5,6 +5,7 @@ import com.mmg.app.model.CategoryChild;
 import com.mmg.app.model.CategoryParentChildRelations;
 import com.mmg.app.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,9 +47,10 @@ public class CategoryController {
     }
 
     @GetMapping("/relation")
-    public List<CategoryParentChildRelations> getAllCategoryParentChildRelations() {
-        return categoryService.getAllCategoryParentChildRelations();
+    public List<CategoryParentChildRelations> getAllCategories() {
+        return categoryService.findAllByOrderByChildCategoryNameAsc();
     }
+
 
 //    @PutMapping("/relation/{relationId}/budget")
 //    public ResponseEntity<?> updateBudget(@PathVariable Long relationId, @RequestBody Map<String, Double> budget) {
