@@ -11,6 +11,8 @@
 
             <IncomeOverviewCard :incomeTransactions="currentMonthIncomeTransactions" :estimatedIncome="estimatedIncome" @update-estimated-income="setEstimatedIncome" />
 
+            <FileUploader />
+
             <!-- Other dashboard components (Expenses Overview, etc.) -->
         </div>
     </div>
@@ -23,12 +25,14 @@ import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 import AccountsOverviewCard from '@/components/dashboard/AccountsOverviewCard.vue';
 import TransactionsTableCard from '@/components/dashboard/TransactionsTableCard.vue';
 import IncomeOverviewCard from '@/components/dashboard/IncomeOverviewCard.vue';
+import FileUploader from '@/components/utility/FileUploader.vue';
 
 export default {
     components: {
         AccountsOverviewCard,
         TransactionsTableCard,
         IncomeOverviewCard,
+        FileUploader,
     },
     data() {
         return {
