@@ -10,15 +10,23 @@
                     {{ transaction.type.substring(0, 1) }}
                 </span>
                 <span class="font-mono text-sky-500 text-xs border border-1 border-sky-500 px-1 mr-2 rounded-md" title="Split Transaction">S</span>
-                {{ transaction.merchant }}
+                <input v-model="transaction.merchant" @change="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
             </td>
-            <td class="pl-4 py-4 whitespace-nowrap">{{ transaction.description }}</td>
-            <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': split.amount > 0 }">{{ formatBalance(split.amount) }}</td>
-            <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.accountBalance < 0 }">{{ formatBalance(calculateSplitBalance(index, transaction)) }}</td>
+            <td class="pl-4 py-4 whitespace-nowrap">
+                <input v-model="transaction.description" @change="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+            </td>
+            <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': split.amount > 0 }">
+                <input v-model="formattedSplitAmounts[index]" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+            </td>
+            <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.accountBalance < 0 }">
+                {{ formatBalance(calculateSplitBalance(index, transaction)) }}
+            </td>
             <td class="pl-4 py-4 whitespace-nowrap text-center">
                 <input type="checkbox" v-model="split.planned" @change="updateTransaction(split)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
             </td>
-            <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(split.plannedAmount) }}</td>
+            <td class="pl-4 py-4 whitespace-nowrap">
+                <input v-model="formattedPlannedSplitAmounts[index]" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+            </td>
             <td class="px-4 py-4 whitespace-nowrap flex items-center relative" @click="toggleCategoryMenu(split, `splitMenu-${split.id}`)">
                 <div :class="`${getCategoryBgColor(split.categoryId?.childCategory?.name || 'Unknown')} px-2 py-0.5 rounded-xl`">
                     <i :class="`fa ${getCategoryIcon(split.categoryId?.childCategory?.name || 'Unknown')} text-xxs`" class="mr-2"></i>
@@ -43,7 +51,7 @@
                 :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-sky-400 border-sky-400': transaction.type !== 'Income' }">
                 {{ transaction.type.substring(0, 1) }}
             </span>
-            {{ transaction.merchant }}
+            <input v-model="transaction.merchant" @change="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
             <span class="text-gray-400 ml-2">{{ transaction.accountId.bankName || 'Unknown Bank' }}</span>
         </td>
         <td class="category px-4 py-4 whitespace-nowrap flex items-center relative" @click="toggleCategoryMenu(transaction, `categoryMenu-${transaction.id}`)">
@@ -59,13 +67,21 @@
                 </ul>
             </div>
         </td>
-        <td class="pl-4 py-4 whitespace-nowrap">{{ transaction.description }}</td>
-        <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': transaction.amount > 0 }">{{ formatBalance(transaction.amount) }}</td>
-        <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.accountBalance < 0 }">{{ formatBalance(transaction.accountBalance) }}</td>
+        <td class="pl-4 py-4 whitespace-nowrap">
+            <input v-model="transaction.description" @change="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+        </td>
+        <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': transaction.amount > 0 }">
+            <input v-model="formattedTransactionAmount" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+        </td>
+        <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.accountBalance < 0 }">
+            <input v-model="formattedTransactionBalance" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+        </td>
         <td class="py-4 whitespace-nowrap flex justify-around">
             <input type="checkbox" v-model="transaction.planned" @change="updateTransaction(transaction)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
         </td>
-        <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(transaction.plannedAmount) }}</td>
+        <td class="pl-4 py-4 whitespace-nowrap">
+            <input v-model="formattedPlannedAmount" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+        </td>
     </tr>
 </template>
 
@@ -86,8 +102,51 @@ export default {
             required: true,
         },
     },
-    emits: ['update-transaction'],
+    computed: {
+        formattedTransactionAmount: {
+            get() {
+                return this.formatCurrency(this.transaction.amount);
+            },
+            set(value) {
+                this.transaction.amount = this.parseCurrency(value);
+            },
+        },
+        formattedTransactionBalance: {
+            get() {
+                return this.formatCurrency(this.transaction.accountBalance);
+            },
+            set(value) {
+                this.transaction.accountBalance = this.parseCurrency(value);
+            },
+        },
+        formattedPlannedAmount: {
+            get() {
+                return this.formatCurrency(this.transaction.plannedAmount);
+            },
+            set(value) {
+                this.transaction.plannedAmount = this.parseCurrency(value);
+            },
+        },
+        formattedSplitAmounts() {
+            return this.transaction.splits.map((split) => this.formatCurrency(split.amount));
+        },
+        formattedPlannedSplitAmounts() {
+            return this.transaction.splits.map((split) => this.formatCurrency(split.plannedAmount));
+        },
+    },
     methods: {
+        formatCurrency(value) {
+            if (value === null || value === undefined) {
+                return '';
+            }
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+            }).format(value);
+        },
+        parseCurrency(value) {
+            return parseFloat(value.replace(/[^0-9.-]+/g, ''));
+        },
         toggleCategoryMenu(transaction, menuRef) {
             this.showCategoryMenu = !this.showCategoryMenu;
             this.selectedTransaction = transaction;
@@ -121,26 +180,8 @@ export default {
         async changeCategory(transaction, category) {
             try {
                 const updatedTransaction = {
-                    id: transaction.id,
-                    userId: transaction.user.id,
-                    accountId: transaction.accountId.id,
-                    amount: transaction.amount,
-                    splits: transaction.splits,
+                    ...transaction,
                     categoryId: category.id, // Ensure this is a Long
-                    description: transaction.description,
-                    timeOfTransaction: transaction.timeOfTransaction,
-                    notes: transaction.notes,
-                    merchant: transaction.merchant,
-                    recurring: transaction.recurring,
-                    frequency: transaction.frequency,
-                    included: transaction.included,
-                    reviewed: transaction.reviewed,
-                    type: transaction.type,
-                    plannedAmount: transaction.plannedAmount,
-                    hasSplit: transaction.hasSplit,
-                    accountBalance: transaction.accountBalance,
-                    planned: transaction.planned,
-                    balance: transaction.balance,
                 };
 
                 console.log('Updated Transaction JSON: ', JSON.stringify(updatedTransaction, null, 2));
@@ -172,18 +213,50 @@ export default {
             }
             return cumulativeBalance;
         },
-        updateTransaction(transaction) {
-            axios
-                .put(`http://localhost:8080/api/transactions/${transaction.id}`, transaction, {
-                    headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
-                })
-                .then((response) => {
-                    this.$emit('update-transaction', transaction);
-                    console.log('updateTransaction response: ', response);
-                })
-                .catch((error) => {
-                    console.error('Error updating transaction', error);
+        async updateTransaction(transaction) {
+            try {
+                const token = authService.getCurrentUser().jwt;
+                console.log('JWT Token:', token);
+
+                const updatedTransaction = {
+                    id: transaction.id,
+                    userId: authService.getCurrentUser().userId,
+                    accountId: transaction.accountId.id,
+                    amount: transaction.amount,
+                    splits: transaction.splits
+                        ? transaction.splits.map((split) => ({
+                              id: split.id,
+                              amount: split.amount,
+                              categoryId: split.categoryId.id,
+                          }))
+                        : [],
+                    categoryId: transaction.categoryId.id,
+                    description: transaction.description,
+                    timeOfTransaction: transaction.timeOfTransaction,
+                    notes: transaction.notes,
+                    merchant: transaction.merchant,
+                    recurring: transaction.recurring,
+                    frequency: transaction.frequency,
+                    included: transaction.included,
+                    reviewed: transaction.reviewed,
+                    type: transaction.type,
+                    plannedAmount: transaction.plannedAmount,
+                    hasSplit: transaction.hasSplit,
+                    accountBalance: transaction.accountBalance,
+                    isPlanned: transaction.planned,
+                    balance: transaction.balance,
+                };
+
+                console.log('Updated Transaction Payload:', updatedTransaction);
+
+                const response = await axios.put(`http://localhost:8080/api/transactions/${transaction.id}`, updatedTransaction, {
+                    headers: { Authorization: `Bearer ${token}` },
                 });
+                this.$emit('update-transaction', response.data);
+                console.log('updateTransaction response: ', response);
+            } catch (error) {
+                console.error('Error updating transaction', error);
+            }
         },
         getCategoryIcon(categoryName) {
             const categoryIcons = {
@@ -206,6 +279,7 @@ export default {
                 // Financial
                 'Credit Card Payment': 'fa-coins text-gray-600',
                 'Internal Transfer': 'fa-coins text-gray-600',
+                Fee: 'fa-file-invoice-dollar text-gray-600',
                 // Flight
                 Materials: 'fa-box text-sky-600',
                 'Flight Time': 'fa-plane text-sky-600',
@@ -248,60 +322,61 @@ export default {
         getCategoryBgColor(categoryName) {
             const categoryBgColor = {
                 // Dining
-                Restaurants: 'text-indigo-700 bg-indigo-200',
-                Groceries: 'text-indigo-700 bg-indigo-200',
-                'Fast Food': 'text-indigo-700 bg-indigo-200',
+                Restaurants: 'text-indigo-700 bg-indigo-200 hover:bg-indigo-300',
+                Groceries: 'text-indigo-700 bg-indigo-200 hover:bg-indigo-300',
+                'Fast Food': 'text-indigo-700 bg-indigo-200 hover:bg-indigo-300',
                 // Education
-                'Online Courses': 'text-amber-700 bg-amber-200',
-                Books: 'text-amber-700 bg-amber-200',
-                Tuition: 'text-amber-700 bg-amber-200',
-                Supplies: 'text-amber-700 bg-amber-200',
+                'Online Courses': 'text-amber-700 bg-amber-200 hover:bg-amber-300',
+                Books: 'text-amber-700 bg-amber-200 hover:bg-amber-300',
+                Tuition: 'text-amber-700 bg-amber-200 hover:bg-amber-300',
+                Supplies: 'text-amber-700 bg-amber-200 hover:bg-amber-300',
                 // Entertainment
-                Hobbies: 'text-purple-700 bg-purple-200',
-                Subscription: 'text-purple-700 bg-purple-200',
-                Concerts: 'text-purple-700 bg-purple-200',
-                Movies: 'text-purple-700 bg-purple-200',
-                Games: 'text-purple-700 bg-purple-200',
-                Gambling: 'text-purple-700 bg-purple-200',
+                Hobbies: 'text-purple-700 bg-purple-200 hover:bg-purple-300',
+                Subscription: 'text-purple-700 bg-purple-200 hover:bg-purple-300',
+                Concerts: 'text-purple-700 bg-purple-200 hover:bg-purple-300',
+                Movies: 'text-purple-700 bg-purple-200 hover:bg-purple-300',
+                Games: 'text-purple-700 bg-purple-200 hover:bg-purple-300',
+                Gambling: 'text-gray-700 bg-purple-200 hover:bg-purple-300',
                 // Financial
-                'Credit Card Payment': 'text-gray-700 bg-gray-200',
-                'Internal Transfer': 'text-gray-700 bg-gray-200',
+                'Credit Card Payment': 'text-gray-700 bg-gray-200 hover:bg-gray-300',
+                'Internal Transfer': 'text-gray-700 bg-gray-200 hover:bg-gray-300',
+                Fee: 'text-gray-700 bg-gray-200 hover:bg-gray-300',
                 // Flight
-                Materials: 'text-sky-700 fa-box bg-sky-200',
-                'Flight Time': 'text-sky-700 bg-sky-200',
-                'Instructor Time': 'text-sky-700 bg-sky-200',
+                Materials: 'text-sky-700 fa-box bg-sky-200 hover:bg-sky-300',
+                'Flight Time': 'text-sky-700 bg-sky-200 hover:bg-sky-300',
+                'Instructor Time': 'text-sky-700 bg-sky-200 hover:bg-sky-300',
                 // Healthcare
-                Dental: 'text-cyan-700 bg-cyan-200',
-                'Medical Bills': 'text-cyan-200 bg-cyan-200',
-                Prescriptions: 'text-cyan-700 bg-cyan-200',
-                Vision: 'text-cyan-700 bg-cyan-200',
-                'Health Insurance': 'text-cyan-700 bg-cyan-200',
+                Dental: 'text-cyan-700 bg-cyan-200 hover:bg-cyan-300',
+                'Medical Bills': 'text-cyan-200 bg-cyan-200 hover:bg-cyan-300',
+                Prescriptions: 'text-cyan-700 bg-cyan-200 hover:bg-cyan-300',
+                Vision: 'text-cyan-700 bg-cyan-200 hover:bg-cyan-300',
+                'Health Insurance': 'text-cyan-700 bg-cyan-200 hover:bg-cyan-300',
                 // Housing
-                Rent: 'text-orange-700 bg-orange-200',
+                Rent: 'text-orange-700 bg-orange-200 hover:bg-orange-300',
                 //Income
-                Paycheck: 'text-green-700 bg-green-200',
+                Paycheck: 'text-green-700 bg-green-200 hover:bg-green-300',
                 // Miscellaneous
-                Other: 'text-gray-700 bg-gray-200',
-                Donations: 'text-gray-700 bg-gray-200',
+                Other: 'text-gray-700 bg-gray-200 hover:bg-gray-300',
+                Donations: 'text-gray-700 bg-gray-200 hover:bg-gray-300',
                 // Personal Care
-                Spa: 'text-teal-700 bg-teal-200',
-                Cosmetics: 'text-teal-700 bg-teal-200',
-                Haircuts: 'text-teal-700 bg-teal-200',
-                'Gym Membership': 'text-teal-700 bg-teal-200',
+                Spa: 'text-teal-700 bg-teal-200 hover:bg-teal-300',
+                Cosmetics: 'text-teal-700 bg-teal-200 hover:bg-teal-300',
+                Haircuts: 'text-teal-700 bg-teal-200 hover:bg-teal-300',
+                'Gym Membership': 'text-teal-700 bg-teal-200 hover:bg-teal-300',
                 // Shopping
-                Clothing: 'text-rose-700 bg-rose-200',
-                Electronics: 'text-rose-700 bg-rose-200',
-                'Home Goods': 'text-rose-700 bg-rose-200',
-                Gifts: 'text-rose-700 bg-rose-200',
-                Toys: 'text-rose-700 bg-rose-200',
+                Clothing: 'text-rose-700 bg-rose-200 hover:bg-rose-300',
+                Electronics: 'text-rose-700 bg-rose-200 hover:bg-rose-300',
+                'Home Goods': 'text-rose-700 bg-rose-200 hover:bg-rose-300',
+                Gifts: 'text-rose-700 bg-rose-200 hover:bg-rose-300',
+                Toys: 'text-rose-700 bg-rose-200 hover:bg-rose-300',
                 // Split Transaction
-                'Split Transaction': 'text-slate-700 bg-slate-200',
+                'Split Transaction': 'text-slate-700 bg-slate-200 hover:bg-slate-300',
                 // Transportation
-                'Car Insurance': 'text-red-700 bg-red-200',
-                'Car Payment': 'text-red-700 bg-red-200',
-                Fuel: 'text-red-700 bg-red-200',
-                Repairs: 'text-red-700 bg-red-200',
-                'Public Transport': 'text-red-700 bg-red-200',
+                'Car Insurance': 'text-red-700 bg-red-200 hover:bg-red-300',
+                'Car Payment': 'text-red-700 bg-red-200 hover:bg-red-300',
+                Fuel: 'text-red-700 bg-red-200 hover:bg-red-300',
+                Repairs: 'text-red-700 bg-red-200 hover:bg-red-300',
+                'Public Transport': 'text-red-700 bg-red-200 hover:bg-red-300',
             };
             return categoryBgColor[categoryName] || '';
         },
