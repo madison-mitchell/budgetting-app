@@ -4,13 +4,12 @@ import com.mmg.app.dto.CategoryTotalDto;
 import com.mmg.app.dto.TransactionDto;
 import com.mmg.app.dto.TransactionSplitDto;
 import com.mmg.app.model.Transactions;
-import com.mmg.app.repository.BankAccountRepository;
-import com.mmg.app.repository.UserRepository;
 import com.mmg.app.service.TransactionsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,18 +36,20 @@ public class TransactionsController {
         return new ResponseEntity<>(newTransaction, HttpStatus.CREATED);
     }
 
+    @Transactional
     @PutMapping("/{id}")
     public ResponseEntity<Transactions> updateTransaction(@PathVariable Long id, @RequestBody TransactionDto transactionDto) {
         try {
             System.out.println("Incoming TransactionDto: " + transactionDto);
             Transactions updatedTransaction = transactionsService.updateTransaction(id, transactionDto);
+
+            System.out.println("Updated TransactionDto: " + updatedTransaction);
             return new ResponseEntity<>(updatedTransaction, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @DeleteMapping("/{id}")
     public void deleteTransaction(@PathVariable Long id) {
@@ -92,7 +93,8 @@ public class TransactionsController {
     }
 
     @PutMapping("/{id}/reviewed")
-    public ResponseEntity<Transactions> updateTransactionReviewed(@PathVariable Long id, @RequestBody Boolean reviewed) {
+    public ResponseEntity<Transactions> updateTransactionReviewed(@PathVariable Long id,
+            @RequestBody Boolean reviewed) {
         Transactions transaction = transactionsService.getTransactionById(id);
         if (transaction == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -129,7 +131,5 @@ public class TransactionsController {
         Transactions updatedTransaction = transactionsService.updateTransaction(id, transactionDto);
         return new ResponseEntity<>(updatedTransaction, HttpStatus.OK);
     }
-
-
 
 }

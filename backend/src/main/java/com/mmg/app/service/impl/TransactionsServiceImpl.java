@@ -11,6 +11,7 @@ import com.mmg.app.service.TransactionsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,17 +90,25 @@ public class TransactionsServiceImpl implements TransactionsService {
         return transactionsRepository.save(transaction);
     }
 
+    @Transactional
     @Override
     public Transactions updateTransaction(Long id, TransactionDto transactionDto) {
+        System.out.println("Starting updateTransaction for id: " + id);
         Transactions existingTransaction = transactionsRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
+        System.out.println("Existing transaction found: " + existingTransaction.getId());
 
         User user = userRepository.findById(transactionDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        System.out.println("User found: " + user.getId());
+
         BankAccount bankAccount = bankAccountRepository.findById(transactionDto.getAccountId())
                 .orElseThrow(() -> new RuntimeException("Bank Account not found"));
+        System.out.println("BankAccount found: " + bankAccount.getId());
+
         CategoryParentChildRelations category = categoryRepository.findById(transactionDto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
+        System.out.println("Category found: " + category.getId());
 
         existingTransaction.setUser(user);
         existingTransaction.setAccountId(bankAccount);
@@ -131,8 +140,13 @@ public class TransactionsServiceImpl implements TransactionsService {
             existingTransaction.setSplits(splits);
         }
 
-        return transactionsRepository.save(existingTransaction);
+        System.out.println("Saving updated transaction: " + existingTransaction);
+        Transactions savedTransaction = transactionsRepository.save(existingTransaction);
+        System.out.println("Saved transaction: " + savedTransaction);
+
+        return savedTransaction;
     }
+
 
     @Override
     public void deleteTransaction(Long id) {

@@ -19,13 +19,13 @@
                 <input type="checkbox" v-model="split.planned" @change="updateTransaction(split)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
             </td>
             <td class="pl-4 py-4 whitespace-nowrap">{{ formatBalance(split.plannedAmount) }}</td>
-            <td class="px-4 py-4 whitespace-nowrap flex items-center relative" @click="toggleCategoryMenu(split)">
+            <td class="px-4 py-4 whitespace-nowrap flex items-center relative" @click="toggleCategoryMenu(split, `splitMenu-${split.id}`)">
                 <div :class="`${getCategoryBgColor(split.categoryId?.childCategory?.name || 'Unknown')} px-2 py-0.5 rounded-xl`">
                     <i :class="`fa ${getCategoryIcon(split.categoryId?.childCategory?.name || 'Unknown')} text-xxs`" class="mr-2"></i>
                     {{ split.categoryId?.childCategory?.name || 'Unknown Category' }}
                     <i class="fa-solid fa-circle text-xxxs text-sky-500 ml-2" title="Split Transaction"></i>
                 </div>
-                <div v-if="showCategoryMenu && selectedTransaction === split" class="absolute z-10 bg-white border mt-1">
+                <div v-if="showCategoryMenu && selectedTransaction === split" :ref="`splitMenu-${split.id}`" class="category-menu">
                     <ul>
                         <li v-for="category in sortedCategories" :key="category.id" @click="changeCategory(split, category)">
                             {{ category.childCategory.name }}
@@ -46,12 +46,12 @@
             {{ transaction.merchant }}
             <span class="text-gray-400 ml-2">{{ transaction.accountId.bankName || 'Unknown Bank' }}</span>
         </td>
-        <td class="category px-4 py-4 whitespace-nowrap flex items-center relative" @click="toggleCategoryMenu(transaction)">
+        <td class="category px-4 py-4 whitespace-nowrap flex items-center relative" @click="toggleCategoryMenu(transaction, `categoryMenu-${transaction.id}`)">
             <div :class="`${getCategoryBgColor(transaction.categoryId?.childCategory?.name || 'Unknown')} px-2 py-0.5 rounded-xl`">
                 <i :class="`fa ${getCategoryIcon(transaction.categoryId?.childCategory?.name || 'Unknown')} text-xxs`" class="mr-2"></i>
                 {{ transaction.categoryId?.childCategory?.name || 'Unknown Category' }}
             </div>
-            <div v-if="showCategoryMenu && selectedTransaction === transaction" ref="categoryMenu" class="category-menu">
+            <div v-if="showCategoryMenu && selectedTransaction === transaction" :ref="`categoryMenu-${transaction.id}`" class="category-menu">
                 <ul>
                     <li v-for="category in sortedCategories" :key="category.id" @click="changeCategory(transaction, category)" class="p-2 hover:bg-gray-200 cursor-pointer">
                         {{ category.childCategory.name }}
@@ -88,21 +88,23 @@ export default {
     },
     emits: ['update-transaction'],
     methods: {
-        toggleCategoryMenu(transaction) {
+        toggleCategoryMenu(transaction, menuRef) {
             this.showCategoryMenu = !this.showCategoryMenu;
             this.selectedTransaction = transaction;
 
             this.$nextTick(() => {
-                const menu = this.$refs.categoryMenu;
-                const rect = menu.getBoundingClientRect();
-                const viewportHeight = window.innerHeight;
+                const menu = this.$refs[menuRef]?.[0];
+                if (menu) {
+                    const rect = menu.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
 
-                if (rect.bottom > viewportHeight) {
-                    menu.classList.add('bottom');
-                    menu.classList.remove('top');
-                } else {
-                    menu.classList.add('top');
-                    menu.classList.remove('bottom');
+                    if (rect.bottom > viewportHeight) {
+                        menu.classList.add('bottom');
+                        menu.classList.remove('top');
+                    } else {
+                        menu.classList.add('top');
+                        menu.classList.remove('bottom');
+                    }
                 }
             });
         },
@@ -120,11 +122,11 @@ export default {
             try {
                 const updatedTransaction = {
                     id: transaction.id,
-                    userId: transaction.user.id, // Convert nested user object to user ID
-                    accountId: transaction.accountId.id, // Convert nested account object to account ID
+                    userId: transaction.user.id,
+                    accountId: transaction.accountId.id,
                     amount: transaction.amount,
                     splits: transaction.splits,
-                    categoryId: category.id, // Ensure this is the correct ID format expected by the backend
+                    categoryId: category.id, // Ensure this is a Long
                     description: transaction.description,
                     timeOfTransaction: transaction.timeOfTransaction,
                     notes: transaction.notes,
@@ -141,12 +143,13 @@ export default {
                     balance: transaction.balance,
                 };
 
-                console.log('Updated Transaction JSON: ', JSON.stringify(updatedTransaction, null, 2)); // Log JSON
+                console.log('Updated Transaction JSON: ', JSON.stringify(updatedTransaction, null, 2));
                 const response = await axios.put(`http://localhost:8080/api/transactions/${transaction.id}`, updatedTransaction, {
                     headers: { Authorization: 'Bearer ' + authService.getCurrentUser().jwt },
                 });
                 this.$emit('update-transaction', response.data);
                 this.showCategoryMenu = false;
+                this.selectedTransaction = null;
             } catch (error) {
                 console.error('Error updating transaction', error);
             }
