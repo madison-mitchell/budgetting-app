@@ -20,7 +20,7 @@
                 <tr class="w-full bg-gray-100 border-b text-left text-xs font-medium text-gray-600 tracking-wider">
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('timeOfTransaction')">Date</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('merchant')">Merchant</th>
-                    <th class="px-4 py-3 cursor-pointer text-gray-100" @click="sortBy('category')">Category</th>
+                    <th class="py-3 cursor-pointer text-gray-100" @click="sortBy('category')">Category</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('description')">Description</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('amount')">Amount</th>
                     <th class="pl-4 py-3 cursor-pointer" @click="sortBy('balance')">Balance</th>

@@ -71,16 +71,16 @@
             <input v-model="transaction.description" @change="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
         </td>
         <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-green-600': transaction.amount > 0 }">
-            <input v-model="formattedTransactionAmount" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+            <input v-model="formattedTransactionAmount" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs w-20" />
         </td>
         <td class="pl-4 py-4 whitespace-nowrap" :class="{ 'text-red-500': transaction.accountBalance < 0 }">
-            <input v-model="formattedTransactionBalance" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+            <input v-model="formattedTransactionBalance" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs w-20" />
         </td>
         <td class="py-4 whitespace-nowrap flex justify-around">
             <input type="checkbox" v-model="transaction.planned" @change="updateTransaction(transaction)" class="form-checkbox h-4 w-5 text-green-600 transition duration-150 ease-in-out" />
         </td>
         <td class="pl-4 py-4 whitespace-nowrap">
-            <input v-model="formattedPlannedAmount" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
+            <input v-model="formattedPlannedAmount" @blur="updateTransaction(transaction)" class="px-2 py-1 text-xs w-20" />
         </td>
     </tr>
 </template>
