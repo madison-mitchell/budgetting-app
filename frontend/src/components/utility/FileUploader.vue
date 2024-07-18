@@ -8,7 +8,7 @@
                 </option>
             </select>
         </div>
-        <input type="file" @change="onFileChange" />
+        <input type="file" accept=".pdf,.csv" @change="onFileChange" />
     </div>
 </template>
 
@@ -41,6 +41,17 @@ export default {
         },
         onFileChange(event) {
             const file = event.target.files[0];
+            if (!file) {
+                alert('No file selected');
+                return;
+            }
+
+            const allowedTypes = ['application/pdf', 'text/csv'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Unsupported file type. Please upload a PDF or CSV file.');
+                return;
+            }
+
             this.uploadFile(file);
         },
         async uploadFile(file) {
@@ -63,6 +74,7 @@ export default {
                 console.log('File uploaded successfully', response.data);
             } catch (error) {
                 console.error('Error uploading file', error);
+                alert('Error uploading file: ' + error.response?.data || error.message);
             }
         },
     },

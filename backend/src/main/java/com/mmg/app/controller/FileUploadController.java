@@ -8,9 +8,8 @@ import com.mmg.app.repository.BankAccountRepository;
 import com.mmg.app.repository.CategoryParentChildRelationsRepository;
 import com.mmg.app.repository.TransactionsRepository;
 import com.mmg.app.repository.UserRepository;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +18,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,7 +42,7 @@ public class FileUploadController {
     @Autowired
     private CategoryParentChildRelationsRepository categoryRepository;
 
-    private static final String DATE_FORMAT = "MM/dd/yy";
+    private static final String DATE_FORMAT = "MM/dd/yyyy";
 
     @PostMapping
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file, @RequestParam("accountId") Long accountId) {
@@ -61,38 +58,66 @@ public class FileUploadController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid user.");
         }
 
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
-             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
-
-            List<Transactions> transactions = new ArrayList<>();
-            for (CSVRecord record : csvParser) {
-                Transactions transaction = new Transactions();
-
-                // Parse date using the correct format
-                transaction.setTimeOfTransaction(parseDate(record.get("Date")));
-                transaction.setDescription(record.get("Description"));
-                transaction.setAmount(Double.parseDouble(record.get("Amount")));
-                transaction.setType(record.get("Category")); // Category maps to type
-                transaction.setAccountId(bankAccount); // Set the bank account
-                transaction.setUser(user); // Set the user
-
-                // Fetch the related category entity based on the child category name (tags)
-                CategoryParentChildRelations category = categoryRepository.findByChildCategoryName(record.get("Tags"));
-                if (category == null) {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid category name: " + record.get("Tags"));
-                }
-                transaction.setCategoryId(category); // Set the category
-
-                transactions.add(transaction);
-            }
-
-            transactionRepository.saveAll(transactions);
-            return ResponseEntity.status(HttpStatus.OK).body("File uploaded and transactions saved successfully!");
-
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process the file!");
+        if (file.getContentType().equals("application/pdf")) {
+            return handlePdfUpload(file, bankAccount, user);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unsupported file type.");
         }
+    }
+
+    private ResponseEntity<String> handlePdfUpload(MultipartFile file, BankAccount bankAccount, User user) {
+        try (PDDocument document = PDDocument.load(file.getInputStream())) {
+            PDFTextStripper pdfStripper = new PDFTextStripper();
+            String text = pdfStripper.getText(document);
+            List<Transactions> transactions = parseAppleCardStatement(text, bankAccount, user);
+            transactionRepository.saveAll(transactions);
+            return ResponseEntity.status(HttpStatus.OK).body("PDF file uploaded and transactions saved successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process the PDF file!");
+        }
+    }
+
+    private List<Transactions> parseAppleCardStatement(String text, BankAccount bankAccount, User user) {
+        List<Transactions> transactions = new ArrayList<>();
+        String[] lines = text.split("\\r?\\n");
+
+        for (String line : lines) {
+            if (line.matches("\\d{2}/\\d{2}/\\d{4}.*")) { // Match lines that start with a date
+                String[] parts = line.split("\\s+");
+
+                try {
+                    Date date = parseDate(parts[0]);
+                    StringBuilder descriptionBuilder = new StringBuilder();
+                    int i = 1;
+                    while (i < parts.length && !parts[i].matches("\\d+%")) {
+                        descriptionBuilder.append(parts[i]).append(" ");
+                        i++;
+                    }
+                    String description = descriptionBuilder.toString().trim();
+                    double amount = Double.parseDouble(parts[parts.length - 1].replace(",", "").replace("$", ""));
+
+                    Transactions transaction = new Transactions();
+                    transaction.setTimeOfTransaction(date);
+                    transaction.setDescription(description);
+                    transaction.setAmount(amount);
+                    transaction.setType("Apple Card");
+                    transaction.setAccountId(bankAccount);
+                    transaction.setUser(user);
+
+                    // For now, we'll set the category as "Other" or a default category
+                    CategoryParentChildRelations categoryEntity = categoryRepository.findByChildCategoryName("Other");
+                    transaction.setCategoryId(categoryEntity);
+
+                    transactions.add(transaction);
+                } catch (ParseException | NumberFormatException e) {
+                    // Log error and continue parsing the next line
+                    System.err.println("Skipping line due to parsing error: " + line);
+                }
+            }
+        }
+
+        return transactions;
     }
 
     private Date parseDate(String date) throws ParseException {
