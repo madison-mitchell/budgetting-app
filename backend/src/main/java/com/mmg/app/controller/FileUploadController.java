@@ -17,18 +17,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @CrossOrigin
 @RequestMapping("/api/upload")
 public class FileUploadController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileUploadController.class);
 
     @Autowired
     private TransactionsRepository transactionRepository;
@@ -71,57 +73,97 @@ public class FileUploadController {
             String text = pdfStripper.getText(document);
             List<Transactions> transactions = parseAppleCardStatement(text, bankAccount, user);
             transactionRepository.saveAll(transactions);
+            logger.info("PDF file uploaded and transactions saved successfully!");
             return ResponseEntity.status(HttpStatus.OK).body("PDF file uploaded and transactions saved successfully!");
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to process the PDF file!", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process the PDF file!");
         }
     }
 
     private List<Transactions> parseAppleCardStatement(String text, BankAccount bankAccount, User user) {
         List<Transactions> transactions = new ArrayList<>();
+        Map<Date, List<Transactions>> transactionsByDate = new HashMap<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+
         String[] lines = text.split("\\r?\\n");
+        boolean isPaymentSection = false;
+        boolean isTransactionSection = false;
 
         for (String line : lines) {
-            if (line.matches("\\d{2}/\\d{2}/\\d{4}.*")) { // Match lines that start with a date
-                String[] parts = line.split("\\s+");
+            if (line.contains("Payments made by")) {
+                isPaymentSection = true;
+                isTransactionSection = false;
+                logger.info("Entering Payments section");
+                continue;
+            } else if (line.contains("Transactions")) {
+                isPaymentSection = false;
+                isTransactionSection = true;
+                logger.info("Entering Transactions section");
+                continue;
+            }
 
-                try {
-                    Date date = parseDate(parts[0]);
-                    StringBuilder descriptionBuilder = new StringBuilder();
-                    int i = 1;
-                    while (i < parts.length && !parts[i].matches("\\d+%")) {
-                        descriptionBuilder.append(parts[i]).append(" ");
-                        i++;
+            if (isPaymentSection || isTransactionSection) {
+                if (line.matches("\\d{2}/\\d{2}/\\d{4}.*")) { // Match lines that start with a date
+                    String[] parts = line.split("\\s+");
+                    try {
+                        Date date = dateFormat.parse(parts[0]);
+                        StringBuilder descriptionBuilder = new StringBuilder();
+                        int i = 1;
+                        while (i < parts.length && !parts[i].matches("\\d+%")) {
+                            descriptionBuilder.append(parts[i]).append(" ");
+                            i++;
+                        }
+                        String description = descriptionBuilder.toString().trim();
+                        double amount = Double.parseDouble(parts[parts.length - 1].replace(",", "").replace("$", ""));
+
+                        Transactions transaction = new Transactions();
+                        transaction.setTimeOfTransaction(date);
+                        transaction.setDescription(description);
+                        transaction.setAmount(-amount); // Positive for payments, negative for transactions
+                        transaction.setType(isPaymentSection ? "Payment" : "Transaction");
+                        transaction.setAccountId(bankAccount);
+                        transaction.setUser(user);
+
+                        logger.debug("Parsed transaction: date={}, description={}, amount={}, type={}", date, description, amount, transaction.getType());
+
+                        // Set the category to default to "Other"
+                        CategoryParentChildRelations categoryEntity = categoryRepository.findByChildCategoryName("Other");
+                        transaction.setCategoryId(categoryEntity);
+
+                        if (isPaymentSection) {
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(date);
+                            cal.add(Calendar.DAY_OF_MONTH, 1); // Add one day to move the payment to midnight the next day
+                            cal.set(Calendar.HOUR_OF_DAY, 0);
+                            cal.set(Calendar.MINUTE, 0);
+                            cal.set(Calendar.SECOND, 0);
+                            cal.set(Calendar.MILLISECOND, 0);
+                            transaction.setTimeOfTransaction(cal.getTime());
+                            logger.debug("Adjusted payment date to next day midnight: {}", transaction.getTimeOfTransaction());
+                        }
+
+                        transactionsByDate.putIfAbsent(date, new ArrayList<>());
+                        transactionsByDate.get(date).add(transaction);
+
+                    } catch (ParseException | NumberFormatException e) {
+                        logger.error("Skipping line due to parsing error: " + line, e);
                     }
-                    String description = descriptionBuilder.toString().trim();
-                    double amount = Double.parseDouble(parts[parts.length - 1].replace(",", "").replace("$", ""));
-
-                    Transactions transaction = new Transactions();
-                    transaction.setTimeOfTransaction(date);
-                    transaction.setDescription(description);
-                    transaction.setAmount(amount);
-                    transaction.setType("Apple Card");
-                    transaction.setAccountId(bankAccount);
-                    transaction.setUser(user);
-
-                    // For now, we'll set the category as "Other" or a default category
-                    CategoryParentChildRelations categoryEntity = categoryRepository.findByChildCategoryName("Other");
-                    transaction.setCategoryId(categoryEntity);
-
-                    transactions.add(transaction);
-                } catch (ParseException | NumberFormatException e) {
-                    // Log error and continue parsing the next line
-                    System.err.println("Skipping line due to parsing error: " + line);
                 }
             }
         }
 
-        return transactions;
-    }
+        // Flatten the map to a sorted list of transactions
+        transactionsByDate.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEach(entry -> {
+                    List<Transactions> dayTransactions = entry.getValue();
+                    dayTransactions.sort(Comparator.comparing(Transactions::getTimeOfTransaction));
+                    transactions.addAll(dayTransactions);
+                });
 
-    private Date parseDate(String date) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
-        return dateFormat.parse(date);
+        logger.info("Parsed a total of {} transactions", transactions.size());
+        return transactions;
     }
 }
