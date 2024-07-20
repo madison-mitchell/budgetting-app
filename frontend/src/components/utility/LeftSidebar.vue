@@ -98,7 +98,7 @@ export default {
                     },
                 })
                 .then((response) => {
-                    console.log('Bank Accounts: ', response.data);
+                    // console.log('Bank Accounts: ', response.data);
                     // Sort the accounts by their ID and add an order property
                     this.bankAccounts = response.data
                         .sort((a, b) => a.id - b.id)
@@ -114,9 +114,9 @@ export default {
         },
         filterAccountByType() {
             this.creditCards = this.bankAccounts.filter((account) => account.accountType === 'Credit Card');
-            console.log('Credit Cards: ', this.creditCards);
+            // console.log('Credit Cards: ', this.creditCards);
             this.depositories = this.bankAccounts.filter((account) => account.accountType === 'Checking' || account.accountType === 'Savings');
-            console.log('Depositories: ', this.depositories);
+            // console.log('Depositories: ', this.depositories);
         },
         formatBalance(balance) {
             if (balance === null || balance === undefined) {
@@ -131,11 +131,10 @@ export default {
         },
     },
     mounted() {
-        console.log('------------------ LeftSidebar.vue --------------------');
+        // console.log('------------------ LeftSidebar.vue --------------------');
         if (this.isAuthenticated) {
             this.fetchBankAccounts();
         }
-        this.calculateNetWorth;
     },
     watch: {
         $route() {
