@@ -1,14 +1,16 @@
 <template>
-    <div class="max-w-7xl mx-auto p-12 text-gray-600">
-        <div>
-            <label for="bankAccount">Select Bank Account:</label>
-            <select v-model="selectedAccountId">
-                <option v-for="account in accounts" :key="account.id" :value="account.id">
-                    {{ account.name }}
-                </option>
-            </select>
-        </div>
-        <input type="file" accept=".pdf,.csv" @change="onFileChange" />
+    <!-- <div class="max-w-7xl mx-auto p-12 text-gray-600"> -->
+    <div class="flex items-center">
+        <select
+            v-model="selectedAccountId"
+            id="bankAccount"
+            class="block w-full px-3 py-0.5 text-base text-gray-700 placeholder-gray-500 border border-gray-300 rounded-md appearance-none focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option disabled value="" class="text-gray-800">Select Bank Account</option>
+            <option v-for="account in accounts" :key="account.id" :value="account.id">
+                {{ account.name }}
+            </option>
+        </select>
+        <input class="w-full" type="file" accept=".pdf,.csv" @change="onFileChange" />
     </div>
 </template>
 
@@ -20,7 +22,7 @@ export default {
     data() {
         return {
             accounts: [],
-            selectedAccountId: null,
+            selectedAccountId: '',
         };
     },
     created() {

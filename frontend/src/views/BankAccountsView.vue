@@ -2,8 +2,10 @@
     <div class="max-w-7xl mx-auto p-12">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold text-gray-900">Bank Accounts</h2>
+            <FileUploader />
             <AddButton @click="showModal = true" />
         </div>
+
         <div v-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <AccountCard
@@ -70,6 +72,7 @@ import TransactionsTable from '../components/transactions/TransactionsTable.vue'
 import NewTransactionModal from '../components/transactions/NewTransactionModal.vue';
 import Spinner from '../components/utility/Spinner.vue';
 import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
+import FileUploader from '../components/utility/FileUploader.vue';
 
 export default {
     components: {
@@ -79,6 +82,7 @@ export default {
         TransactionsTable,
         NewTransactionModal,
         Spinner,
+        FileUploader,
     },
     data() {
         return {

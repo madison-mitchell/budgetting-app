@@ -10,10 +10,6 @@
             </div>
 
             <IncomeOverviewCard :incomeTransactions="currentMonthIncomeTransactions" :estimatedIncome="estimatedIncome" @update-estimated-income="setEstimatedIncome" />
-
-            <FileUploader />
-
-            <!-- Other dashboard components (Expenses Overview, etc.) -->
         </div>
     </div>
 </template>
@@ -25,14 +21,12 @@ import { format, parseISO, startOfMonth, endOfMonth } from 'date-fns';
 import AccountsOverviewCard from '@/components/dashboard/AccountsOverviewCard.vue';
 import TransactionsTableCard from '@/components/dashboard/TransactionsTableCard.vue';
 import IncomeOverviewCard from '@/components/dashboard/IncomeOverviewCard.vue';
-import FileUploader from '@/components/utility/FileUploader.vue';
 
 export default {
     components: {
         AccountsOverviewCard,
         TransactionsTableCard,
         IncomeOverviewCard,
-        FileUploader,
     },
     data() {
         return {
@@ -70,7 +64,6 @@ export default {
                     console.error('Failed to fetch bank accounts:', error);
                 });
         },
-
         fetchTransactions() {
             const [year, month] = this.currentMonth.split('-');
             axios
