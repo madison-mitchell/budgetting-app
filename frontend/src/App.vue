@@ -1,7 +1,7 @@
 <template>
     <div id="app" class="flex">
         <LeftSidebar />
-        <div class="flex-1 ml-60">
+        <div :class="{ 'flex-1 ml-60': isAuthenticated, 'w-full': !isAuthenticated }">
             <Navigation />
             <router-view />
         </div>
@@ -11,10 +11,21 @@
 <script>
 import Navigation from '@/components/utility/Navigation.vue';
 import LeftSidebar from '@/components/utility/LeftSidebar.vue';
+import authService from '@/services/authService';
 
 export default {
     components: { Navigation, LeftSidebar },
     name: 'App',
+    data() {
+        return {
+            isAuthenticated: !!authService.getCurrentUser(),
+        };
+    },
+    watch: {
+        $route() {
+            this.isAuthenticated = !!authService.getCurrentUser();
+        },
+    },
 };
 </script>
 
