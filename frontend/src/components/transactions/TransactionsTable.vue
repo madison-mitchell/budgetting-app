@@ -1,4 +1,3 @@
-<!-- src/components/transactions/TransactionsTable.vue -->
 <template>
     <div>
         <div class="mb-4 flex items-center justify-between">
@@ -66,7 +65,6 @@ export default {
         },
     },
     data() {
-        const currentMonth = format(new Date(), 'yyyy-MM');
         return {
             sortField: '',
             sortOrder: 'asc',
@@ -83,9 +81,6 @@ export default {
         selectedMonth() {
             this.filterTransactionsByMonth();
         },
-    },
-    mounted() {
-        this.filterTransactionsByMonth();
     },
     computed: {
         filteredTransactions() {

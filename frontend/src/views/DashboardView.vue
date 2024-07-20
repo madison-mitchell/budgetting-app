@@ -36,6 +36,7 @@ export default {
             transactions: [],
             availableMonths: [],
             currentMonth: format(new Date(), 'yyyy-MM'),
+            estimatedIncome: 0,
         };
     },
     mounted() {
@@ -95,6 +96,7 @@ export default {
                 .then((response) => {
                     console.log('Budgets: ', response.data[0]);
                     this.budgets = response.data;
+                    this.updateEstimatedIncome();
                 })
                 .catch((error) => {
                     console.error('Failed to fetch categories:', error);
@@ -137,6 +139,16 @@ export default {
         setEstimatedIncome(amount) {
             this.estimatedIncome = Number(amount); // Ensure the amount is a number
         },
+        updateEstimatedIncome() {
+            const incomeBudget = this.budgets.filter((budget) => budget.category.parentCategory.id === 1);
+            // Summing up the budgetAmount for all matched budgets
+            const totalBudgetAmount = incomeBudget.reduce((total, budget) => {
+                return total + budget.budgetAmount;
+            }, 0);
+
+            console.log('Total Budget Amount: ', totalBudgetAmount);
+            this.estimatedIncome = totalBudgetAmount;
+        },
     },
     computed: {
         currentMonthTransactions() {
@@ -156,16 +168,6 @@ export default {
         },
         currentMonthIncomeTransactions() {
             return this.currentMonthTransactions.filter((transaction) => transaction.type === 'Income');
-        },
-        estimatedIncome() {
-            const incomeBudget = this.budgets.filter((budget) => budget.category.parentCategory.id === 1);
-            // Summing up the budgetAmount for all matched budgets
-            const totalBudgetAmount = incomeBudget.reduce((total, budget) => {
-                return total + budget.budgetAmount;
-            }, 0);
-
-            console.log('Total Budget Amount: ', totalBudgetAmount);
-            return totalBudgetAmount;
         },
         currentMonthUnreviewedTransactions() {
             return this.currentMonthTransactions.filter((transaction) => !transaction.reviewed);
