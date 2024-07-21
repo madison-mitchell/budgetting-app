@@ -16,14 +16,15 @@ public class Expenses {
     private User user;
 
     private double amount;
+    @Column(name = "total_budget")
+    private double totalBudget;
 
 //    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryParentChildRelations category;
 
-    private String description;
-    private Date date;
+    private String name;
     private String notes;
 
     @ManyToOne
@@ -37,6 +38,28 @@ public class Expenses {
     private boolean paid;
     @Column(name = "payment_date")
     private Date paymentDate;
+
+    @Column(name = "due_date")
+    private Date dueDate;
+
+    @Column(name = "other_party_share")
+    private double otherPartyShare;
+
+    @Column(name = "is_shared_expense")
+    private boolean isSharedExpense;
+
+    @Column(name = "my_share")
+    private double myShare;
+
+    @Column(name = "shared_party_name")
+    private String sharedPartyName;
+
+    @Column(name = "my_share_budget")
+    private double myShareBudget;
+
+    @OneToOne
+    private Transactions transaction;
+
 
     public Long getId() {
         return id;
@@ -62,6 +85,14 @@ public class Expenses {
         this.amount = amount;
     }
 
+    public double getTotalBudget() {
+        return totalBudget;
+    }
+
+    public void setTotalBudget(double totalBudget) {
+        this.totalBudget = totalBudget;
+    }
+
     public CategoryParentChildRelations getCategory() {
         return category;
     }
@@ -70,20 +101,12 @@ public class Expenses {
         this.category = category;
     }
 
-    public String getDescription() {
-        return description;
+    public String getName() {
+        return name;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getNotes() {
@@ -148,5 +171,61 @@ public class Expenses {
 
     public void setPaymentDate(Date paymentDate) {
         this.paymentDate = paymentDate;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public double getOtherPartyShare() {
+        return otherPartyShare;
+    }
+
+    public void setOtherPartyShare(double otherPartyShare) {
+        this.otherPartyShare = otherPartyShare;
+    }
+
+    public boolean isSharedExpense() {
+        return isSharedExpense;
+    }
+
+    public void setSharedExpense(boolean sharedExpense) {
+        isSharedExpense = sharedExpense;
+    }
+
+    public double getMyShare() {
+        return myShare;
+    }
+
+    public void setMyShare(double myShare) {
+        this.myShare = myShare;
+    }
+
+    public String getSharedPartyName() {
+        return sharedPartyName;
+    }
+
+    public void setSharedPartyName(String sharedPartyName) {
+        this.sharedPartyName = sharedPartyName;
+    }
+
+    public double getMyShareBudget() {
+        return myShareBudget;
+    }
+
+    public void setMyShareBudget(double myShareBudget) {
+        this.myShareBudget = myShareBudget;
+    }
+
+    public Transactions getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(Transactions transaction) {
+        this.transaction = transaction;
     }
 }

@@ -55,6 +55,9 @@ public class Transactions {
     @Column(name = "account_balance")
     private double accountBalance;
 
+    @OneToOne
+    private Expenses expense;
+
     public Long getId() {
         return id;
     }
@@ -208,4 +211,12 @@ public class Transactions {
     public void setAccountBalance(double accountBalance) {
         this.accountBalance = accountBalance;
     }
+
+//    public Expenses getExpense() {
+//        return expense;
+//    }
+
+//    public void setExpense(Expenses expense) {
+//        this.expense = expense;
+//    }
 }

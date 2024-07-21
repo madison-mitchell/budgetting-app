@@ -1,12 +1,13 @@
 <template>
     <div class="max-w-7xl mx-auto p-12">
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Expenses</h2>
-        <div class="flex justify-end">
+        <div class="flex justify-end mb-6">
             <AddButton @click="showModal = true" class="h-full" />
         </div>
         <div v-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <ExpenseCard v-for="expense in expenses" :key="expense.id" :expense="expense" :budget="getBudgetForCategory(expense.category.id)" />
+            <!-- <ExpenseCard v-for="expense in sortedExpenses" :key="expense.id" :expense="expense" :budget="getBudgetForCategory(expense.category.id)" /> -->
+            <ExpenseCard v-for="expense in sortedExpenses" :key="expense.id" :expense="expense" />
         </div>
 
         <!-- Modal -->
@@ -40,6 +41,11 @@ export default {
     mounted() {
         this.fetchExpenses();
         this.fetchBudgets();
+    },
+    computed: {
+        sortedExpenses() {
+            return this.sortExpensesByDueDate(this.expenses);
+        },
     },
     methods: {
         fetchExpenses() {
@@ -75,6 +81,13 @@ export default {
                 .catch((error) => {
                     console.error('Failed to fetch budgets:', error);
                 });
+        },
+        sortExpensesByDueDate(expenses) {
+            return expenses.sort((a, b) => {
+                const dateA = new Date(a.dueDate);
+                const dateB = new Date(b.dueDate);
+                return dateA - dateB;
+            });
         },
         getCategories() {
             return [];
