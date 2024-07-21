@@ -48,7 +48,12 @@
         <td class="pl-4 py-4 whitespace-nowrap">
             <span
                 class="font-mono text-xs border border-1 px-1 mr-2 rounded-md cursor-default"
-                :class="{ 'text-green-500 border-green-500': transaction.type === 'Income', 'text-sky-400 border-sky-400': transaction.type !== 'Income' }">
+                :class="{
+                    'text-green-500 border-green-500': transaction.type === 'Income',
+                    'text-gray-400 border-gray-400': transaction.type === 'Transfer',
+                    'text-sky-400 border-sky-400': transaction.type === 'Expense',
+                    // 'text-sky-400 border-sky-400': transaction.type === 'Regular',
+                }">
                 {{ transaction.type.substring(0, 1) }}
             </span>
             <input v-model="transaction.merchant" @change="updateTransaction(transaction)" class="px-2 py-1 text-xs" />
@@ -309,7 +314,7 @@ export default {
                 Gifts: 'fa-gift text-rose-600',
                 Toys: 'fa-puzzle-piece text-rose-600',
                 // Split Transaction
-                'Split Transaction': 'fa-random text-slate-600',
+                'Split Transaction': 'fa-random text-neutral-600',
                 // Transportation
                 'Car Insurance': 'fa-shield-alt text-red-600',
                 'Car Payment': 'fa-car text-red-600',
@@ -377,6 +382,9 @@ export default {
                 Fuel: 'text-red-700 bg-red-200 hover:bg-red-300',
                 Repairs: 'text-red-700 bg-red-200 hover:bg-red-300',
                 'Public Transport': 'text-red-700 bg-red-200 hover:bg-red-300',
+                //Utility
+                Loan: 'text-indigo-700 bg-indigo-200 hover:bg-indigo-300',
+                'Mobile Phone': 'text-indigo-700 bg-indigo-200 hover:bg-indigo-300',
             };
             return categoryBgColor[categoryName] || '';
         },

@@ -1,10 +1,12 @@
 <template>
     <div class="max-w-7xl mx-auto p-12">
         <h2 class="text-2xl font-semibold text-gray-900 mb-6">Expenses</h2>
+        <div class="flex justify-end">
+            <AddButton @click="showModal = true" class="h-full" />
+        </div>
         <div v-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <ExpenseCard v-for="expense in expenses" :key="expense.id" :expense="expense" />
-            <AddButton @click="showModal = true" />
+            <ExpenseCard v-for="expense in expenses" :key="expense.id" :expense="expense" :budget="getBudgetForCategory(expense.category.id)" />
         </div>
 
         <!-- Modal -->
@@ -14,6 +16,7 @@
 
 <script>
 import axios from 'axios';
+import { format, subMonths, addMonths } from 'date-fns';
 import authService from '@/services/authService';
 import ExpenseCard from '../components/ExpenseCard.vue';
 import AddButton from '../components/AddButton.vue';
@@ -28,31 +31,15 @@ export default {
     data() {
         return {
             expenses: [],
+            budgets: [],
             showModal: false,
             errorMessage: '',
-            expenseFields: [
-                { name: 'description', label: 'Description', type: 'text', required: true },
-                { name: 'amount', label: 'Amount', type: 'number', required: true },
-                {
-                    name: 'categoryId',
-                    label: 'Category',
-                    type: 'select',
-                    options: this.getCategories(),
-                    required: true,
-                },
-                {
-                    name: 'bankAccountId',
-                    label: 'Bank Account',
-                    type: 'select',
-                    options: this.getBankAccounts(),
-                    required: true,
-                },
-                { name: 'date', label: 'Date', type: 'date', required: true },
-            ],
+            selectedMonth: format(new Date(), 'yyyy-MM'),
         };
     },
     mounted() {
         this.fetchExpenses();
+        this.fetchBudgets();
     },
     methods: {
         fetchExpenses() {
@@ -64,24 +51,57 @@ export default {
                 })
                 .then((response) => {
                     this.expenses = response.data;
-                    console.log('response.data: ', response.data);
                 })
                 .catch((error) => {
                     this.errorMessage = 'Failed to fetch expenses.';
                     console.error(error);
                 });
         },
+        fetchBudgets() {
+            const [year, month] = this.selectedMonth.split('-');
+            const token = authService.getCurrentUser().jwt;
+
+            axios
+                .get('http://localhost:8080/api/category-budgets', {
+                    params: { month: parseInt(month), year: parseInt(year) },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                .then((response) => {
+                    // this.budgets = this.organizeCategories(response.data);
+                    this.budgets = response.data;
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch budgets:', error);
+                });
+        },
+        getCategories() {
+            return [];
+        },
+        getBankAccounts() {
+            return [];
+        },
         handleAddExpense(newExpense) {
             this.expenses.push(newExpense);
             this.showModal = false;
         },
-        getCategories() {
-            // Fetch categories from API or use predefined list
-            return [];
-        },
-        getBankAccounts() {
-            // Fetch bank accounts from API or use predefined list
-            return [];
+        getBudgetForCategory(categoryId) {
+            if (!Array.isArray(this.budgets)) {
+                console.error('Budgets is not an array:', this.budgets);
+                return 0;
+            }
+
+            const budgetItem = this.budgets.find((b) => {
+                if (!b.category || typeof b.category.id === 'undefined') {
+                    console.error('Invalid budget item or missing category ID:', b);
+                    return false;
+                }
+
+                return b.category.id === categoryId;
+            });
+
+            return budgetItem ? budgetItem.budgetAmount : 0;
         },
     },
 };

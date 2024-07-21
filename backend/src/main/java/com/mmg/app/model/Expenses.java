@@ -17,7 +17,7 @@ public class Expenses {
 
     private double amount;
 
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryParentChildRelations category;
@@ -33,7 +33,10 @@ public class Expenses {
     private String merchant;
     private boolean recurring;
     private String frequency;
-    private String reviewed;
+    private boolean reviewed;
+    private boolean paid;
+    @Column(name = "payment_date")
+    private Date paymentDate;
 
     public Long getId() {
         return id;
@@ -123,13 +126,27 @@ public class Expenses {
         this.frequency = frequency;
     }
 
-    public String getReviewed() {
+    public boolean getReviewed() {
         return reviewed;
     }
 
-    public void setReviewed(String reviewed) {
+    public void setReviewed(boolean reviewed) {
         this.reviewed = reviewed;
     }
 
-    // Getters and Setters
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
+    }
+
+    public Date getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(Date paymentDate) {
+        this.paymentDate = paymentDate;
+    }
 }

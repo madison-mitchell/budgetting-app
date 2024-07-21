@@ -8,6 +8,9 @@ import com.mmg.app.repository.BankAccountRepository;
 import com.mmg.app.repository.CategoryParentChildRelationsRepository;
 import com.mmg.app.repository.TransactionsRepository;
 import com.mmg.app.repository.UserRepository;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -62,6 +67,8 @@ public class FileUploadController {
 
         if (file.getContentType().equals("application/pdf")) {
             return handlePdfUpload(file, bankAccount, user);
+        } else if (file.getContentType().equals("text/csv") || file.getContentType().equals("application/vnd.ms-excel")) {
+            return handleCsvUpload(file, bankAccount, user);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unsupported file type.");
         }
@@ -79,6 +86,46 @@ public class FileUploadController {
             logger.error("Failed to process the PDF file!", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process the PDF file!");
         }
+    }
+
+    private ResponseEntity<String> handleCsvUpload(MultipartFile file, BankAccount bankAccount, User user) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()));
+             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
+
+            List<Transactions> transactions = new ArrayList<>();
+            for (CSVRecord record : csvParser) {
+                Transactions transaction = new Transactions();
+
+                // Parse date using the correct format
+                transaction.setTimeOfTransaction(parseDate(record.get("Date")));
+                transaction.setDescription(record.get("Description"));
+                transaction.setAmount(Double.parseDouble(record.get("Amount")));
+                transaction.setType(record.get("Category")); // Category maps to type
+                transaction.setAccountId(bankAccount); // Set the bank account
+                transaction.setUser(user); // Set the user
+
+                // Fetch the related category entity based on the child category name (tags)
+                CategoryParentChildRelations category = categoryRepository.findByChildCategoryName(record.get("Tags"));
+                if (category == null) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid category name: " + record.get("Tags"));
+                }
+                transaction.setCategoryId(category); // Set the category
+
+                transactions.add(transaction);
+            }
+
+            transactionRepository.saveAll(transactions);
+            return ResponseEntity.status(HttpStatus.OK).body("File uploaded and transactions saved successfully!");
+
+        } catch (IOException | ParseException e) {
+            logger.error("Failed to process the CSV file!", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to process the CSV file!");
+        }
+    }
+
+    private Date parseDate(String date) throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        return dateFormat.parse(date);
     }
 
     private List<Transactions> parseAppleCardStatement(String text, BankAccount bankAccount, User user) {
