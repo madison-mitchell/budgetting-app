@@ -6,6 +6,7 @@
             <div class="pt-4 pl-6 pr-2 pb-2 text-left">
                 <div class="flex space-x-2 items-center">
                     <h3 class="text-lg font-semibold text-sky-500 uppercase">{{ expense.category.childCategory.name }}</h3>
+
                     <div class="expense-paid text-xs" @click="togglePaid">
                         <span v-if="expense.paid" class="text-green-500 hover:text-green-700">
                             <i class="fas fa-check-circle" title="Paid Expense"></i>
@@ -23,10 +24,11 @@
                         </span>
                     </div>
                 </div>
-
                 <p class="text-xs text-gray-600">{{ expense.merchant }} - {{ expense.frequency }}</p>
             </div>
-            <div class="rounded-bl-lg rounded-tr-lg" :class="{ 'bg-white text-gray-600': expense.sharedExpense, 'text-sky-700 bg-gradient-to-br from-cyan-100 to-sky-200': !expense.sharedExpense }">
+            <div
+                class="expense-due-date rounded-bl-lg rounded-tr-lg"
+                :class="{ 'bg-white text-gray-600': expense.sharedExpense, 'text-sky-700 bg-gradient-to-br from-cyan-100 to-sky-200': !expense.sharedExpense }">
                 <p class="pt-8 pr-6 pl-2 pb-2 w-14 text-sm">{{ formatDayWithOrdinal(expense.dueDate) }}</p>
             </div>
         </div>
@@ -40,7 +42,6 @@
             </div>
 
             <div class="expense-amount flex flex-col w-full justify-center text-lg">
-                <!-- <h3 v-if="expense.sharedExpense" class="mt-4 text-sm text-left text-sky-600">TOTAL:</h3> -->
                 <div class="flex w-full justify-center">
                     <p
                         class="font-semibold"
@@ -54,9 +55,20 @@
                     <p class="font-semibold px-2 text-gray-600">|</p>
                     <p class="font-semibold text-gray-600">{{ formatAmount(expense.totalBudget) }}</p>
                 </div>
+                <div class="w-full bg-gray-300 rounded-full h-2 mt-4">
+                    <div
+                        class="h-2 rounded-full"
+                        :class="{
+                            'bg-gradient-to-r from-lime-300 to-green-500': meetsTotalBudget || overIncomeTotalBudget,
+                            'bg-gradient-to-r from-cyan-300 to-blue-500': budgetPercentage < 100 && (underTotalBudget || underIncomeTotalBudget),
+                            'bg-gradient-to-r from-orange-300 to-red-500': budgetPercentage > 100 && overTotalBudget,
+                        }"
+                        :style="{ width: budgetPercentage + '%' }"></div>
+                </div>
+                <p class="text-xs text-center mt-2">{{ budgetPercentage.toFixed(2) }}% of budget used</p>
             </div>
 
-            <div v-if="expense.sharedExpense">
+            <div v-if="expense.sharedExpense" class="show-hide-details-btn">
                 <button @click="toggleDetails" class="my-6 text-xs text-sky-600 hover:text-sky-800">
                     {{ showDetails ? 'Hide Details' : 'Show Shared Details' }}
                 </button>
@@ -127,11 +139,12 @@ export default {
         };
     },
     computed: {
-        positiveAmount() {
-            this.expense.amount = this.expense.amount > 0 ? this.expense.amount : -this.expense.amount;
-        },
-        positiveTotalBudget() {
-            this.expense.totalBudget = this.expense.totalBudget > 0 ? this.expense.totalBudget : -this.expense.totalBudget;
+        budgetPercentage() {
+            if (!this.expense.totalBudget || this.expense.totalBudget === 0) {
+                return 0;
+            }
+
+            return Math.round((this.expense.amount / this.expense.totalBudget) * 100);
         },
         overTotalBudget() {
             if (this.expense.totalBudget < 0) {
@@ -141,6 +154,16 @@ export default {
         underTotalBudget() {
             if (this.expense.totalBudget < 0) {
                 return this.expense.amount > this.expense.totalBudget;
+            }
+        },
+        overIncomeTotalBudget() {
+            if (this.expense.category.id === 1) {
+                return this.expense.amount > this.expense.totalBudget;
+            }
+        },
+        underIncomeTotalBudget() {
+            if (this.expense.category.id === 1) {
+                return this.expense.amount < this.expense.totalBudget;
             }
         },
         meetsTotalBudget() {
@@ -171,16 +194,6 @@ export default {
         },
         meetsSharedBudget() {
             return this.expense.otherPartyShare === this.expense.totalBudget - this.expense.myShareBudget;
-        },
-        overIncomeTotalBudget() {
-            if (this.expense.category.id === 1) {
-                return this.expense.amount > this.expense.totalBudget;
-            }
-        },
-        underIncomeTotalBudget() {
-            if (this.expense.category.id === 1) {
-                return this.expense.amount < this.expense.totalBudget;
-            }
         },
     },
     methods: {
