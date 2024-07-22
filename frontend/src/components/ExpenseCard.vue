@@ -1,10 +1,29 @@
 <template>
     <div
-        class="relative shadow-md border border-grey-50 rounded-lg pb-6 flex flex-col justify-between hover:shadow-lg"
+        class="relative shadow-md border border-grey-50 rounded-lg pb-6 flex flex-col justify-between hover:shadow-lg cursor-pointer"
         :class="{ 'bg-gradient-to-br from-cyan-100 to-sky-200': expense.sharedExpense, 'bg-white': !expense.sharedExpense }">
         <div class="expense-header flex justify-between items-start w-full">
             <div class="pt-4 pl-6 pr-2 pb-2 text-left">
-                <h3 class="text-lg font-semibold text-sky-500 uppercase">{{ expense.category.childCategory.name }}</h3>
+                <div class="flex space-x-2 items-center">
+                    <h3 class="text-lg font-semibold text-sky-500 uppercase">{{ expense.category.childCategory.name }}</h3>
+                    <div class="expense-paid text-xs" @click="togglePaid">
+                        <span v-if="expense.paid" class="text-green-500 hover:text-green-700">
+                            <i class="fas fa-check-circle" title="Paid Expense"></i>
+                        </span>
+                        <span v-else :class="{ 'text-red-300 hover:text-red-500': !expense.sharedExpense, 'text-red-500 hover:text-red-700': expense.sharedExpense }">
+                            <i class="fas fa-times-circle" title="Unpaid Expense"></i>
+                        </span>
+                    </div>
+                    <div class="expense-recurring text-xs">
+                        <span v-if="expense.recurring" class="text-green-500 hover:text-green-700">
+                            <i class="fa-solid fa-repeat" title="Recurring Expense"></i>
+                        </span>
+                        <span v-else class="text-gray-500 hover:text-gray-700">
+                            <i class="fa-solid fa-repeat" title="Not A Recurring Expense"></i>
+                        </span>
+                    </div>
+                </div>
+
                 <p class="text-xs text-gray-600">{{ expense.merchant }} - {{ expense.frequency }}</p>
             </div>
             <div class="rounded-bl-lg rounded-tr-lg" :class="{ 'bg-white text-gray-600': expense.sharedExpense, 'text-sky-700 bg-gradient-to-br from-cyan-100 to-sky-200': !expense.sharedExpense }">
@@ -18,22 +37,10 @@
                 <h3 v-if="expense.sharedExpense" class="text-xs text-gray-700">Shared Expense</h3>
                 <h3 v-if="expense.sharedPartyName" class="text-xs text-gray-700">{{ expense.sharedPartyName }}</h3>
                 <h3 class="text-sm text-gray-400">{{ expense.notes }}</h3>
-                <!-- <h2 class="text-md font-semibold text-gray-500">{{ expense.user.username }}</h2> -->
             </div>
 
-            <div v-if="expense.sharedExpense" class="expenses-shared-amount flex flex-col w-full justify-center">
-                <h3 v-if="expense.sharedExpense" class="mt-4 text-sm text-left text-sky-600">MY SHARE:</h3>
-                <div class="flex w-full justify-center">
-                    <p class="text-lg font-semibold" :class="{ 'text-red-600': overSharedBudget, 'text-sky-500': underSharedBudget, 'text-emerald-500': meetsSharedBudget }">
-                        {{ formatAmount(expense.myShare) }}
-                    </p>
-                    <p class="text-lg font-semibold px-2 text-gray-600">|</p>
-                    <p class="text-lg font-semibold text-gray-600">{{ formatAmount(expense.myShareBudget) }}</p>
-                </div>
-            </div>
-
-            <div class="expense-amount flex flex-col w-full justify-center" :class="{ 'text-lg': !expense.sharedExpense, 'text-sm': expense.sharedExpense }">
-                <h3 v-if="expense.sharedExpense" class="mt-4 text-sm text-left text-sky-600">TOTAL:</h3>
+            <div class="expense-amount flex flex-col w-full justify-center text-lg">
+                <!-- <h3 v-if="expense.sharedExpense" class="mt-4 text-sm text-left text-sky-600">TOTAL:</h3> -->
                 <div class="flex w-full justify-center">
                     <p
                         class="font-semibold"
@@ -48,9 +55,45 @@
                     <p class="font-semibold text-gray-600">{{ formatAmount(expense.totalBudget) }}</p>
                 </div>
             </div>
+
+            <div v-if="expense.sharedExpense">
+                <button @click="toggleDetails" class="my-6 text-xs text-sky-600 hover:text-sky-800">
+                    {{ showDetails ? 'Hide Details' : 'Show Shared Details' }}
+                </button>
+            </div>
+
+            <div v-if="expense.sharedExpense && showDetails" class="expenses-shared-amount flex flex-col w-full justify-center bg-white bg-opacity-75 rounded-lg p-4">
+                <div class="expenses-my-share">
+                    <h3 class="text-sm text-left text-sky-600">MY SHARE:</h3>
+                    <div class="flex w-full justify-center">
+                        <p class="text-lg font-semibold" :class="{ 'text-red-600': overMySharedBudget, 'text-sky-500': underMySharedBudget, 'text-emerald-500': meetsMySharedBudget }">
+                            {{ formatAmount(expense.myShare) }}
+                        </p>
+                        <p class="text-lg font-semibold px-2 text-gray-600">|</p>
+                        <p class="text-lg font-semibold text-gray-600">{{ formatAmount(expense.myShareBudget) }}</p>
+                    </div>
+                </div>
+
+                <div class="expense-shared-party-share">
+                    <h3 class="mt-4 text-sm text-left text-sky-600 uppercase">{{ expense.sharedPartyName }}'s SHARE:</h3>
+                    <div class="flex w-full justify-center">
+                        <p class="text-lg font-semibold" :class="{ 'text-red-600': overSharedBudget, 'text-sky-500': underSharedBudget, 'text-emerald-500': meetsSharedBudget }">
+                            {{ formatAmount(expense.otherPartyShare) }}
+                        </p>
+                        <p class="text-lg font-semibold px-2 text-gray-600">|</p>
+                        <p class="text-lg font-semibold text-gray-600">{{ formatAmount(expense.totalBudget - expense.myShareBudget) }}</p>
+                    </div>
+                </div>
+
+                <h3 class="mt-4 mb-2 text-sm text-left text-sky-600">TRANSACTION:</h3>
+                <div class="text-xs text-center">
+                    <p>{{ expense.transaction.description }}</p>
+                    <p>{{ formatDate(expense.transaction.timeOfTransaction) }} | {{ formatAmount(expense.transaction.amount) }}</p>
+                </div>
+            </div>
         </div>
 
-        <div class="expense-recurring absolute bottom-2 left-2">
+        <!-- <div class="expense-recurring absolute bottom-2 left-2">
             <span v-if="expense.recurring" :class="{ 'text-green-300 hover:text-green-500': !expense.sharedExpense, 'text-green-500 hover:text-green-700': expense.sharedExpense }">
                 <i class="fa-solid fa-repeat" title="Recurring Expense"></i>
             </span>
@@ -66,7 +109,7 @@
             <span v-else :class="{ 'text-red-100 hover:text-red-500': !expense.sharedExpense, 'text-red-500 hover:text-red-700': expense.sharedExpense }">
                 <i class="fas fa-times-circle" title="Unpaid Expense"></i>
             </span>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -77,10 +120,11 @@ export default {
             type: Object,
             required: true,
         },
-        // budget: {
-        //     type: Number,
-        //     required: true,
-        // },
+    },
+    data() {
+        return {
+            showDetails: false,
+        };
     },
     computed: {
         positiveAmount() {
@@ -102,18 +146,31 @@ export default {
         meetsTotalBudget() {
             return this.expense.amount === this.expense.totalBudget;
         },
-        overSharedBudget() {
+        overMySharedBudget() {
             if (this.expense.myShareBudget < 0) {
                 return this.expense.myShare < this.expense.myShareBudget;
             }
         },
-        underSharedBudget() {
+        underMySharedBudget() {
             if (this.expense.myShareBudget < 0) {
                 return this.expense.myShare > this.expense.myShareBudget;
             }
         },
-        meetsSharedBudget() {
+        meetsMySharedBudget() {
             return this.expense.myShare === this.expense.myShareBudget;
+        },
+        overSharedBudget() {
+            if (this.expense.totalBudget - this.expense.myShareBudget < 0) {
+                return this.expense.otherPartyShare < this.expense.totalBudget - this.expense.myShareBudget;
+            }
+        },
+        underSharedBudget() {
+            if (this.expense.totalBudget - this.expense.myShareBudget < 0) {
+                return this.expense.otherPartyShare > this.expense.totalBudget - this.expense.myShareBudget;
+            }
+        },
+        meetsSharedBudget() {
+            return this.expense.otherPartyShare === this.expense.totalBudget - this.expense.myShareBudget;
         },
         overIncomeTotalBudget() {
             if (this.expense.category.id === 1) {
@@ -145,27 +202,21 @@ export default {
                 paid: !this.expense.paid,
             });
         },
+        toggleDetails() {
+            this.showDetails = !this.showDetails;
+        },
         formatDate(dateTimeString) {
-            // Parse the date-time string into a Date object
             const date = new Date(dateTimeString);
-
-            // Use Intl.DateTimeFormat to format the date
-            const formatter = new Intl.DateTimeFormat('en-GB', {
-                // year: 'numeric',
-                // month: '2-digit',
+            const formatter = new Intl.DateTimeFormat('en-US', {
                 day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
             });
-
             return formatter.format(date);
         },
         formatDayWithOrdinal(dateTimeString) {
-            // Parse the date-time string into a Date object
             const date = new Date(dateTimeString);
-
-            // Get the day of the month
             const day = date.getDate();
-
-            // Determine the ordinal suffix
             let suffix;
             if (day > 3 && day < 21) {
                 suffix = 'th';
@@ -185,7 +236,6 @@ export default {
                         break;
                 }
             }
-
             return `${day}${suffix}`;
         },
     },
