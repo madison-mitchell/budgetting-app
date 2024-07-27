@@ -65,7 +65,7 @@
                         }"
                         :style="{ width: budgetPercentage + '%' }"></div>
                 </div>
-                <p class="text-xs text-center mt-2">{{ budgetPercentage.toFixed(2) }}% of budget used</p>
+                <p class="text-xs text-right mt-2 text-gray-400">{{ budgetPercentage.toFixed(0) }}% of budget used</p>
             </div>
 
             <div v-if="expense.sharedExpense" class="show-hide-details-btn">

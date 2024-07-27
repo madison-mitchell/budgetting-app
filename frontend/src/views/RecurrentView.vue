@@ -1,6 +1,6 @@
 <template>
     <div class="max-w-7xl mx-auto p-12">
-        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Expenses</h2>
+        <h2 class="text-2xl font-semibold text-gray-900 mb-6">Recurring Transactions</h2>
         <div class="flex justify-end mb-6">
             <AddButton @click="showModal = true" class="h-full" />
         </div>

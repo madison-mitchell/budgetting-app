@@ -3,7 +3,7 @@ import HomeView from '../views/HomeView.vue';
 import Login from '../components/Login.vue';
 import BankAccountsView from '../views/BankAccountsView.vue';
 import TransactionsView from '../views/TransactionsView.vue';
-import ExpensesView from '../views/ExpensesView.vue';
+import RecurrentView from '../views/RecurrentView.vue';
 import DashboardView from '../views/DashboardView.vue';
 import ProfileView from '../views/ProfileView.vue';
 import authService from '@/services/authService';
@@ -15,7 +15,7 @@ const routes = [
     { path: '/dashboard', name: 'Dashboard', component: DashboardView, meta: { requiresAuth: true } },
     { path: '/bank-accounts', name: 'BankAccounts', component: BankAccountsView, meta: { requiresAuth: true } },
     { path: '/transactions', name: 'Transactions', component: TransactionsView, meta: { requiresAuth: true } },
-    { path: '/expenses', name: 'Expenses', component: ExpensesView, meta: { requiresAuth: true } },
+    { path: '/recurrent', name: 'Expenses', component: RecurrentView, meta: { requiresAuth: true } },
     { path: '/profile', name: 'Profile', component: ProfileView, meta: { requiresAuth: true } },
     { path: '/categories', name: 'Categories', component: CategoriesView, meta: { requiresAuth: true } },
 ];
