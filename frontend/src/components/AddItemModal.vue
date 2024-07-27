@@ -9,7 +9,7 @@
             <form @submit.prevent="addItem">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div v-for="field in fields" :key="field.name" class="mb-4 text-left">
-                        <label :class="fieldClass">
+                        <label :class="fieldClass" class="w-full">
                             {{ field.label }}
                             <span v-if="field.required" class="text-red-500">*</span>
                         </label>
@@ -19,10 +19,15 @@
                             :type="field.type"
                             :class="inputClass"
                             :required="field.required"
-                            class="border border-0.5 rounded-md border-gray-200" />
-                        <input v-if="field.type === 'checkbox'" v-model="itemData[field.name]" type="checkbox" :class="inputClass" :required="field.required" />
-                        <select v-else-if="field.type === 'select'" v-model="itemData[field.name]" :class="inputClass" :required="field.required" class="border border-0.5 rounded-md border-gray-200">
-                            <option v-for="option in getOptions(field.name)" :key="option.value" :value="option.value">
+                            class="w-full border border-0.5 rounded-md border-gray-200 text-sm p-1" />
+                        <input v-if="field.type === 'checkbox'" v-model="itemData[field.name]" type="checkbox" :class="inputClass" class="text-sm" :required="field.required" />
+                        <select
+                            v-else-if="field.type === 'select'"
+                            v-model="itemData[field.name]"
+                            :class="inputClass"
+                            :required="field.required"
+                            class="w-full border border-0.5 rounded-md border-gray-200 p-0.5 text-sm">
+                            <option v-for="option in getOptions(field.name)" :key="option.value" :value="option.value" class="text-sm">
                                 {{ option.label }}
                             </option>
                         </select>
@@ -59,6 +64,10 @@ export default {
             required: true,
         },
         accountOptions: {
+            type: Array,
+            required: true,
+        },
+        transactionOptions: {
             type: Array,
             required: true,
         },
@@ -115,6 +124,9 @@ export default {
             if (fieldName === 'accountId') {
                 return this.accountOptions;
             }
+            if (fieldName === 'transactionId') {
+                return this.transactionOptions;
+            }
             return [];
         },
     },
@@ -132,7 +144,7 @@ export default {
             return 'block text-sm font-medium text-gray-700';
         },
         inputClass() {
-            return 'mt-1 block w-full';
+            return 'mt-1 block';
         },
     },
 };

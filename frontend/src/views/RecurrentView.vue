@@ -15,8 +15,9 @@
             :show="showModal"
             itemType="Expense"
             :fields="expenseFields"
-            :categories="categories"
-            :accounts="accounts"
+            :categoryOptions="categories"
+            :accountOptions="accounts"
+            :transactionOptions="transactions"
             @close="showModal = false"
             @add-item="handleAddExpense" />
     </div>
@@ -45,6 +46,7 @@ export default {
             selectedMonth: format(new Date(), 'yyyy-MM'),
             categories: [],
             accounts: [],
+            transactions: [],
             expenseFields: [
                 { name: 'name', label: 'Name', type: 'text', required: true },
                 { name: 'merchant', label: 'Merchant', type: 'text', required: false },
@@ -55,16 +57,16 @@ export default {
                 { name: 'dueDate', label: 'Due Date', type: 'date', required: true },
                 { name: 'frequency', label: 'Frequency', type: 'text', required: false },
                 { name: 'myShareBudget', label: 'My Share Budget', type: 'number', required: false },
-                { name: 'accountId', label: 'Account ID', type: 'select', required: true, options: [] },
+                { name: 'accountId', label: 'Account', type: 'select', required: true, options: [] },
                 { name: 'myShare', label: 'My Share', type: 'number', required: false },
-                { name: 'paid', label: 'Paid', type: 'checkbox', required: false },
+                { name: 'isSharedExpense', label: 'Shared Expense', type: 'checkbox', required: false },
                 { name: 'paymentDate', label: 'Payment Date', type: 'date', required: false },
                 { name: 'reviewed', label: 'Reviewed', type: 'checkbox', required: false },
                 { name: 'sharedPartyName', label: 'Shared Party Name', type: 'text', required: false },
                 { name: 'recurring', label: 'Recurring', type: 'checkbox', required: false },
                 { name: 'otherPartyShare', label: 'Other Party Share', type: 'number', required: false },
-                { name: 'isSharedExpense', label: 'Shared Expense', type: 'checkbox', required: false },
-                { name: 'transactionId', label: 'Transaction ID', type: 'number', required: true },
+                { name: 'paid', label: 'Paid', type: 'checkbox', required: false },
+                { name: 'transactionId', label: 'Transaction', type: 'select', required: true, options: [] },
             ],
         };
     },
@@ -73,6 +75,7 @@ export default {
         this.fetchBudgets();
         this.fetchCategories();
         this.fetchAccounts();
+        this.fetchTransactions();
     },
     computed: {
         sortedExpenses() {
@@ -122,6 +125,7 @@ export default {
                 })
                 .then((response) => {
                     this.categories = response.data.map((category) => ({ value: category.id, label: category.childCategory.name }));
+                    console.log('this.categories: ', this.categories);
                 })
                 .catch((error) => {
                     console.error('Failed to fetch categories:', error);
@@ -129,7 +133,7 @@ export default {
         },
         fetchAccounts() {
             axios
-                .get('http://localhost:8080/api/accounts', {
+                .get('http://localhost:8080/api/bank-accounts', {
                     headers: {
                         Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
                     },
@@ -139,6 +143,25 @@ export default {
                 })
                 .catch((error) => {
                     console.error('Failed to fetch accounts:', error);
+                });
+        },
+        fetchTransactions() {
+            axios
+                .get('http://localhost:8080/api/transactions', {
+                    headers: {
+                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                    },
+                })
+                .then((response) => {
+                    console.log('response.data: ', response.data);
+                    this.transactions = response.data.map((transaction) => ({
+                        value: transaction.id,
+                        label: this.formatDate(transaction.timeOfTransaction) + ' ' + transaction.merchant + ' ' + transaction.categoryId.childCategory.name,
+                    }));
+                    console.log('this.transactions: ', this.transactions);
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch transactions:', error);
                 });
         },
         sortExpensesByDueDate(expenses) {
@@ -168,6 +191,10 @@ export default {
             });
 
             return budgetItem ? budgetItem.budgetAmount : 0;
+        },
+        formatDate(datetime) {
+            const date = new Date(datetime);
+            return date.toLocaleDateString();
         },
     },
 };
