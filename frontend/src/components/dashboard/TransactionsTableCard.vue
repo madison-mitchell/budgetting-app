@@ -1,22 +1,13 @@
 <!-- src/components/dashboard/TransactionsTableCard.vue -->
 <template>
-    <div class="flex flex-col justify-center">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Unreviewed Transactions</h3>
-        <table v-if="sortedTransactions.length > 0" class="min-w-full bg-white rounded-lg shadow overflow-hidden">
-            <thead>
-                <tr class="w-full bg-gray-100 border-b text-left text-xs font-medium text-gray-600 tracking-wider">
-                    <th class="pl-4 py-3 cursor-pointer" @click="sortBy('timeOfTransaction')">Date</th>
-                    <th class="pl-4 py-3 cursor-pointer" @click="sortBy('merchant')">Merchant</th>
-                    <th class="pl-4 py-3 cursor-pointer" @click="sortBy('amount')">Amount</th>
-                    <th class="pl-4 py-3">Reviewed</th>
-                </tr>
-            </thead>
-            <tbody>
+    <div class="flex flex-col h-full">
+        <h3 class="text-lg font-semibold text-gray-800 mt-4">Transactions to Review</h3>
+        <div class="p-6 h-full flex flex-col justify-evenly">
+            <table v-if="sortedTransactions.length > 0" class="w-full">
                 <TransactionRow v-for="transaction in sortedTransactions" :key="transaction.id" :transaction="transaction" />
-            </tbody>
-        </table>
-
-        <p v-else class="text-green-700 font-medium italic mt-2">No transactions to review.</p>
+            </table>
+            <p v-else class="text-sm text-sky-500 font-medium italic mb-10">No transactions to review.</p>
+        </div>
     </div>
 </template>
 

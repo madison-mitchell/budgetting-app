@@ -5,7 +5,7 @@
             <AccountsOverviewCard :accounts="accounts" :totalBalance="totalBalance" />
 
             <!-- Simplified Transactions Table -->
-            <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6">
+            <div class="bg-white shadow-md border border-grey-50 rounded-lg">
                 <TransactionsTableCard :transactions="currentMonthUnreviewedTransactions" @update-transaction="updateTransaction" />
             </div>
 

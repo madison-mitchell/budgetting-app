@@ -3,10 +3,10 @@
         <h2 class="text-lg font-semibold mb-4">Income</h2>
         <div class="mb-4">
             <div class="flex justify-between w-full items-center mb-4">
-                <h2 class="text-sm text-left w-20" :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }">{{ formatAmount(totalIncomeEarned) }}</h2>
+                <h2 class="income-actual text-sm text-left w-20" :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }">{{ formatAmount(totalIncomeEarned) }}</h2>
                 <div class="relative">
                     <div
-                        class="overflow-hidden h-3 text-xs flex rounded-xl border w-32 mx-auto bg-sky-200"
+                        class="income-progress-bar overflow-hidden h-3 text-xs flex rounded-xl border w-44 mx-auto bg-sky-200"
                         :class="{ 'border-green-500': progressPercentage >= 100, 'border-sky-500': progressPercentage < 100 }">
                         <div
                             :style="{ width: progressPercentage + '%' }"
@@ -16,13 +16,13 @@
                 </div>
                 <div class="relative flex items-center">
                     <input
+                        class="income-budget border-none text-sm text-right w-20 rounded-md focus:outline-none focus:ring focus:ring-sky-500 focus:border-sky-800"
                         :value="inputValue"
                         @input="onInput"
                         @blur="onBlur"
                         @focus="onFocus"
                         type="text"
                         placeholder="Enter estimated income"
-                        class="border-none text-sm text-right w-20 rounded-md focus:outline-none focus:ring focus:ring-sky-500 focus:border-sky-800"
                         :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }"
                         :style="{ width: inputWidth + 'px' }" />
                     <span ref="textWidthHelper" class="absolute invisible whitespace-nowrap">{{ inputValue }}</span>
