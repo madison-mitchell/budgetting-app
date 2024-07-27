@@ -18,6 +18,7 @@
                 >{{ transaction.type.substring(0, 1) }}</span
             >
             {{ transaction.merchant }}
+            <span class="tracking-tighter text-gray-300 text-xs ml-2 italic">**** {{ getLastFourDigits(transaction.accountId.accountNumber) }}</span>
         </td>
         <td class="pt-1 whitespace-nowrap text-right" :class="{ 'text-green-600': transaction.amount > 0 }">{{ formatBalance(transaction.amount) }}</td>
     </tr>
@@ -62,6 +63,9 @@ export default {
                 }
             }
             return `${day}${suffix}`;
+        },
+        getLastFourDigits(accountNumber) {
+            return accountNumber.slice(-4);
         },
     },
 };
