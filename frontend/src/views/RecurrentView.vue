@@ -6,20 +6,27 @@
         </div>
         <div v-if="errorMessage" class="text-red-500">{{ errorMessage }}</div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- <ExpenseCard v-for="expense in sortedExpenses" :key="expense.id" :expense="expense" :budget="getBudgetForCategory(expense.category.id)" /> -->
             <ExpenseCard v-for="expense in sortedExpenses" :key="expense.id" :expense="expense" />
         </div>
 
         <!-- Modal -->
-        <AddItemModal v-if="showModal" :show="showModal" itemType="Expense" :fields="expenseFields" @close="showModal = false" @add-item="handleAddExpense" />
+        <AddItemModal
+            v-if="showModal"
+            :show="showModal"
+            itemType="Expense"
+            :fields="expenseFields"
+            :categories="categories"
+            :accounts="accounts"
+            @close="showModal = false"
+            @add-item="handleAddExpense" />
     </div>
 </template>
 
 <script>
 import axios from 'axios';
-import { format, subMonths, addMonths } from 'date-fns';
+import { format } from 'date-fns';
 import authService from '@/services/authService';
-import ExpenseCard from '../components/ExpenseCard.vue';
+import ExpenseCard from '../components/recurrent/RecurrentCard.vue';
 import AddButton from '../components/AddButton.vue';
 import AddItemModal from '../components/AddItemModal.vue';
 
@@ -36,11 +43,36 @@ export default {
             showModal: false,
             errorMessage: '',
             selectedMonth: format(new Date(), 'yyyy-MM'),
+            categories: [],
+            accounts: [],
+            expenseFields: [
+                { name: 'name', label: 'Name', type: 'text', required: true },
+                { name: 'merchant', label: 'Merchant', type: 'text', required: false },
+                { name: 'amount', label: 'Amount', type: 'number', required: true },
+                { name: 'childCategoryName', label: 'Category', type: 'select', required: true, options: [] },
+                { name: 'totalBudget', label: 'Total Budget', type: 'number', required: false },
+                { name: 'notes', label: 'Notes', type: 'text', required: false },
+                { name: 'dueDate', label: 'Due Date', type: 'date', required: true },
+                { name: 'frequency', label: 'Frequency', type: 'text', required: false },
+                { name: 'myShareBudget', label: 'My Share Budget', type: 'number', required: false },
+                { name: 'accountId', label: 'Account ID', type: 'select', required: true, options: [] },
+                { name: 'myShare', label: 'My Share', type: 'number', required: false },
+                { name: 'paid', label: 'Paid', type: 'checkbox', required: false },
+                { name: 'paymentDate', label: 'Payment Date', type: 'date', required: false },
+                { name: 'reviewed', label: 'Reviewed', type: 'checkbox', required: false },
+                { name: 'sharedPartyName', label: 'Shared Party Name', type: 'text', required: false },
+                { name: 'recurring', label: 'Recurring', type: 'checkbox', required: false },
+                { name: 'otherPartyShare', label: 'Other Party Share', type: 'number', required: false },
+                { name: 'isSharedExpense', label: 'Shared Expense', type: 'checkbox', required: false },
+                { name: 'transactionId', label: 'Transaction ID', type: 'number', required: true },
+            ],
         };
     },
     mounted() {
         this.fetchExpenses();
         this.fetchBudgets();
+        this.fetchCategories();
+        this.fetchAccounts();
     },
     computed: {
         sortedExpenses() {
@@ -75,11 +107,38 @@ export default {
                     },
                 })
                 .then((response) => {
-                    // this.budgets = this.organizeCategories(response.data);
                     this.budgets = response.data;
                 })
                 .catch((error) => {
                     console.error('Failed to fetch budgets:', error);
+                });
+        },
+        fetchCategories() {
+            axios
+                .get('http://localhost:8080/api/categories/relation', {
+                    headers: {
+                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                    },
+                })
+                .then((response) => {
+                    this.categories = response.data.map((category) => ({ value: category.id, label: category.childCategory.name }));
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch categories:', error);
+                });
+        },
+        fetchAccounts() {
+            axios
+                .get('http://localhost:8080/api/accounts', {
+                    headers: {
+                        Authorization: 'Bearer ' + authService.getCurrentUser().jwt,
+                    },
+                })
+                .then((response) => {
+                    this.accounts = response.data.map((account) => ({ value: account.id, label: account.name }));
+                })
+                .catch((error) => {
+                    console.error('Failed to fetch accounts:', error);
                 });
         },
         sortExpensesByDueDate(expenses) {
@@ -88,12 +147,6 @@ export default {
                 const dateB = new Date(b.dueDate);
                 return dateA - dateB;
             });
-        },
-        getCategories() {
-            return [];
-        },
-        getBankAccounts() {
-            return [];
         },
         handleAddExpense(newExpense) {
             this.expenses.push(newExpense);
@@ -119,7 +172,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-/* Add any scoped styles here if needed */
-</style>

@@ -7,16 +7,28 @@
                 <button @click="$emit('close')" class="text-gray-500 hover:text-gray-800">&times;</button>
             </div>
             <form @submit.prevent="addItem">
-                <div v-for="field in fields" :key="field.name" class="mb-4">
-                    <label :class="fieldClass">{{ field.label }}</label>
-                    <input v-if="field.type !== 'select'" v-model="itemData[field.name]" :type="field.type" :class="inputClass" :required="field.required" />
-                    <select v-else v-model="itemData[field.name]" :class="inputClass" :required="field.required">
-                        <option v-for="option in field.options" :key="option.value" :value="option.value">
-                            {{ option.label }}
-                        </option>
-                    </select>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div v-for="field in fields" :key="field.name" class="mb-4 text-left">
+                        <label :class="fieldClass">
+                            {{ field.label }}
+                            <span v-if="field.required" class="text-red-500">*</span>
+                        </label>
+                        <input
+                            v-if="field.type !== 'select' && field.type !== 'checkbox'"
+                            v-model="itemData[field.name]"
+                            :type="field.type"
+                            :class="inputClass"
+                            :required="field.required"
+                            class="border border-0.5 rounded-md border-gray-200" />
+                        <input v-if="field.type === 'checkbox'" v-model="itemData[field.name]" type="checkbox" :class="inputClass" :required="field.required" />
+                        <select v-else-if="field.type === 'select'" v-model="itemData[field.name]" :class="inputClass" :required="field.required" class="border border-0.5 rounded-md border-gray-200">
+                            <option v-for="option in getOptions(field.name)" :key="option.value" :value="option.value">
+                                {{ option.label }}
+                            </option>
+                        </select>
+                    </div>
                 </div>
-                <div class="flex justify-end">
+                <div class="flex justify-end mt-4">
                     <button type="submit" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded">Add {{ itemType }}</button>
                 </div>
             </form>
@@ -42,13 +54,32 @@ export default {
             type: Array,
             required: true,
         },
+        categoryOptions: {
+            type: Array,
+            required: true,
+        },
+        accountOptions: {
+            type: Array,
+            required: true,
+        },
     },
     data() {
         return {
-            itemData: {},
+            itemData: this.initializeItemData(),
         };
     },
     methods: {
+        initializeItemData() {
+            const data = {};
+            this.fields.forEach((field) => {
+                if (field.type === 'checkbox') {
+                    data[field.name] = false;
+                } else {
+                    data[field.name] = '';
+                }
+            });
+            return data;
+        },
         addItem() {
             const endpoint = this.getEndpoint();
             axios
@@ -76,6 +107,24 @@ export default {
                 default:
                     throw new Error('Invalid item type');
             }
+        },
+        getOptions(fieldName) {
+            if (fieldName === 'childCategoryName') {
+                return this.categoryOptions;
+            }
+            if (fieldName === 'accountId') {
+                return this.accountOptions;
+            }
+            return [];
+        },
+    },
+    watch: {
+        fields: {
+            handler() {
+                this.itemData = this.initializeItemData();
+            },
+            immediate: true,
+            deep: true,
         },
     },
     computed: {
