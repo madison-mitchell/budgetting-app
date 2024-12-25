@@ -2,7 +2,7 @@
 <template>
     <div class="bg-white shadow-md border border-grey-50 rounded-lg p-6 flex flex-col justify-between">
         <div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">Bank Accounts</h3>
+            <h3 class="font-marker text-gray-800 text-xl mb-4 text-capitalize">Bank Accounts</h3>
 
             <table class="table-auto w-full">
                 <tbody>

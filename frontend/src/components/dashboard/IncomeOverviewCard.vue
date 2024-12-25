@@ -1,6 +1,6 @@
 <template>
     <div class="bg-white shadow-md border border-grey-50 rounded-lg p-4">
-        <h2 class="text-lg font-semibold mb-4">Income</h2>
+        <h2 class="font-marker text-gray-800 text-xl mb-4">Income</h2>
         <div class="mb-4">
             <div class="flex justify-between w-full items-center mb-4">
                 <h2 class="income-actual text-sm text-left w-20" :class="{ 'text-green-500': totalIncomeEarned >= estimatedIncome }">{{ formatAmount(totalIncomeEarned) }}</h2>

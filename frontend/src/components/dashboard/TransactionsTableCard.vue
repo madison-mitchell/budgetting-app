@@ -1,7 +1,7 @@
 <!-- src/components/dashboard/TransactionsTableCard.vue -->
 <template>
     <div class="flex flex-col h-full">
-        <h3 class="text-lg font-semibold text-gray-800 mt-4">Transactions to Review</h3>
+        <h3 class="font-marker text-xl text-gray-800 mt-4">Transactions to Review</h3>
         <div class="p-6 h-full flex flex-col justify-evenly">
             <table v-if="sortedTransactions.length > 0" class="w-full">
                 <TransactionRow v-for="transaction in sortedTransactions" :key="transaction.id" :transaction="transaction" />

@@ -3,7 +3,7 @@
         <SearchBox />
         <div class="flex-grow mt-10 overflow-auto">
             <div class="text-left">
-                <h2>MY ACCOUNTS</h2>
+                <h2 class="font-marker text-2xl">My Accounts</h2>
                 <div v-if="creditCards.length > 0">
                     <h3 class="mt-4 text-sm">Credit Cards</h3>
                     <div v-for="account in creditCards" :key="account.id" class="ml-2 text-xs flex justify-between">
@@ -42,8 +42,8 @@
         </div>
         <div class="flex justify-evenly mt-4">
             <router-link v-if="!isAuthenticated" to="/login" class="px-4 py-2 hover:text-sky-300">LOGIN</router-link>
-            <router-link v-else to="/profile" class="py-2 hover:text-sky-600">PROFILE</router-link>
-            <button v-if="isAuthenticated" @click="logout" class="py-2 hover:text-sky-300">
+            <router-link v-else to="/profile" class="py-2 hover:text-sky-100">PROFILE</router-link>
+            <button v-if="isAuthenticated" @click="logout" class="py-2 hover:text-sky-100">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </button>
         </div>
